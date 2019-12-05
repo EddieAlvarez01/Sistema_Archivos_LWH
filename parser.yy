@@ -113,6 +113,9 @@ class Mkdir* mkdir;
 %token<TEXT> ampersand;
 %token<TEXT> mayorQ;
 %token<TEXT> porcentaje;
+%token<TEXT> pallocation;
+%token<TEXT> pc;
+%token<TEXT> pix;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -135,6 +138,7 @@ class Mkdir* mkdir;
 %type<mkfs> PROPIEDADESMKFS;
 %type<TEXT> FORMAT;
 %type<TEXT> VALUE;
+%type<TEXT> ALLOCATION;
 %type<login> PROPIEDADESLOGIN;
 %type<rmgrp> PROPIEDADESRMGRP;
 %type<mkgrp> PROPIEDADESMKGRP;
@@ -185,33 +189,40 @@ AJUSTE : pbf { strcpy($$, "bf"); }
         |pff { strcpy($$, "ff"); }
         |pwf { strcpy($$, "wf"); };
 
-UNIDAD : pk { strcpy($$, "k"); }
+UNIDAD : pb { strcpy($$, "b"); }
+        |pk { strcpy($$, "k"); }
         |pm { strcpy($$, "m"); };
 
 PATH : cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }
       |id { strcpy($$, $1); };
 
-PROPIEDADESRM : guion ppath igual PATH { $$ = new Rmdisk(); $$->path = $4; };
+PROPIEDADESRM : ampersand ppath guion mayorQ PATH { $$ = new Rmdisk(); $$->path = $5; };
 
-PROPIEDADESFD : PROPIEDADESFD guion psize igual numero { $$ = $1; $$->size = std::stoi($5); }
-               |PROPIEDADESFD guion punit igual UNIDAD { $$ = $1; $$->unit = $5; }
-               |PROPIEDADESFD guion ppath igual PATH { $$ = $1; $$->path = $5; }
-               |PROPIEDADESFD guion ptype igual TYPE { $$ = $1; $$->type = $5; }
-               |PROPIEDADESFD guion pdetele igual DELETE { $$ = $1; $$->toDelete = $5; }
-               |PROPIEDADESFD guion pname igual PATH { $$ = $1; $$->name = $5; }
-               |PROPIEDADESFD guion padd igual E { $$ = $1; $$->add = $5; $$->isAdd = true; }
-               |PROPIEDADESFD guion pfit igual AJUSTE { $$ = $1; $$->fit = $5; }
-               |guion psize igual numero { $$ = new Fdisk(); $$->size = std::stoi($4); }
-               |guion punit igual UNIDAD { $$ = new Fdisk(); $$->unit = $4; }
-               |guion ppath igual PATH { $$ = new Fdisk(); $$->path = $4; }
-               |guion ptype igual TYPE { $$ = new Fdisk(); $$->type = $4; }
-               |guion pdetele igual DELETE { $$ = new Fdisk(); $$->toDelete = $4; }
-               |guion pname igual PATH { $$ = new Fdisk(); $$->name = $4; }
-               |guion padd igual E { $$ = new Fdisk(); $$->add = $4; $$->isAdd = true; }
-               |guion pfit igual AJUSTE { $$ = new Fdisk(); $$->fit = $4; };
+PROPIEDADESFD : PROPIEDADESFD ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
+               |PROPIEDADESFD porcentaje punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
+               |PROPIEDADESFD ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
+               |PROPIEDADESFD porcentaje ptype guion mayorQ TYPE { $$ = $1; $$->type = $6; }
+               |PROPIEDADESFD porcentaje pdetele guion mayorQ DELETE { $$ = $1; $$->toDelete = $6; }
+               |PROPIEDADESFD ampersand pname guion mayorQ PATH { $$ = $1; $$->name = $6; }
+               |PROPIEDADESFD porcentaje padd guion mayorQ E { $$ = $1; $$->add = $6; $$->isAdd = true; }
+               |PROPIEDADESFD porcentaje pfit guion mayorQ AJUSTE { $$ = $1; $$->fit = $6; }
+               |PROPIEDADESFD porcentaje pallocation guion mayorQ ALLOCATION { $$ = $1; $$->allocation = $6; }
+               |ampersand psize guion mayorQ numero { $$ = new Fdisk(); $$->size = std::stoi($5); }
+               |porcentaje punit guion mayorQ UNIDAD { $$ = new Fdisk(); $$->unit = $5; }
+               |ampersand ppath guion mayorQ PATH { $$ = new Fdisk(); $$->path = $5; }
+               |porcentaje ptype guion mayorQ TYPE { $$ = new Fdisk(); $$->type = $5; }
+               |porcentaje pdetele guion mayorQ DELETE { $$ = new Fdisk(); $$->toDelete = $5; }
+               |ampersand pname guion mayorQ PATH { $$ = new Fdisk(); $$->name = $5; }
+               |porcentaje padd guion mayorQ E { $$ = new Fdisk(); $$->add = $5; $$->isAdd = true; }
+               |porcentaje pfit guion mayorQ AJUSTE { $$ = new Fdisk(); $$->fit = $5; }
+               |porcentaje pallocation guion mayorQ ALLOCATION { $$ = new Fdisk(); $$->fit = $5; };
 
 DELETE : pfast { strcpy($$, "fast"); }
         |pfull { strcpy($$, "full"); };
+
+ALLOCATION : pc { strcpy($$, "c"); }
+            |pe { strcpy($$, "e"); }
+            |pix { strcpy($$, "ix"); };
 
 E : numero { $$ = std::stoi($1); }
    |guion numero { $$ = (-1) * std::stoi($2); };

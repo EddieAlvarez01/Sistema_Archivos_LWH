@@ -45,6 +45,7 @@ INITIAL
 "rmdisk" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return prmdisk;}
 "fdisk" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pfdisk;}
 "type" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return ptype;}
+"allocation" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pallocation;}
 "delete" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pdetele;}
 "name" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pname;}
 "add" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return padd;}
@@ -71,6 +72,8 @@ INITIAL
 "b" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pb;}
 "k" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pk;}
 "m" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pm;}
+"c" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pc;}
+"ix" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pix;}
 "bf" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pbf;}
 "ff" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pff;}
 "fs" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pfs;}

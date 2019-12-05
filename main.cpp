@@ -581,11 +581,11 @@ void Create_Partition_Primary(Fdisk *fd){
                         }
                         if(end <= mbr.mbr_size){
                             mbr.particions[parT].part_start = start;
-                            mbr.particions[parT].part_status = 1;
+                            mbr.particions[parT].part_status = 49;
                             strcpy(mbr.particions[parT].part_name, fd->name.c_str());
                             mbr.particions[parT].part_size = fd->size;
                             strcpy(mbr.particions[parT].part_fit, fd->fit.c_str());
-                            mbr.particions[parT].part_type == 80;
+                            mbr.particions[parT].part_type = 80;
                             cout << "Particion primaria '" + fd->name + "' creada exitosamente\n";
                             fseek(file, 0, SEEK_SET);
                             fwrite(&mbr, sizeof (Mbr), 1, file);
@@ -746,11 +746,10 @@ int main()
                                     }
                                 }else{
                                     Create_Partition_Primary(fd);
-                                    fd->path = Path_Raid(fd->path);
-                                    Create_Partition_Primary(fd);
                                 }
                             }else{
-                                cout << "Error: el parametro 'size' es obligatorio\n";                            }
+                                cout << "Error: el parametro 'size' es obligatorio\n";
+                            }
                         }
                     }else{
                         cout << "Error: el parametro 'name' es obligatorio\n";
