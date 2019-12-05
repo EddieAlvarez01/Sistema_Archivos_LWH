@@ -11,6 +11,7 @@ public:
     std::string fit;
     std::string unit;
     std::string path;
+    std::string name;
     Mkdisk();
 };
 

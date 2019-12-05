@@ -7,12 +7,12 @@ class Partition
 {
 public:
     Partition();
-    int part_status;
-    char part_type [5];
-    char part_fit [5];
+    char part_status;
+    char part_type;
+    char part_fit [3];
     int part_start;
     int part_size;
-    char part_name [30];
+    char part_name [16];
     char id [8];
 };
 

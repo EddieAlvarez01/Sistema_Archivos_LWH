@@ -12,7 +12,6 @@ public:
     int mbr_size;
     char dateTime [50];
     int mbr_disk_aignature;
-    char disk_fit [10];
     Partition particions[4];
     char id [8];
 };

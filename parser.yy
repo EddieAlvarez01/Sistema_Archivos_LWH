@@ -111,6 +111,8 @@ class Mkdir* mkdir;
 %token<TEXT> pcont;
 %token<TEXT> pmkdir;
 %token<TEXT> ampersand;
+%token<TEXT> mayorQ;
+%token<TEXT> porcentaje;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -170,21 +172,20 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |pmkdir PROPIEDADESMKDIR { listCommand.push_back($2); }
          |error;
 
-PROPIEDADESMK : PROPIEDADESMK guion psize igual numero { $$ = $1; $$->size = std::stoi($5); }
-               |PROPIEDADESMK guion pfit igual AJUSTE { $$ = $1; $$->fit = $5; }
-               |PROPIEDADESMK guion punit igual UNIDAD { $$ = $1; $$->unit = $5; }
-               |PROPIEDADESMK guion ppath igual PATH { $$ = $1; $$->path = $5; }
-               |guion psize igual numero { $$ =  new Mkdisk(); $$->size = std::stoi($4); }
-               |guion pfit igual AJUSTE { $$ =  new Mkdisk(); $$->fit = $4; }
-               |guion punit igual UNIDAD { $$ = new Mkdisk(); $$->unit = $4; }
-               |guion ppath igual PATH { $$ = new Mkdisk(); $$->path = $4; };
+PROPIEDADESMK : PROPIEDADESMK ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
+               |PROPIEDADESMK porcentaje punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
+               |PROPIEDADESMK ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
+               |PROPIEDADESMK ampersand pname guion mayorQ id { $$ = $1; $$->name = $6; }
+               |ampersand pname guion mayorQ id { $$ = new Mkdisk(); $$->name = $5; }
+               |ampersand psize guion mayorQ numero { $$ =  new Mkdisk(); $$->size = std::stoi($5); }
+               |porcentaje punit guion mayorQ UNIDAD { $$ = new Mkdisk(); $$->unit = $5; }
+               |ampersand ppath guion mayorQ PATH { $$ = new Mkdisk(); $$->path = $5; };
 
 AJUSTE : pbf { strcpy($$, "bf"); }
         |pff { strcpy($$, "ff"); }
         |pwf { strcpy($$, "wf"); };
 
-UNIDAD : pb { strcpy($$, "b"); }
-        |pk { strcpy($$, "k"); }
+UNIDAD : pk { strcpy($$, "k"); }
         |pm { strcpy($$, "m"); };
 
 PATH : cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }

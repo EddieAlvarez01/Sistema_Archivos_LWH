@@ -26,7 +26,7 @@ letra [a-zñA-ZÑ]+
 numero [0-9]+
 booleano ("verdadero"|"falso"|"true"|"false")
 decimal [0-9]+"."[0-9]+
-id ("\/"?({letra}|{numero}))+({letra}|{numero}|"_"|".")*
+id ("\/"?({letra}|{numero}))+({letra}|{numero}|"_"|"."|"\/")*
 cadena "\""[^"\""]*"\""
 
 
@@ -87,7 +87,9 @@ INITIAL
 {id} { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return id;}
 "=" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return igual;}
 "-"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return guion; }
+">"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return mayorQ; }
 "&"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return ampersand; }
+"%"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return porcentaje; }
 "\t"            {
                     strcpy(yylval.TEXT, yytext); columna=26;
                 }

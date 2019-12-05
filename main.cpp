@@ -46,9 +46,8 @@ char generateLetter = 'a';
 int Total_Disk_Size(string unit, int size){
     if(unit == "k"){
         return size *1024;
-    }else{
-        return size *1024*1024;
     }
+   return size *1024*1024;
 }
 
 int Random_Id(){
@@ -126,17 +125,12 @@ void Create_Disk_Wihout_fit(Mkdisk *mk){
     chain = to_string(now->tm_mday) + "-" + to_string((now->tm_mon+1)) + "-" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
     strcpy(newDisk.dateTime, chain.c_str());
     newDisk.mbr_disk_aignature = Random_Id();
-    if(mk->fit != ""){
-        strcpy(newDisk.disk_fit, mk->fit.c_str());
-    }else{
-        strcpy(newDisk.disk_fit, "ff");
-    }
     string adId = "vd" + string(1, generateLetter);
     generateLetter++;
     strcpy(newDisk.id, adId.c_str());
     Create_Directory(mk->path);
     if(!existDir(mk->path)){
-        FILE *file = fopen(mk->path.c_str(), "ab");
+        FILE *file = fopen(mk->path.c_str(), "w");
         if(file != nullptr){
             int fin = (mk->size/1024);
             char buffer[1024] = {0};
@@ -145,6 +139,7 @@ void Create_Disk_Wihout_fit(Mkdisk *mk){
                 fwrite(&buffer, 1024, 1, file);
                 j++;
             }
+            fclose(file);
             file = fopen(mk->path.c_str(), "rb+");
             fseek(file, 0, SEEK_SET);
             if(file != nullptr){
@@ -156,31 +151,6 @@ void Create_Disk_Wihout_fit(Mkdisk *mk){
             fclose(file);
         }else{
             cout << "Error al tratar de crear el archivo " + mk->path  + "\n"<< endl;
-        }
-        string pathRaid = Path_Raid(mk->path);
-        file = fopen(pathRaid.c_str(), "ab");
-        if(file != nullptr){
-            adId = "vd" + string(1, generateLetter);
-            generateLetter++;
-            strcpy(newDisk.id, adId.c_str());
-            int fin = (mk->size/1024);
-            char buffer[1024] = {0};
-            int j = 0;
-            while(j != fin){
-                fwrite(&buffer, 1024, 1, file);
-                j++;
-            }
-            file = fopen(pathRaid.c_str(), "rb+");
-            fseek(file, 0, SEEK_SET);
-            if(file != nullptr){
-                fwrite(&newDisk, sizeof(Mbr), 1, file);
-                cout << "\nDisco raid creado exitosamente\n" << endl;
-            }else{
-                cout << "Error al tratar de acceder al archivo raid " + pathRaid + "\n" << endl;
-            }
-            fclose(file);
-        }else{
-            cout << "Error al tratar de crear el archivo " + pathRaid << endl;
         }
     }else{
         cout << "\nError al crear el disco" << endl;
@@ -262,14 +232,13 @@ void Msg_Disk(Mbr mbr, FILE *file, string nameD){
     cout << "\nDisco: " + nameD + "\n";
     cout << "Tamaño total: " + to_string(mbr.mbr_size) + " bytes\n";
     cout << "Fecha de Creacion: " + string(mbr.dateTime) + "\n";
-    cout << "Ajuste: " + string(mbr.disk_fit) + "\n";
     int pP = 0;
     int pE = 0;
     int pL = 0;
     for(int x=0; x<4; x++){
-        if(strcmp(mbr.particions[x].part_type, "p") == 0){
+        if(mbr.particions[x].part_type == 80){
             pP++;
-        }else if(strcmp(mbr.particions[x].part_type, "e") == 0){
+        }else if(mbr.particions[x].part_type == 69){
             pE++;
             Ebr ebr;
             fseek(file, mbr.particions[x].part_start, SEEK_SET);
@@ -283,11 +252,11 @@ void Msg_Disk(Mbr mbr, FILE *file, string nameD){
 
 bool Name_Equal_Partition(string name, Mbr mbr, FILE *ff){
     for(int x=0; x<4; x++){
-        if(strcmp(mbr.particions[x].part_type, "p") == 0){
+        if(mbr.particions[x].part_type == 80){
             if(strcmp(name.c_str(), mbr.particions[x].part_name) == 0){
                 return true;
             }
-        }else if(strcmp(mbr.particions[x].part_type, "l") == 0 || strcmp(mbr.particions[x].part_type, "e") == 0){
+        }else if(mbr.particions[x].part_type == 76 || mbr.particions[x].part_type == 69){
             if(strcmp(mbr.particions[x].part_name, name.c_str()) == 0){
                 return true;
             }else{
@@ -335,7 +304,7 @@ void Delete_Partition(Fdisk *fd){
                         isValid = true;
                         int index = Position_Partition(mbr, fd->name);
                         mbr.particions[index].part_status = 0;
-                        strcpy(mbr.particions[index].part_type, "");
+                        mbr.particions[index].part_type = 0;
                         strcpy(mbr.particions[index].part_fit, "");
                         mbr.particions[index].part_start = -1;
                         mbr.particions[index].part_size = 0;
@@ -407,7 +376,7 @@ void addUnits(Fdisk *fd){
             Msg_Disk(mbr, file, NameDisk(fd->path));
             bool error = false;
             for(int x=0; x<4; x++){
-                if(strcmp(mbr.particions[x].part_type, "e") == 0){
+                if(mbr.particions[x].part_type == 69){
                     if(strcmp(mbr.particions[x].part_name, fd->name.c_str()) == 0){
                         error = false;
                         int ss = Disk_Space(mbr);
@@ -516,7 +485,7 @@ bool Partiton_Disk_Space(Mbr mbr, int sizea){
 
 bool Exist_Extended(Mbr mbr){
     for(int x=0; x<4; x++){
-        if(strcmp(mbr.particions[x].part_type, "e") == 0){
+        if(mbr.particions[x].part_type == 69){
             return true;
         }
     }
@@ -553,7 +522,7 @@ void Create_Partition_Extended(Fdisk *fd){
                                 strcpy(mbr.particions[parT].part_name, fd->name.c_str());
                                 mbr.particions[parT].part_size = fd->size;
                                 strcpy(mbr.particions[parT].part_fit, fd->fit.c_str());
-                                strcpy(mbr.particions[parT].part_type, "e");
+                                mbr.particions[parT].part_type == 69;
                                 Ebr ebr;
                                 fseek(file, mbr.particions[parT].part_start, SEEK_SET);
                                 fwrite(&ebr, sizeof (Ebr), 1, file);
@@ -616,7 +585,7 @@ void Create_Partition_Primary(Fdisk *fd){
                             strcpy(mbr.particions[parT].part_name, fd->name.c_str());
                             mbr.particions[parT].part_size = fd->size;
                             strcpy(mbr.particions[parT].part_fit, fd->fit.c_str());
-                            strcpy(mbr.particions[parT].part_type, "p");
+                            mbr.particions[parT].part_type == 80;
                             cout << "Particion primaria '" + fd->name + "' creada exitosamente\n";
                             fseek(file, 0, SEEK_SET);
                             fwrite(&mbr, sizeof (Mbr), 1, file);
@@ -689,6 +658,14 @@ string Path_To_Report(string path){
     return pp;
 }
 
+bool hasExtension(string name){
+    string ext = name.substr(name.length() - 4, 4);
+    if(ext == ".dsk"){
+        return true;
+    }
+    return false;
+}
+
 
 int main()
 {
@@ -712,12 +689,25 @@ int main()
         list<Command*> :: iterator it;
         for(it = listCommand.begin(); it != listCommand.end(); ++it){
             if(Mkdisk *mk = dynamic_cast<Mkdisk*>((*it))){
-                if(mk->size != -1){
-                    if(mk->path != ""){
-                        mk->size = Total_Disk_Size(mk->unit, mk->size);
-                        Create_Disk_Wihout_fit(mk);
+                if(mk->size > 0){
+                    if(mk->size % 8 == 0){
+                        if(mk->path != ""){
+                            if(mk->name != ""){
+                                if(hasExtension(mk->name)){
+                                    mk->path += mk->name;
+                                    mk->size = Total_Disk_Size(mk->unit, mk->size);
+                                    Create_Disk_Wihout_fit(mk);
+                                }else{
+                                    cout << "Error: el nombre no contiene la extension '.dsk'\n";
+                                }
+                            }else{
+                                cout << "Error: el 'name' es obligatorio\n";
+                            }
+                        }else{
+                            cout << "Error: el 'path' es obligatorio" << endl;
+                        }
                     }else{
-                        cout << "Error: el 'path' es obligatorio" << endl;
+                        cout << "Error: el tamaño debe ser multiplo de 8\n";
                     }
                 }else{
                     cout << "Error: el tamaño es obligatorio" << endl;

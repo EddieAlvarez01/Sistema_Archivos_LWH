@@ -98,7 +98,9 @@ extern int yydebug;
     pmkfile = 308,
     pcont = 309,
     pmkdir = 310,
-    ampersand = 311
+    ampersand = 311,
+    mayorQ = 312,
+    porcentaje = 313
   };
 #endif
 
@@ -128,7 +130,7 @@ class Chmod* chmod;
 class Mkfile* mkfile;
 class Mkdir* mkdir;
 
-#line 132 "parser.h" /* yacc.c:1909  */
+#line 134 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

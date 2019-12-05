@@ -23,10 +23,6 @@ void Plotter::Plot_Mbr(Mbr mbr, std::string nameDisk, std::string path){
             std::string("<TD>mbr_disk_signature</TD>\n") +
             "<TD>" + std::to_string(mbr.mbr_disk_aignature) + "</TD>\n" +
             std::string("</TR>\n");
-    body += "<TR>\n" +
-            std::string("<TD>Disk_fit</TD>\n") +
-            "<TD>" + mbr.disk_fit + "</TD>\n" +
-            std::string("</TR>\n");
     for(int x=0; x<4; x++){
         if(mbr.particions[x].part_start != -1){
             body += "<TR>\n" +
@@ -90,9 +86,9 @@ void Plotter::Plot_Disk(Mbr mbr, std::string path, int space){
     for(int x=0; x<4; x++){
         body += "<TD>";
         if(mbr.particions[x].part_start != -1){
-            if(strcmp(mbr.particions[x].part_type, "p") == 0){
+            if(mbr.particions[x].part_type == 80){
                 body += "Primaria<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco";
-            }else if(strcmp(mbr.particions[x].part_type, "e") == 0){
+            }else if(mbr.particions[x].part_type == 69){
                 body += "Extendida<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco";
             }
         }else{

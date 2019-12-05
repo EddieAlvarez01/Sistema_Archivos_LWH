@@ -7,5 +7,6 @@ Mkdisk::Mkdisk()
     fit = "";
     unit = "";
     path = "";
+    name = "";
 
 }
