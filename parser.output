@@ -1,3 +1,8 @@
+Terminales no usados en la gramática
+
+   porcentaje
+
+
 Gramática
 
     0 $accept: INICIO $end
@@ -27,12 +32,12 @@ Gramática
    21        | error
 
    22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion mayorQ numero
-   23              | PROPIEDADESMK porcentaje punit guion mayorQ UNIDAD
+   23              | PROPIEDADESMK ampersand punit guion mayorQ UNIDAD
    24              | PROPIEDADESMK ampersand ppath guion mayorQ PATH
    25              | PROPIEDADESMK ampersand pname guion mayorQ id
    26              | ampersand pname guion mayorQ id
    27              | ampersand psize guion mayorQ numero
-   28              | porcentaje punit guion mayorQ UNIDAD
+   28              | ampersand punit guion mayorQ UNIDAD
    29              | ampersand ppath guion mayorQ PATH
 
    30 AJUSTE: pbf
@@ -49,23 +54,23 @@ Gramática
    38 PROPIEDADESRM: ampersand ppath guion mayorQ PATH
 
    39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion mayorQ numero
-   40              | PROPIEDADESFD porcentaje punit guion mayorQ UNIDAD
+   40              | PROPIEDADESFD ampersand punit guion mayorQ UNIDAD
    41              | PROPIEDADESFD ampersand ppath guion mayorQ PATH
-   42              | PROPIEDADESFD porcentaje ptype guion mayorQ TYPE
-   43              | PROPIEDADESFD porcentaje pdetele guion mayorQ DELETE
+   42              | PROPIEDADESFD ampersand ptype guion mayorQ TYPE
+   43              | PROPIEDADESFD ampersand pdetele guion mayorQ DELETE
    44              | PROPIEDADESFD ampersand pname guion mayorQ PATH
-   45              | PROPIEDADESFD porcentaje padd guion mayorQ E
-   46              | PROPIEDADESFD porcentaje pfit guion mayorQ AJUSTE
-   47              | PROPIEDADESFD porcentaje pallocation guion mayorQ ALLOCATION
+   45              | PROPIEDADESFD ampersand padd guion mayorQ E
+   46              | PROPIEDADESFD ampersand pfit guion mayorQ AJUSTE
+   47              | PROPIEDADESFD ampersand pallocation guion mayorQ ALLOCATION
    48              | ampersand psize guion mayorQ numero
-   49              | porcentaje punit guion mayorQ UNIDAD
+   49              | ampersand punit guion mayorQ UNIDAD
    50              | ampersand ppath guion mayorQ PATH
-   51              | porcentaje ptype guion mayorQ TYPE
-   52              | porcentaje pdetele guion mayorQ DELETE
+   51              | ampersand ptype guion mayorQ TYPE
+   52              | ampersand pdetele guion mayorQ DELETE
    53              | ampersand pname guion mayorQ PATH
-   54              | porcentaje padd guion mayorQ E
-   55              | porcentaje pfit guion mayorQ AJUSTE
-   56              | porcentaje pallocation guion mayorQ ALLOCATION
+   54              | ampersand padd guion mayorQ E
+   55              | ampersand pfit guion mayorQ AJUSTE
+   56              | ampersand pallocation guion mayorQ ALLOCATION
 
    57 DELETE: pfast
    58       | pfull
@@ -219,10 +224,11 @@ pugo (307) 108 111
 pmkfile (308) 19
 pcont (309) 116 120
 pmkdir (310) 20
-ampersand (311) 22 24 25 26 27 29 38 39 41 44 48 50 53
+ampersand (311) 22 23 24 25 26 27 28 29 38 39 40 41 42 43 44 45 46
+    47 48 49 50 51 52 53 54 55 56
 mayorQ (312) 22 23 24 25 26 27 28 29 38 39 40 41 42 43 44 45 46 47
     48 49 50 51 52 53 54 55 56
-porcentaje (313) 23 28 40 42 43 45 46 47 49 51 52 54 55 56
+porcentaje (313)
 pallocation (314) 47 56
 pc (315) 59
 pix (316) 61
@@ -339,83 +345,81 @@ Estado 2
 
     4 COMANDO: pmkdisk . PROPIEDADESMK
 
-    ampersand   desplazar e ir al estado 22
-    porcentaje  desplazar e ir al estado 23
+    ampersand  desplazar e ir al estado 22
 
-    PROPIEDADESMK  ir al estado 24
+    PROPIEDADESMK  ir al estado 23
 
 
 Estado 3
 
     5 COMANDO: prmdisk . PROPIEDADESRM
 
-    ampersand  desplazar e ir al estado 25
+    ampersand  desplazar e ir al estado 24
 
-    PROPIEDADESRM  ir al estado 26
+    PROPIEDADESRM  ir al estado 25
 
 
 Estado 4
 
     6 COMANDO: pfdisk . PROPIEDADESFD
 
-    ampersand   desplazar e ir al estado 27
-    porcentaje  desplazar e ir al estado 28
+    ampersand  desplazar e ir al estado 26
 
-    PROPIEDADESFD  ir al estado 29
+    PROPIEDADESFD  ir al estado 27
 
 
 Estado 5
 
     7 COMANDO: pmount . PROPIEDADESMOUNT
 
-    guion  desplazar e ir al estado 30
+    guion  desplazar e ir al estado 28
 
-    PROPIEDADESMOUNT  ir al estado 31
+    PROPIEDADESMOUNT  ir al estado 29
 
 
 Estado 6
 
     8 COMANDO: punmount . PROPIEDADESUNMOUNT
 
-    pid  desplazar e ir al estado 32
+    pid  desplazar e ir al estado 30
 
-    PROPIEDADESUNMOUNT  ir al estado 33
+    PROPIEDADESUNMOUNT  ir al estado 31
 
 
 Estado 7
 
     9 COMANDO: prep . PROPIEDADESREP
 
-    guion  desplazar e ir al estado 34
+    guion  desplazar e ir al estado 32
 
-    PROPIEDADESREP  ir al estado 35
+    PROPIEDADESREP  ir al estado 33
 
 
 Estado 8
 
    10 COMANDO: pexec . PROPIEDADESEXEC
 
-    guion  desplazar e ir al estado 36
+    guion  desplazar e ir al estado 34
 
-    PROPIEDADESEXEC  ir al estado 37
+    PROPIEDADESEXEC  ir al estado 35
 
 
 Estado 9
 
    11 COMANDO: pmkfs . PROPIEDADESMKFS
 
-    guion  desplazar e ir al estado 38
+    guion  desplazar e ir al estado 36
 
-    PROPIEDADESMKFS  ir al estado 39
+    PROPIEDADESMKFS  ir al estado 37
 
 
 Estado 10
 
    12 COMANDO: plogin . PROPIEDADESLOGIN
 
-    guion  desplazar e ir al estado 40
+    guion  desplazar e ir al estado 38
 
-    PROPIEDADESLOGIN  ir al estado 41
+    PROPIEDADESLOGIN  ir al estado 39
 
 
 Estado 11
@@ -429,70 +433,70 @@ Estado 12
 
    15 COMANDO: prmgrp . PROPIEDADESRMGRP
 
-    guion  desplazar e ir al estado 42
+    guion  desplazar e ir al estado 40
 
-    PROPIEDADESRMGRP  ir al estado 43
+    PROPIEDADESRMGRP  ir al estado 41
 
 
 Estado 13
 
    14 COMANDO: pmkgrp . PROPIEDADESMKGRP
 
-    guion  desplazar e ir al estado 44
+    guion  desplazar e ir al estado 42
 
-    PROPIEDADESMKGRP  ir al estado 45
+    PROPIEDADESMKGRP  ir al estado 43
 
 
 Estado 14
 
    16 COMANDO: pmkusr . PROPIEDADESMKUSR
 
-    guion  desplazar e ir al estado 46
+    guion  desplazar e ir al estado 44
 
-    PROPIEDADESMKUSR  ir al estado 47
+    PROPIEDADESMKUSR  ir al estado 45
 
 
 Estado 15
 
    17 COMANDO: prmusr . PROPIEDADESRMUSR
 
-    guion  desplazar e ir al estado 48
+    guion  desplazar e ir al estado 46
 
-    PROPIEDADESRMUSR  ir al estado 49
+    PROPIEDADESRMUSR  ir al estado 47
 
 
 Estado 16
 
    18 COMANDO: pchmod . PROPIEDADESCHMOD
 
-    guion  desplazar e ir al estado 50
+    guion  desplazar e ir al estado 48
 
-    PROPIEDADESCHMOD  ir al estado 51
+    PROPIEDADESCHMOD  ir al estado 49
 
 
 Estado 17
 
    19 COMANDO: pmkfile . PROPIEDADESMKFILE
 
-    guion  desplazar e ir al estado 52
+    guion  desplazar e ir al estado 50
 
-    PROPIEDADESMKFILE  ir al estado 53
+    PROPIEDADESMKFILE  ir al estado 51
 
 
 Estado 18
 
    20 COMANDO: pmkdir . PROPIEDADESMKDIR
 
-    guion  desplazar e ir al estado 54
+    guion  desplazar e ir al estado 52
 
-    PROPIEDADESMKDIR  ir al estado 55
+    PROPIEDADESMKDIR  ir al estado 53
 
 
 Estado 19
 
     0 $accept: INICIO . $end
 
-    $end  desplazar e ir al estado 56
+    $end  desplazar e ir al estado 54
 
 
 Estado 20
@@ -521,7 +525,7 @@ Estado 20
 
     $end  reduce usando la regla 1 (INICIO)
 
-    COMANDO  ir al estado 57
+    COMANDO  ir al estado 55
 
 
 Estado 21
@@ -535,314 +539,302 @@ Estado 22
 
    26 PROPIEDADESMK: ampersand . pname guion mayorQ id
    27              | ampersand . psize guion mayorQ numero
+   28              | ampersand . punit guion mayorQ UNIDAD
    29              | ampersand . ppath guion mayorQ PATH
 
-    psize  desplazar e ir al estado 58
-    ppath  desplazar e ir al estado 59
-    pname  desplazar e ir al estado 60
+    psize  desplazar e ir al estado 56
+    punit  desplazar e ir al estado 57
+    ppath  desplazar e ir al estado 58
+    pname  desplazar e ir al estado 59
 
 
 Estado 23
 
-   28 PROPIEDADESMK: porcentaje . punit guion mayorQ UNIDAD
-
-    punit  desplazar e ir al estado 61
-
-
-Estado 24
-
     4 COMANDO: pmkdisk PROPIEDADESMK .
    22 PROPIEDADESMK: PROPIEDADESMK . ampersand psize guion mayorQ numero
-   23              | PROPIEDADESMK . porcentaje punit guion mayorQ UNIDAD
+   23              | PROPIEDADESMK . ampersand punit guion mayorQ UNIDAD
    24              | PROPIEDADESMK . ampersand ppath guion mayorQ PATH
    25              | PROPIEDADESMK . ampersand pname guion mayorQ id
 
-    ampersand   desplazar e ir al estado 62
-    porcentaje  desplazar e ir al estado 63
+    ampersand  desplazar e ir al estado 60
 
     $default  reduce usando la regla 4 (COMANDO)
 
 
-Estado 25
+Estado 24
 
    38 PROPIEDADESRM: ampersand . ppath guion mayorQ PATH
 
-    ppath  desplazar e ir al estado 64
+    ppath  desplazar e ir al estado 61
 
 
-Estado 26
+Estado 25
 
     5 COMANDO: prmdisk PROPIEDADESRM .
 
     $default  reduce usando la regla 5 (COMANDO)
 
 
-Estado 27
+Estado 26
 
    48 PROPIEDADESFD: ampersand . psize guion mayorQ numero
+   49              | ampersand . punit guion mayorQ UNIDAD
    50              | ampersand . ppath guion mayorQ PATH
+   51              | ampersand . ptype guion mayorQ TYPE
+   52              | ampersand . pdetele guion mayorQ DELETE
    53              | ampersand . pname guion mayorQ PATH
+   54              | ampersand . padd guion mayorQ E
+   55              | ampersand . pfit guion mayorQ AJUSTE
+   56              | ampersand . pallocation guion mayorQ ALLOCATION
 
-    psize  desplazar e ir al estado 65
-    ppath  desplazar e ir al estado 66
-    pname  desplazar e ir al estado 67
-
-
-Estado 28
-
-   49 PROPIEDADESFD: porcentaje . punit guion mayorQ UNIDAD
-   51              | porcentaje . ptype guion mayorQ TYPE
-   52              | porcentaje . pdetele guion mayorQ DELETE
-   54              | porcentaje . padd guion mayorQ E
-   55              | porcentaje . pfit guion mayorQ AJUSTE
-   56              | porcentaje . pallocation guion mayorQ ALLOCATION
-
-    pfit         desplazar e ir al estado 68
-    punit        desplazar e ir al estado 69
-    ptype        desplazar e ir al estado 70
-    pdetele      desplazar e ir al estado 71
-    padd         desplazar e ir al estado 72
-    pallocation  desplazar e ir al estado 73
+    psize        desplazar e ir al estado 62
+    pfit         desplazar e ir al estado 63
+    punit        desplazar e ir al estado 64
+    ppath        desplazar e ir al estado 65
+    ptype        desplazar e ir al estado 66
+    pdetele      desplazar e ir al estado 67
+    pname        desplazar e ir al estado 68
+    padd         desplazar e ir al estado 69
+    pallocation  desplazar e ir al estado 70
 
 
-Estado 29
+Estado 27
 
     6 COMANDO: pfdisk PROPIEDADESFD .
    39 PROPIEDADESFD: PROPIEDADESFD . ampersand psize guion mayorQ numero
-   40              | PROPIEDADESFD . porcentaje punit guion mayorQ UNIDAD
+   40              | PROPIEDADESFD . ampersand punit guion mayorQ UNIDAD
    41              | PROPIEDADESFD . ampersand ppath guion mayorQ PATH
-   42              | PROPIEDADESFD . porcentaje ptype guion mayorQ TYPE
-   43              | PROPIEDADESFD . porcentaje pdetele guion mayorQ DELETE
+   42              | PROPIEDADESFD . ampersand ptype guion mayorQ TYPE
+   43              | PROPIEDADESFD . ampersand pdetele guion mayorQ DELETE
    44              | PROPIEDADESFD . ampersand pname guion mayorQ PATH
-   45              | PROPIEDADESFD . porcentaje padd guion mayorQ E
-   46              | PROPIEDADESFD . porcentaje pfit guion mayorQ AJUSTE
-   47              | PROPIEDADESFD . porcentaje pallocation guion mayorQ ALLOCATION
+   45              | PROPIEDADESFD . ampersand padd guion mayorQ E
+   46              | PROPIEDADESFD . ampersand pfit guion mayorQ AJUSTE
+   47              | PROPIEDADESFD . ampersand pallocation guion mayorQ ALLOCATION
 
-    ampersand   desplazar e ir al estado 74
-    porcentaje  desplazar e ir al estado 75
+    ampersand  desplazar e ir al estado 71
 
     $default  reduce usando la regla 6 (COMANDO)
 
 
-Estado 30
+Estado 28
 
    69 PROPIEDADESMOUNT: guion . ppath igual PATH
    70                 | guion . pname igual PATH
 
-    ppath  desplazar e ir al estado 76
-    pname  desplazar e ir al estado 77
+    ppath  desplazar e ir al estado 72
+    pname  desplazar e ir al estado 73
 
 
-Estado 31
+Estado 29
 
     7 COMANDO: pmount PROPIEDADESMOUNT .
    67 PROPIEDADESMOUNT: PROPIEDADESMOUNT . guion ppath igual PATH
    68                 | PROPIEDADESMOUNT . guion pname igual PATH
 
-    guion  desplazar e ir al estado 78
+    guion  desplazar e ir al estado 74
 
     $default  reduce usando la regla 7 (COMANDO)
 
 
-Estado 32
+Estado 30
 
    71 PROPIEDADESUNMOUNT: pid . igual id
 
-    igual  desplazar e ir al estado 79
+    igual  desplazar e ir al estado 75
 
 
-Estado 33
+Estado 31
 
     8 COMANDO: punmount PROPIEDADESUNMOUNT .
 
     $default  reduce usando la regla 8 (COMANDO)
 
 
-Estado 34
+Estado 32
 
    75 PROPIEDADESREP: guion . pname igual NAME
    76               | guion . ppath igual PATH
    77               | guion . pid igual id
 
-    ppath  desplazar e ir al estado 80
-    pname  desplazar e ir al estado 81
-    pid    desplazar e ir al estado 82
+    ppath  desplazar e ir al estado 76
+    pname  desplazar e ir al estado 77
+    pid    desplazar e ir al estado 78
 
 
-Estado 35
+Estado 33
 
     9 COMANDO: prep PROPIEDADESREP .
    72 PROPIEDADESREP: PROPIEDADESREP . guion pname igual NAME
    73               | PROPIEDADESREP . guion ppath igual PATH
    74               | PROPIEDADESREP . guion pid igual id
 
-    guion  desplazar e ir al estado 83
+    guion  desplazar e ir al estado 79
 
     $default  reduce usando la regla 9 (COMANDO)
 
 
-Estado 36
+Estado 34
 
    85 PROPIEDADESEXEC: guion . ppath igual PATH
 
-    ppath  desplazar e ir al estado 84
+    ppath  desplazar e ir al estado 80
 
 
-Estado 37
+Estado 35
 
    10 COMANDO: pexec PROPIEDADESEXEC .
 
     $default  reduce usando la regla 10 (COMANDO)
 
 
-Estado 38
+Estado 36
 
    89 PROPIEDADESMKFS: guion . pid igual id
    90                | guion . ptype igual DELETE
    91                | guion . pfs igual FORMAT
 
-    ptype  desplazar e ir al estado 85
-    pid    desplazar e ir al estado 86
-    pfs    desplazar e ir al estado 87
+    ptype  desplazar e ir al estado 81
+    pid    desplazar e ir al estado 82
+    pfs    desplazar e ir al estado 83
 
 
-Estado 39
+Estado 37
 
    11 COMANDO: pmkfs PROPIEDADESMKFS .
    86 PROPIEDADESMKFS: PROPIEDADESMKFS . guion pid igual id
    87                | PROPIEDADESMKFS . guion ptype igual DELETE
    88                | PROPIEDADESMKFS . guion pfs igual FORMAT
 
-    guion  desplazar e ir al estado 88
+    guion  desplazar e ir al estado 84
 
     $default  reduce usando la regla 11 (COMANDO)
 
 
-Estado 40
+Estado 38
 
    95 PROPIEDADESLOGIN: guion . pusr igual PATH
    96                 | guion . ppwd igual VALUE
    97                 | guion . pid igual id
 
-    pid   desplazar e ir al estado 89
-    pusr  desplazar e ir al estado 90
-    ppwd  desplazar e ir al estado 91
+    pid   desplazar e ir al estado 85
+    pusr  desplazar e ir al estado 86
+    ppwd  desplazar e ir al estado 87
 
 
-Estado 41
+Estado 39
 
    12 COMANDO: plogin PROPIEDADESLOGIN .
    92 PROPIEDADESLOGIN: PROPIEDADESLOGIN . guion pusr igual PATH
    93                 | PROPIEDADESLOGIN . guion ppwd igual VALUE
    94                 | PROPIEDADESLOGIN . guion pid igual id
 
-    guion  desplazar e ir al estado 92
+    guion  desplazar e ir al estado 88
 
     $default  reduce usando la regla 12 (COMANDO)
 
 
-Estado 42
+Estado 40
 
    98 PROPIEDADESRMGRP: guion . pname igual PATH
 
-    pname  desplazar e ir al estado 93
+    pname  desplazar e ir al estado 89
 
 
-Estado 43
+Estado 41
 
    15 COMANDO: prmgrp PROPIEDADESRMGRP .
 
     $default  reduce usando la regla 15 (COMANDO)
 
 
-Estado 44
+Estado 42
 
    99 PROPIEDADESMKGRP: guion . pname igual PATH
 
-    pname  desplazar e ir al estado 94
+    pname  desplazar e ir al estado 90
 
 
-Estado 45
+Estado 43
 
    14 COMANDO: pmkgrp PROPIEDADESMKGRP .
 
     $default  reduce usando la regla 14 (COMANDO)
 
 
-Estado 46
+Estado 44
 
   103 PROPIEDADESMKUSR: guion . pusr igual VALUE
   104                 | guion . ppwd igual VALUE
   105                 | guion . pgrp igual VALUE
 
-    pusr  desplazar e ir al estado 95
-    ppwd  desplazar e ir al estado 96
-    pgrp  desplazar e ir al estado 97
+    pusr  desplazar e ir al estado 91
+    ppwd  desplazar e ir al estado 92
+    pgrp  desplazar e ir al estado 93
 
 
-Estado 47
+Estado 45
 
    16 COMANDO: pmkusr PROPIEDADESMKUSR .
   100 PROPIEDADESMKUSR: PROPIEDADESMKUSR . guion pusr igual VALUE
   101                 | PROPIEDADESMKUSR . guion ppwd igual VALUE
   102                 | PROPIEDADESMKUSR . guion pgrp igual VALUE
 
-    guion  desplazar e ir al estado 98
+    guion  desplazar e ir al estado 94
 
     $default  reduce usando la regla 16 (COMANDO)
 
 
-Estado 48
+Estado 46
 
   106 PROPIEDADESRMUSR: guion . pusr igual PATH
 
-    pusr  desplazar e ir al estado 99
+    pusr  desplazar e ir al estado 95
 
 
-Estado 49
+Estado 47
 
    17 COMANDO: prmusr PROPIEDADESRMUSR .
 
     $default  reduce usando la regla 17 (COMANDO)
 
 
-Estado 50
+Estado 48
 
   110 PROPIEDADESCHMOD: guion . ppath igual PATH
   111                 | guion . pugo igual numero
   112                 | guion . pr
 
-    ppath  desplazar e ir al estado 100
-    pr     desplazar e ir al estado 101
-    pugo   desplazar e ir al estado 102
+    ppath  desplazar e ir al estado 96
+    pr     desplazar e ir al estado 97
+    pugo   desplazar e ir al estado 98
 
 
-Estado 51
+Estado 49
 
    18 COMANDO: pchmod PROPIEDADESCHMOD .
   107 PROPIEDADESCHMOD: PROPIEDADESCHMOD . guion ppath igual PATH
   108                 | PROPIEDADESCHMOD . guion pugo igual numero
   109                 | PROPIEDADESCHMOD . guion pr
 
-    guion  desplazar e ir al estado 103
+    guion  desplazar e ir al estado 99
 
     $default  reduce usando la regla 18 (COMANDO)
 
 
-Estado 52
+Estado 50
 
   117 PROPIEDADESMKFILE: guion . ppath igual PATH
   118                  | guion . pp
   119                  | guion . psize igual numero
   120                  | guion . pcont igual PATH
 
-    psize  desplazar e ir al estado 104
-    ppath  desplazar e ir al estado 105
-    pp     desplazar e ir al estado 106
-    pcont  desplazar e ir al estado 107
+    psize  desplazar e ir al estado 100
+    ppath  desplazar e ir al estado 101
+    pp     desplazar e ir al estado 102
+    pcont  desplazar e ir al estado 103
 
 
-Estado 53
+Estado 51
 
    19 COMANDO: pmkfile PROPIEDADESMKFILE .
   113 PROPIEDADESMKFILE: PROPIEDADESMKFILE . guion ppath igual PATH
@@ -850,544 +842,562 @@ Estado 53
   115                  | PROPIEDADESMKFILE . guion psize igual numero
   116                  | PROPIEDADESMKFILE . guion pcont igual PATH
 
-    guion  desplazar e ir al estado 108
+    guion  desplazar e ir al estado 104
 
     $default  reduce usando la regla 19 (COMANDO)
 
 
-Estado 54
+Estado 52
 
   123 PROPIEDADESMKDIR: guion . ppath igual PATH
   124                 | guion . pp
 
-    ppath  desplazar e ir al estado 109
-    pp     desplazar e ir al estado 110
+    ppath  desplazar e ir al estado 105
+    pp     desplazar e ir al estado 106
 
 
-Estado 55
+Estado 53
 
    20 COMANDO: pmkdir PROPIEDADESMKDIR .
   121 PROPIEDADESMKDIR: PROPIEDADESMKDIR . guion ppath igual PATH
   122                 | PROPIEDADESMKDIR . guion pp
 
-    guion  desplazar e ir al estado 111
+    guion  desplazar e ir al estado 107
 
     $default  reduce usando la regla 20 (COMANDO)
 
 
-Estado 56
+Estado 54
 
     0 $accept: INICIO $end .
 
     $default  aceptar
 
 
-Estado 57
+Estado 55
 
     2 LCOMANDOS: LCOMANDOS COMANDO .
 
     $default  reduce usando la regla 2 (LCOMANDOS)
 
 
-Estado 58
+Estado 56
 
    27 PROPIEDADESMK: ampersand psize . guion mayorQ numero
 
-    guion  desplazar e ir al estado 112
+    guion  desplazar e ir al estado 108
+
+
+Estado 57
+
+   28 PROPIEDADESMK: ampersand punit . guion mayorQ UNIDAD
+
+    guion  desplazar e ir al estado 109
+
+
+Estado 58
+
+   29 PROPIEDADESMK: ampersand ppath . guion mayorQ PATH
+
+    guion  desplazar e ir al estado 110
 
 
 Estado 59
 
-   29 PROPIEDADESMK: ampersand ppath . guion mayorQ PATH
+   26 PROPIEDADESMK: ampersand pname . guion mayorQ id
 
-    guion  desplazar e ir al estado 113
+    guion  desplazar e ir al estado 111
 
 
 Estado 60
 
-   26 PROPIEDADESMK: ampersand pname . guion mayorQ id
+   22 PROPIEDADESMK: PROPIEDADESMK ampersand . psize guion mayorQ numero
+   23              | PROPIEDADESMK ampersand . punit guion mayorQ UNIDAD
+   24              | PROPIEDADESMK ampersand . ppath guion mayorQ PATH
+   25              | PROPIEDADESMK ampersand . pname guion mayorQ id
 
-    guion  desplazar e ir al estado 114
+    psize  desplazar e ir al estado 112
+    punit  desplazar e ir al estado 113
+    ppath  desplazar e ir al estado 114
+    pname  desplazar e ir al estado 115
 
 
 Estado 61
 
-   28 PROPIEDADESMK: porcentaje punit . guion mayorQ UNIDAD
+   38 PROPIEDADESRM: ampersand ppath . guion mayorQ PATH
 
-    guion  desplazar e ir al estado 115
+    guion  desplazar e ir al estado 116
 
 
 Estado 62
 
-   22 PROPIEDADESMK: PROPIEDADESMK ampersand . psize guion mayorQ numero
-   24              | PROPIEDADESMK ampersand . ppath guion mayorQ PATH
-   25              | PROPIEDADESMK ampersand . pname guion mayorQ id
+   48 PROPIEDADESFD: ampersand psize . guion mayorQ numero
 
-    psize  desplazar e ir al estado 116
-    ppath  desplazar e ir al estado 117
-    pname  desplazar e ir al estado 118
+    guion  desplazar e ir al estado 117
 
 
 Estado 63
 
-   23 PROPIEDADESMK: PROPIEDADESMK porcentaje . punit guion mayorQ UNIDAD
+   55 PROPIEDADESFD: ampersand pfit . guion mayorQ AJUSTE
 
-    punit  desplazar e ir al estado 119
+    guion  desplazar e ir al estado 118
 
 
 Estado 64
 
-   38 PROPIEDADESRM: ampersand ppath . guion mayorQ PATH
+   49 PROPIEDADESFD: ampersand punit . guion mayorQ UNIDAD
 
-    guion  desplazar e ir al estado 120
+    guion  desplazar e ir al estado 119
 
 
 Estado 65
 
-   48 PROPIEDADESFD: ampersand psize . guion mayorQ numero
+   50 PROPIEDADESFD: ampersand ppath . guion mayorQ PATH
 
-    guion  desplazar e ir al estado 121
+    guion  desplazar e ir al estado 120
 
 
 Estado 66
 
-   50 PROPIEDADESFD: ampersand ppath . guion mayorQ PATH
+   51 PROPIEDADESFD: ampersand ptype . guion mayorQ TYPE
+
+    guion  desplazar e ir al estado 121
+
+
+Estado 67
+
+   52 PROPIEDADESFD: ampersand pdetele . guion mayorQ DELETE
 
     guion  desplazar e ir al estado 122
 
 
-Estado 67
+Estado 68
 
    53 PROPIEDADESFD: ampersand pname . guion mayorQ PATH
 
     guion  desplazar e ir al estado 123
 
 
-Estado 68
+Estado 69
 
-   55 PROPIEDADESFD: porcentaje pfit . guion mayorQ AJUSTE
+   54 PROPIEDADESFD: ampersand padd . guion mayorQ E
 
     guion  desplazar e ir al estado 124
 
 
-Estado 69
+Estado 70
 
-   49 PROPIEDADESFD: porcentaje punit . guion mayorQ UNIDAD
+   56 PROPIEDADESFD: ampersand pallocation . guion mayorQ ALLOCATION
 
     guion  desplazar e ir al estado 125
 
 
-Estado 70
-
-   51 PROPIEDADESFD: porcentaje ptype . guion mayorQ TYPE
-
-    guion  desplazar e ir al estado 126
-
-
 Estado 71
 
-   52 PROPIEDADESFD: porcentaje pdetele . guion mayorQ DELETE
+   39 PROPIEDADESFD: PROPIEDADESFD ampersand . psize guion mayorQ numero
+   40              | PROPIEDADESFD ampersand . punit guion mayorQ UNIDAD
+   41              | PROPIEDADESFD ampersand . ppath guion mayorQ PATH
+   42              | PROPIEDADESFD ampersand . ptype guion mayorQ TYPE
+   43              | PROPIEDADESFD ampersand . pdetele guion mayorQ DELETE
+   44              | PROPIEDADESFD ampersand . pname guion mayorQ PATH
+   45              | PROPIEDADESFD ampersand . padd guion mayorQ E
+   46              | PROPIEDADESFD ampersand . pfit guion mayorQ AJUSTE
+   47              | PROPIEDADESFD ampersand . pallocation guion mayorQ ALLOCATION
 
-    guion  desplazar e ir al estado 127
+    psize        desplazar e ir al estado 126
+    pfit         desplazar e ir al estado 127
+    punit        desplazar e ir al estado 128
+    ppath        desplazar e ir al estado 129
+    ptype        desplazar e ir al estado 130
+    pdetele      desplazar e ir al estado 131
+    pname        desplazar e ir al estado 132
+    padd         desplazar e ir al estado 133
+    pallocation  desplazar e ir al estado 134
 
 
 Estado 72
 
-   54 PROPIEDADESFD: porcentaje padd . guion mayorQ E
+   69 PROPIEDADESMOUNT: guion ppath . igual PATH
 
-    guion  desplazar e ir al estado 128
+    igual  desplazar e ir al estado 135
 
 
 Estado 73
 
-   56 PROPIEDADESFD: porcentaje pallocation . guion mayorQ ALLOCATION
+   70 PROPIEDADESMOUNT: guion pname . igual PATH
 
-    guion  desplazar e ir al estado 129
+    igual  desplazar e ir al estado 136
 
 
 Estado 74
 
-   39 PROPIEDADESFD: PROPIEDADESFD ampersand . psize guion mayorQ numero
-   41              | PROPIEDADESFD ampersand . ppath guion mayorQ PATH
-   44              | PROPIEDADESFD ampersand . pname guion mayorQ PATH
+   67 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion . ppath igual PATH
+   68                 | PROPIEDADESMOUNT guion . pname igual PATH
 
-    psize  desplazar e ir al estado 130
-    ppath  desplazar e ir al estado 131
-    pname  desplazar e ir al estado 132
+    ppath  desplazar e ir al estado 137
+    pname  desplazar e ir al estado 138
 
 
 Estado 75
 
-   40 PROPIEDADESFD: PROPIEDADESFD porcentaje . punit guion mayorQ UNIDAD
-   42              | PROPIEDADESFD porcentaje . ptype guion mayorQ TYPE
-   43              | PROPIEDADESFD porcentaje . pdetele guion mayorQ DELETE
-   45              | PROPIEDADESFD porcentaje . padd guion mayorQ E
-   46              | PROPIEDADESFD porcentaje . pfit guion mayorQ AJUSTE
-   47              | PROPIEDADESFD porcentaje . pallocation guion mayorQ ALLOCATION
+   71 PROPIEDADESUNMOUNT: pid igual . id
 
-    pfit         desplazar e ir al estado 133
-    punit        desplazar e ir al estado 134
-    ptype        desplazar e ir al estado 135
-    pdetele      desplazar e ir al estado 136
-    padd         desplazar e ir al estado 137
-    pallocation  desplazar e ir al estado 138
+    id  desplazar e ir al estado 139
 
 
 Estado 76
 
-   69 PROPIEDADESMOUNT: guion ppath . igual PATH
-
-    igual  desplazar e ir al estado 139
-
-
-Estado 77
-
-   70 PROPIEDADESMOUNT: guion pname . igual PATH
+   76 PROPIEDADESREP: guion ppath . igual PATH
 
     igual  desplazar e ir al estado 140
 
 
-Estado 78
-
-   67 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion . ppath igual PATH
-   68                 | PROPIEDADESMOUNT guion . pname igual PATH
-
-    ppath  desplazar e ir al estado 141
-    pname  desplazar e ir al estado 142
-
-
-Estado 79
-
-   71 PROPIEDADESUNMOUNT: pid igual . id
-
-    id  desplazar e ir al estado 143
-
-
-Estado 80
-
-   76 PROPIEDADESREP: guion ppath . igual PATH
-
-    igual  desplazar e ir al estado 144
-
-
-Estado 81
+Estado 77
 
    75 PROPIEDADESREP: guion pname . igual NAME
 
-    igual  desplazar e ir al estado 145
+    igual  desplazar e ir al estado 141
 
 
-Estado 82
+Estado 78
 
    77 PROPIEDADESREP: guion pid . igual id
 
-    igual  desplazar e ir al estado 146
+    igual  desplazar e ir al estado 142
 
 
-Estado 83
+Estado 79
 
    72 PROPIEDADESREP: PROPIEDADESREP guion . pname igual NAME
    73               | PROPIEDADESREP guion . ppath igual PATH
    74               | PROPIEDADESREP guion . pid igual id
 
-    ppath  desplazar e ir al estado 147
-    pname  desplazar e ir al estado 148
-    pid    desplazar e ir al estado 149
+    ppath  desplazar e ir al estado 143
+    pname  desplazar e ir al estado 144
+    pid    desplazar e ir al estado 145
 
 
-Estado 84
+Estado 80
 
    85 PROPIEDADESEXEC: guion ppath . igual PATH
 
-    igual  desplazar e ir al estado 150
+    igual  desplazar e ir al estado 146
 
 
-Estado 85
+Estado 81
 
    90 PROPIEDADESMKFS: guion ptype . igual DELETE
 
-    igual  desplazar e ir al estado 151
+    igual  desplazar e ir al estado 147
 
 
-Estado 86
+Estado 82
 
    89 PROPIEDADESMKFS: guion pid . igual id
 
-    igual  desplazar e ir al estado 152
+    igual  desplazar e ir al estado 148
 
 
-Estado 87
+Estado 83
 
    91 PROPIEDADESMKFS: guion pfs . igual FORMAT
 
-    igual  desplazar e ir al estado 153
+    igual  desplazar e ir al estado 149
 
 
-Estado 88
+Estado 84
 
    86 PROPIEDADESMKFS: PROPIEDADESMKFS guion . pid igual id
    87                | PROPIEDADESMKFS guion . ptype igual DELETE
    88                | PROPIEDADESMKFS guion . pfs igual FORMAT
 
-    ptype  desplazar e ir al estado 154
-    pid    desplazar e ir al estado 155
-    pfs    desplazar e ir al estado 156
+    ptype  desplazar e ir al estado 150
+    pid    desplazar e ir al estado 151
+    pfs    desplazar e ir al estado 152
 
 
-Estado 89
+Estado 85
 
    97 PROPIEDADESLOGIN: guion pid . igual id
 
-    igual  desplazar e ir al estado 157
+    igual  desplazar e ir al estado 153
 
 
-Estado 90
+Estado 86
 
    95 PROPIEDADESLOGIN: guion pusr . igual PATH
 
-    igual  desplazar e ir al estado 158
+    igual  desplazar e ir al estado 154
 
 
-Estado 91
+Estado 87
 
    96 PROPIEDADESLOGIN: guion ppwd . igual VALUE
 
-    igual  desplazar e ir al estado 159
+    igual  desplazar e ir al estado 155
 
 
-Estado 92
+Estado 88
 
    92 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion . pusr igual PATH
    93                 | PROPIEDADESLOGIN guion . ppwd igual VALUE
    94                 | PROPIEDADESLOGIN guion . pid igual id
 
-    pid   desplazar e ir al estado 160
-    pusr  desplazar e ir al estado 161
-    ppwd  desplazar e ir al estado 162
+    pid   desplazar e ir al estado 156
+    pusr  desplazar e ir al estado 157
+    ppwd  desplazar e ir al estado 158
+
+
+Estado 89
+
+   98 PROPIEDADESRMGRP: guion pname . igual PATH
+
+    igual  desplazar e ir al estado 159
+
+
+Estado 90
+
+   99 PROPIEDADESMKGRP: guion pname . igual PATH
+
+    igual  desplazar e ir al estado 160
+
+
+Estado 91
+
+  103 PROPIEDADESMKUSR: guion pusr . igual VALUE
+
+    igual  desplazar e ir al estado 161
+
+
+Estado 92
+
+  104 PROPIEDADESMKUSR: guion ppwd . igual VALUE
+
+    igual  desplazar e ir al estado 162
 
 
 Estado 93
 
-   98 PROPIEDADESRMGRP: guion pname . igual PATH
+  105 PROPIEDADESMKUSR: guion pgrp . igual VALUE
 
     igual  desplazar e ir al estado 163
 
 
 Estado 94
 
-   99 PROPIEDADESMKGRP: guion pname . igual PATH
-
-    igual  desplazar e ir al estado 164
-
-
-Estado 95
-
-  103 PROPIEDADESMKUSR: guion pusr . igual VALUE
-
-    igual  desplazar e ir al estado 165
-
-
-Estado 96
-
-  104 PROPIEDADESMKUSR: guion ppwd . igual VALUE
-
-    igual  desplazar e ir al estado 166
-
-
-Estado 97
-
-  105 PROPIEDADESMKUSR: guion pgrp . igual VALUE
-
-    igual  desplazar e ir al estado 167
-
-
-Estado 98
-
   100 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion . pusr igual VALUE
   101                 | PROPIEDADESMKUSR guion . ppwd igual VALUE
   102                 | PROPIEDADESMKUSR guion . pgrp igual VALUE
 
-    pusr  desplazar e ir al estado 168
-    ppwd  desplazar e ir al estado 169
-    pgrp  desplazar e ir al estado 170
+    pusr  desplazar e ir al estado 164
+    ppwd  desplazar e ir al estado 165
+    pgrp  desplazar e ir al estado 166
 
 
-Estado 99
+Estado 95
 
   106 PROPIEDADESRMUSR: guion pusr . igual PATH
 
-    igual  desplazar e ir al estado 171
+    igual  desplazar e ir al estado 167
 
 
-Estado 100
+Estado 96
 
   110 PROPIEDADESCHMOD: guion ppath . igual PATH
 
-    igual  desplazar e ir al estado 172
+    igual  desplazar e ir al estado 168
 
 
-Estado 101
+Estado 97
 
   112 PROPIEDADESCHMOD: guion pr .
 
     $default  reduce usando la regla 112 (PROPIEDADESCHMOD)
 
 
-Estado 102
+Estado 98
 
   111 PROPIEDADESCHMOD: guion pugo . igual numero
 
-    igual  desplazar e ir al estado 173
+    igual  desplazar e ir al estado 169
 
 
-Estado 103
+Estado 99
 
   107 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion . ppath igual PATH
   108                 | PROPIEDADESCHMOD guion . pugo igual numero
   109                 | PROPIEDADESCHMOD guion . pr
 
-    ppath  desplazar e ir al estado 174
-    pr     desplazar e ir al estado 175
-    pugo   desplazar e ir al estado 176
+    ppath  desplazar e ir al estado 170
+    pr     desplazar e ir al estado 171
+    pugo   desplazar e ir al estado 172
 
 
-Estado 104
+Estado 100
 
   119 PROPIEDADESMKFILE: guion psize . igual numero
 
-    igual  desplazar e ir al estado 177
+    igual  desplazar e ir al estado 173
 
 
-Estado 105
+Estado 101
 
   117 PROPIEDADESMKFILE: guion ppath . igual PATH
 
-    igual  desplazar e ir al estado 178
+    igual  desplazar e ir al estado 174
 
 
-Estado 106
+Estado 102
 
   118 PROPIEDADESMKFILE: guion pp .
 
     $default  reduce usando la regla 118 (PROPIEDADESMKFILE)
 
 
-Estado 107
+Estado 103
 
   120 PROPIEDADESMKFILE: guion pcont . igual PATH
 
-    igual  desplazar e ir al estado 179
+    igual  desplazar e ir al estado 175
 
 
-Estado 108
+Estado 104
 
   113 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion . ppath igual PATH
   114                  | PROPIEDADESMKFILE guion . pp
   115                  | PROPIEDADESMKFILE guion . psize igual numero
   116                  | PROPIEDADESMKFILE guion . pcont igual PATH
 
-    psize  desplazar e ir al estado 180
-    ppath  desplazar e ir al estado 181
-    pp     desplazar e ir al estado 182
-    pcont  desplazar e ir al estado 183
+    psize  desplazar e ir al estado 176
+    ppath  desplazar e ir al estado 177
+    pp     desplazar e ir al estado 178
+    pcont  desplazar e ir al estado 179
 
 
-Estado 109
+Estado 105
 
   123 PROPIEDADESMKDIR: guion ppath . igual PATH
 
-    igual  desplazar e ir al estado 184
+    igual  desplazar e ir al estado 180
 
 
-Estado 110
+Estado 106
 
   124 PROPIEDADESMKDIR: guion pp .
 
     $default  reduce usando la regla 124 (PROPIEDADESMKDIR)
 
 
-Estado 111
+Estado 107
 
   121 PROPIEDADESMKDIR: PROPIEDADESMKDIR guion . ppath igual PATH
   122                 | PROPIEDADESMKDIR guion . pp
 
-    ppath  desplazar e ir al estado 185
-    pp     desplazar e ir al estado 186
+    ppath  desplazar e ir al estado 181
+    pp     desplazar e ir al estado 182
+
+
+Estado 108
+
+   27 PROPIEDADESMK: ampersand psize guion . mayorQ numero
+
+    mayorQ  desplazar e ir al estado 183
+
+
+Estado 109
+
+   28 PROPIEDADESMK: ampersand punit guion . mayorQ UNIDAD
+
+    mayorQ  desplazar e ir al estado 184
+
+
+Estado 110
+
+   29 PROPIEDADESMK: ampersand ppath guion . mayorQ PATH
+
+    mayorQ  desplazar e ir al estado 185
+
+
+Estado 111
+
+   26 PROPIEDADESMK: ampersand pname guion . mayorQ id
+
+    mayorQ  desplazar e ir al estado 186
 
 
 Estado 112
 
-   27 PROPIEDADESMK: ampersand psize guion . mayorQ numero
+   22 PROPIEDADESMK: PROPIEDADESMK ampersand psize . guion mayorQ numero
 
-    mayorQ  desplazar e ir al estado 187
+    guion  desplazar e ir al estado 187
 
 
 Estado 113
 
-   29 PROPIEDADESMK: ampersand ppath guion . mayorQ PATH
+   23 PROPIEDADESMK: PROPIEDADESMK ampersand punit . guion mayorQ UNIDAD
 
-    mayorQ  desplazar e ir al estado 188
+    guion  desplazar e ir al estado 188
 
 
 Estado 114
 
-   26 PROPIEDADESMK: ampersand pname guion . mayorQ id
+   24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath . guion mayorQ PATH
 
-    mayorQ  desplazar e ir al estado 189
+    guion  desplazar e ir al estado 189
 
 
 Estado 115
 
-   28 PROPIEDADESMK: porcentaje punit guion . mayorQ UNIDAD
+   25 PROPIEDADESMK: PROPIEDADESMK ampersand pname . guion mayorQ id
 
-    mayorQ  desplazar e ir al estado 190
+    guion  desplazar e ir al estado 190
 
 
 Estado 116
 
-   22 PROPIEDADESMK: PROPIEDADESMK ampersand psize . guion mayorQ numero
+   38 PROPIEDADESRM: ampersand ppath guion . mayorQ PATH
 
-    guion  desplazar e ir al estado 191
+    mayorQ  desplazar e ir al estado 191
 
 
 Estado 117
 
-   24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath . guion mayorQ PATH
+   48 PROPIEDADESFD: ampersand psize guion . mayorQ numero
 
-    guion  desplazar e ir al estado 192
+    mayorQ  desplazar e ir al estado 192
 
 
 Estado 118
 
-   25 PROPIEDADESMK: PROPIEDADESMK ampersand pname . guion mayorQ id
+   55 PROPIEDADESFD: ampersand pfit guion . mayorQ AJUSTE
 
-    guion  desplazar e ir al estado 193
+    mayorQ  desplazar e ir al estado 193
 
 
 Estado 119
 
-   23 PROPIEDADESMK: PROPIEDADESMK porcentaje punit . guion mayorQ UNIDAD
+   49 PROPIEDADESFD: ampersand punit guion . mayorQ UNIDAD
 
-    guion  desplazar e ir al estado 194
+    mayorQ  desplazar e ir al estado 194
 
 
 Estado 120
 
-   38 PROPIEDADESRM: ampersand ppath guion . mayorQ PATH
+   50 PROPIEDADESFD: ampersand ppath guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 195
 
 
 Estado 121
 
-   48 PROPIEDADESFD: ampersand psize guion . mayorQ numero
+   51 PROPIEDADESFD: ampersand ptype guion . mayorQ TYPE
 
     mayorQ  desplazar e ir al estado 196
 
 
 Estado 122
 
-   50 PROPIEDADESFD: ampersand ppath guion . mayorQ PATH
+   52 PROPIEDADESFD: ampersand pdetele guion . mayorQ DELETE
 
     mayorQ  desplazar e ir al estado 197
 
@@ -1401,56 +1411,56 @@ Estado 123
 
 Estado 124
 
-   55 PROPIEDADESFD: porcentaje pfit guion . mayorQ AJUSTE
+   54 PROPIEDADESFD: ampersand padd guion . mayorQ E
 
     mayorQ  desplazar e ir al estado 199
 
 
 Estado 125
 
-   49 PROPIEDADESFD: porcentaje punit guion . mayorQ UNIDAD
+   56 PROPIEDADESFD: ampersand pallocation guion . mayorQ ALLOCATION
 
     mayorQ  desplazar e ir al estado 200
 
 
 Estado 126
 
-   51 PROPIEDADESFD: porcentaje ptype guion . mayorQ TYPE
+   39 PROPIEDADESFD: PROPIEDADESFD ampersand psize . guion mayorQ numero
 
-    mayorQ  desplazar e ir al estado 201
+    guion  desplazar e ir al estado 201
 
 
 Estado 127
 
-   52 PROPIEDADESFD: porcentaje pdetele guion . mayorQ DELETE
+   46 PROPIEDADESFD: PROPIEDADESFD ampersand pfit . guion mayorQ AJUSTE
 
-    mayorQ  desplazar e ir al estado 202
+    guion  desplazar e ir al estado 202
 
 
 Estado 128
 
-   54 PROPIEDADESFD: porcentaje padd guion . mayorQ E
+   40 PROPIEDADESFD: PROPIEDADESFD ampersand punit . guion mayorQ UNIDAD
 
-    mayorQ  desplazar e ir al estado 203
+    guion  desplazar e ir al estado 203
 
 
 Estado 129
 
-   56 PROPIEDADESFD: porcentaje pallocation guion . mayorQ ALLOCATION
+   41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath . guion mayorQ PATH
 
-    mayorQ  desplazar e ir al estado 204
+    guion  desplazar e ir al estado 204
 
 
 Estado 130
 
-   39 PROPIEDADESFD: PROPIEDADESFD ampersand psize . guion mayorQ numero
+   42 PROPIEDADESFD: PROPIEDADESFD ampersand ptype . guion mayorQ TYPE
 
     guion  desplazar e ir al estado 205
 
 
 Estado 131
 
-   41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath . guion mayorQ PATH
+   43 PROPIEDADESFD: PROPIEDADESFD ampersand pdetele . guion mayorQ DELETE
 
     guion  desplazar e ir al estado 206
 
@@ -1464,617 +1474,617 @@ Estado 132
 
 Estado 133
 
-   46 PROPIEDADESFD: PROPIEDADESFD porcentaje pfit . guion mayorQ AJUSTE
+   45 PROPIEDADESFD: PROPIEDADESFD ampersand padd . guion mayorQ E
 
     guion  desplazar e ir al estado 208
 
 
 Estado 134
 
-   40 PROPIEDADESFD: PROPIEDADESFD porcentaje punit . guion mayorQ UNIDAD
+   47 PROPIEDADESFD: PROPIEDADESFD ampersand pallocation . guion mayorQ ALLOCATION
 
     guion  desplazar e ir al estado 209
 
 
 Estado 135
 
-   42 PROPIEDADESFD: PROPIEDADESFD porcentaje ptype . guion mayorQ TYPE
+   69 PROPIEDADESMOUNT: guion ppath igual . PATH
 
-    guion  desplazar e ir al estado 210
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 212
 
 
 Estado 136
 
-   43 PROPIEDADESFD: PROPIEDADESFD porcentaje pdetele . guion mayorQ DELETE
+   70 PROPIEDADESMOUNT: guion pname igual . PATH
 
-    guion  desplazar e ir al estado 211
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 213
 
 
 Estado 137
 
-   45 PROPIEDADESFD: PROPIEDADESFD porcentaje padd . guion mayorQ E
+   67 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion ppath . igual PATH
 
-    guion  desplazar e ir al estado 212
+    igual  desplazar e ir al estado 214
 
 
 Estado 138
 
-   47 PROPIEDADESFD: PROPIEDADESFD porcentaje pallocation . guion mayorQ ALLOCATION
+   68 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion pname . igual PATH
 
-    guion  desplazar e ir al estado 213
+    igual  desplazar e ir al estado 215
 
 
 Estado 139
-
-   69 PROPIEDADESMOUNT: guion ppath igual . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 216
-
-
-Estado 140
-
-   70 PROPIEDADESMOUNT: guion pname igual . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 217
-
-
-Estado 141
-
-   67 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion ppath . igual PATH
-
-    igual  desplazar e ir al estado 218
-
-
-Estado 142
-
-   68 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion pname . igual PATH
-
-    igual  desplazar e ir al estado 219
-
-
-Estado 143
 
    71 PROPIEDADESUNMOUNT: pid igual id .
 
     $default  reduce usando la regla 71 (PROPIEDADESUNMOUNT)
 
 
-Estado 144
+Estado 140
 
    76 PROPIEDADESREP: guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 220
+    PATH  ir al estado 216
+
+
+Estado 141
+
+   75 PROPIEDADESREP: guion pname igual . NAME
+
+    pmbr   desplazar e ir al estado 217
+    pdisk  desplazar e ir al estado 218
+
+    NAME  ir al estado 219
+
+
+Estado 142
+
+   77 PROPIEDADESREP: guion pid igual . id
+
+    id  desplazar e ir al estado 220
+
+
+Estado 143
+
+   73 PROPIEDADESREP: PROPIEDADESREP guion ppath . igual PATH
+
+    igual  desplazar e ir al estado 221
+
+
+Estado 144
+
+   72 PROPIEDADESREP: PROPIEDADESREP guion pname . igual NAME
+
+    igual  desplazar e ir al estado 222
 
 
 Estado 145
 
-   75 PROPIEDADESREP: guion pname igual . NAME
+   74 PROPIEDADESREP: PROPIEDADESREP guion pid . igual id
 
-    pmbr   desplazar e ir al estado 221
-    pdisk  desplazar e ir al estado 222
-
-    NAME  ir al estado 223
+    igual  desplazar e ir al estado 223
 
 
 Estado 146
 
-   77 PROPIEDADESREP: guion pid igual . id
+   85 PROPIEDADESEXEC: guion ppath igual . PATH
 
-    id  desplazar e ir al estado 224
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 224
 
 
 Estado 147
 
-   73 PROPIEDADESREP: PROPIEDADESREP guion ppath . igual PATH
+   90 PROPIEDADESMKFS: guion ptype igual . DELETE
 
-    igual  desplazar e ir al estado 225
+    pfast  desplazar e ir al estado 225
+    pfull  desplazar e ir al estado 226
+
+    DELETE  ir al estado 227
 
 
 Estado 148
 
-   72 PROPIEDADESREP: PROPIEDADESREP guion pname . igual NAME
+   89 PROPIEDADESMKFS: guion pid igual . id
 
-    igual  desplazar e ir al estado 226
+    id  desplazar e ir al estado 228
 
 
 Estado 149
 
-   74 PROPIEDADESREP: PROPIEDADESREP guion pid . igual id
+   91 PROPIEDADESMKFS: guion pfs igual . FORMAT
 
-    igual  desplazar e ir al estado 227
+    p2fs  desplazar e ir al estado 229
+    p3fs  desplazar e ir al estado 230
+
+    FORMAT  ir al estado 231
 
 
 Estado 150
 
-   85 PROPIEDADESEXEC: guion ppath igual . PATH
+   87 PROPIEDADESMKFS: PROPIEDADESMKFS guion ptype . igual DELETE
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 228
+    igual  desplazar e ir al estado 232
 
 
 Estado 151
 
-   90 PROPIEDADESMKFS: guion ptype igual . DELETE
+   86 PROPIEDADESMKFS: PROPIEDADESMKFS guion pid . igual id
 
-    pfast  desplazar e ir al estado 229
-    pfull  desplazar e ir al estado 230
-
-    DELETE  ir al estado 231
+    igual  desplazar e ir al estado 233
 
 
 Estado 152
 
-   89 PROPIEDADESMKFS: guion pid igual . id
+   88 PROPIEDADESMKFS: PROPIEDADESMKFS guion pfs . igual FORMAT
 
-    id  desplazar e ir al estado 232
+    igual  desplazar e ir al estado 234
 
 
 Estado 153
 
-   91 PROPIEDADESMKFS: guion pfs igual . FORMAT
+   97 PROPIEDADESLOGIN: guion pid igual . id
 
-    p2fs  desplazar e ir al estado 233
-    p3fs  desplazar e ir al estado 234
-
-    FORMAT  ir al estado 235
+    id  desplazar e ir al estado 235
 
 
 Estado 154
 
-   87 PROPIEDADESMKFS: PROPIEDADESMKFS guion ptype . igual DELETE
+   95 PROPIEDADESLOGIN: guion pusr igual . PATH
 
-    igual  desplazar e ir al estado 236
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 236
 
 
 Estado 155
 
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS guion pid . igual id
+   96 PROPIEDADESLOGIN: guion ppwd igual . VALUE
 
-    igual  desplazar e ir al estado 237
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
+
+    VALUE  ir al estado 240
 
 
 Estado 156
 
-   88 PROPIEDADESMKFS: PROPIEDADESMKFS guion pfs . igual FORMAT
+   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pid . igual id
 
-    igual  desplazar e ir al estado 238
+    igual  desplazar e ir al estado 241
 
 
 Estado 157
 
-   97 PROPIEDADESLOGIN: guion pid igual . id
+   92 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pusr . igual PATH
 
-    id  desplazar e ir al estado 239
+    igual  desplazar e ir al estado 242
 
 
 Estado 158
 
-   95 PROPIEDADESLOGIN: guion pusr igual . PATH
+   93 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion ppwd . igual VALUE
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 240
+    igual  desplazar e ir al estado 243
 
 
 Estado 159
 
-   96 PROPIEDADESLOGIN: guion ppwd igual . VALUE
+   98 PROPIEDADESRMGRP: guion pname igual . PATH
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    VALUE  ir al estado 244
+    PATH  ir al estado 244
 
 
 Estado 160
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pid . igual id
+   99 PROPIEDADESMKGRP: guion pname igual . PATH
 
-    igual  desplazar e ir al estado 245
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 245
 
 
 Estado 161
 
-   92 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pusr . igual PATH
+  103 PROPIEDADESMKUSR: guion pusr igual . VALUE
 
-    igual  desplazar e ir al estado 246
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
+
+    VALUE  ir al estado 246
 
 
 Estado 162
 
-   93 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion ppwd . igual VALUE
+  104 PROPIEDADESMKUSR: guion ppwd igual . VALUE
 
-    igual  desplazar e ir al estado 247
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
+
+    VALUE  ir al estado 247
 
 
 Estado 163
 
-   98 PROPIEDADESRMGRP: guion pname igual . PATH
+  105 PROPIEDADESMKUSR: guion pgrp igual . VALUE
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
 
-    PATH  ir al estado 248
+    VALUE  ir al estado 248
 
 
 Estado 164
 
-   99 PROPIEDADESMKGRP: guion pname igual . PATH
+  100 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pusr . igual VALUE
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 249
+    igual  desplazar e ir al estado 249
 
 
 Estado 165
 
-  103 PROPIEDADESMKUSR: guion pusr igual . VALUE
+  101 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion ppwd . igual VALUE
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
-
-    VALUE  ir al estado 250
+    igual  desplazar e ir al estado 250
 
 
 Estado 166
 
-  104 PROPIEDADESMKUSR: guion ppwd igual . VALUE
+  102 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pgrp . igual VALUE
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
-
-    VALUE  ir al estado 251
+    igual  desplazar e ir al estado 251
 
 
 Estado 167
 
-  105 PROPIEDADESMKUSR: guion pgrp igual . VALUE
+  106 PROPIEDADESRMUSR: guion pusr igual . PATH
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    VALUE  ir al estado 252
+    PATH  ir al estado 252
 
 
 Estado 168
 
-  100 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pusr . igual VALUE
+  110 PROPIEDADESCHMOD: guion ppath igual . PATH
 
-    igual  desplazar e ir al estado 253
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 253
 
 
 Estado 169
 
-  101 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion ppwd . igual VALUE
+  111 PROPIEDADESCHMOD: guion pugo igual . numero
 
-    igual  desplazar e ir al estado 254
+    numero  desplazar e ir al estado 254
 
 
 Estado 170
 
-  102 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pgrp . igual VALUE
+  107 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath . igual PATH
 
     igual  desplazar e ir al estado 255
 
 
 Estado 171
 
-  106 PROPIEDADESRMUSR: guion pusr igual . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 256
-
-
-Estado 172
-
-  110 PROPIEDADESCHMOD: guion ppath igual . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 257
-
-
-Estado 173
-
-  111 PROPIEDADESCHMOD: guion pugo igual . numero
-
-    numero  desplazar e ir al estado 258
-
-
-Estado 174
-
-  107 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath . igual PATH
-
-    igual  desplazar e ir al estado 259
-
-
-Estado 175
-
   109 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pr .
 
     $default  reduce usando la regla 109 (PROPIEDADESCHMOD)
 
 
-Estado 176
+Estado 172
 
   108 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo . igual numero
+
+    igual  desplazar e ir al estado 256
+
+
+Estado 173
+
+  119 PROPIEDADESMKFILE: guion psize igual . numero
+
+    numero  desplazar e ir al estado 257
+
+
+Estado 174
+
+  117 PROPIEDADESMKFILE: guion ppath igual . PATH
+
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 258
+
+
+Estado 175
+
+  120 PROPIEDADESMKFILE: guion pcont igual . PATH
+
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 259
+
+
+Estado 176
+
+  115 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion psize . igual numero
 
     igual  desplazar e ir al estado 260
 
 
 Estado 177
 
-  119 PROPIEDADESMKFILE: guion psize igual . numero
+  113 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion ppath . igual PATH
 
-    numero  desplazar e ir al estado 261
+    igual  desplazar e ir al estado 261
 
 
 Estado 178
-
-  117 PROPIEDADESMKFILE: guion ppath igual . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 262
-
-
-Estado 179
-
-  120 PROPIEDADESMKFILE: guion pcont igual . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 263
-
-
-Estado 180
-
-  115 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion psize . igual numero
-
-    igual  desplazar e ir al estado 264
-
-
-Estado 181
-
-  113 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion ppath . igual PATH
-
-    igual  desplazar e ir al estado 265
-
-
-Estado 182
 
   114 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion pp .
 
     $default  reduce usando la regla 114 (PROPIEDADESMKFILE)
 
 
-Estado 183
+Estado 179
 
   116 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion pcont . igual PATH
 
-    igual  desplazar e ir al estado 266
+    igual  desplazar e ir al estado 262
 
 
-Estado 184
+Estado 180
 
   123 PROPIEDADESMKDIR: guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 267
+    PATH  ir al estado 263
 
 
-Estado 185
+Estado 181
 
   121 PROPIEDADESMKDIR: PROPIEDADESMKDIR guion ppath . igual PATH
 
-    igual  desplazar e ir al estado 268
+    igual  desplazar e ir al estado 264
 
 
-Estado 186
+Estado 182
 
   122 PROPIEDADESMKDIR: PROPIEDADESMKDIR guion pp .
 
     $default  reduce usando la regla 122 (PROPIEDADESMKDIR)
 
 
-Estado 187
+Estado 183
 
    27 PROPIEDADESMK: ampersand psize guion mayorQ . numero
 
-    numero  desplazar e ir al estado 269
+    numero  desplazar e ir al estado 265
 
 
-Estado 188
+Estado 184
+
+   28 PROPIEDADESMK: ampersand punit guion mayorQ . UNIDAD
+
+    pb  desplazar e ir al estado 266
+    pk  desplazar e ir al estado 267
+    pm  desplazar e ir al estado 268
+
+    UNIDAD  ir al estado 269
+
+
+Estado 185
 
    29 PROPIEDADESMK: ampersand ppath guion mayorQ . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
     PATH  ir al estado 270
 
 
-Estado 189
+Estado 186
 
    26 PROPIEDADESMK: ampersand pname guion mayorQ . id
 
     id  desplazar e ir al estado 271
 
 
+Estado 187
+
+   22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion . mayorQ numero
+
+    mayorQ  desplazar e ir al estado 272
+
+
+Estado 188
+
+   23 PROPIEDADESMK: PROPIEDADESMK ampersand punit guion . mayorQ UNIDAD
+
+    mayorQ  desplazar e ir al estado 273
+
+
+Estado 189
+
+   24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath guion . mayorQ PATH
+
+    mayorQ  desplazar e ir al estado 274
+
+
 Estado 190
 
-   28 PROPIEDADESMK: porcentaje punit guion mayorQ . UNIDAD
+   25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion . mayorQ id
 
-    pb  desplazar e ir al estado 272
-    pk  desplazar e ir al estado 273
-    pm  desplazar e ir al estado 274
-
-    UNIDAD  ir al estado 275
+    mayorQ  desplazar e ir al estado 275
 
 
 Estado 191
 
-   22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion . mayorQ numero
+   38 PROPIEDADESRM: ampersand ppath guion mayorQ . PATH
 
-    mayorQ  desplazar e ir al estado 276
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 276
 
 
 Estado 192
 
-   24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath guion . mayorQ PATH
+   48 PROPIEDADESFD: ampersand psize guion mayorQ . numero
 
-    mayorQ  desplazar e ir al estado 277
+    numero  desplazar e ir al estado 277
 
 
 Estado 193
 
-   25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion . mayorQ id
+   55 PROPIEDADESFD: ampersand pfit guion mayorQ . AJUSTE
 
-    mayorQ  desplazar e ir al estado 278
+    pbf  desplazar e ir al estado 278
+    pff  desplazar e ir al estado 279
+    pwf  desplazar e ir al estado 280
+
+    AJUSTE  ir al estado 281
 
 
 Estado 194
 
-   23 PROPIEDADESMK: PROPIEDADESMK porcentaje punit guion . mayorQ UNIDAD
+   49 PROPIEDADESFD: ampersand punit guion mayorQ . UNIDAD
 
-    mayorQ  desplazar e ir al estado 279
+    pb  desplazar e ir al estado 266
+    pk  desplazar e ir al estado 267
+    pm  desplazar e ir al estado 268
+
+    UNIDAD  ir al estado 282
 
 
 Estado 195
 
-   38 PROPIEDADESRM: ampersand ppath guion mayorQ . PATH
+   50 PROPIEDADESFD: ampersand ppath guion mayorQ . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 280
+    PATH  ir al estado 283
 
 
 Estado 196
 
-   48 PROPIEDADESFD: ampersand psize guion mayorQ . numero
+   51 PROPIEDADESFD: ampersand ptype guion mayorQ . TYPE
 
-    numero  desplazar e ir al estado 281
+    pp  desplazar e ir al estado 284
+    pe  desplazar e ir al estado 285
+    pl  desplazar e ir al estado 286
+
+    TYPE  ir al estado 287
 
 
 Estado 197
 
-   50 PROPIEDADESFD: ampersand ppath guion mayorQ . PATH
+   52 PROPIEDADESFD: ampersand pdetele guion mayorQ . DELETE
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    pfast  desplazar e ir al estado 225
+    pfull  desplazar e ir al estado 226
 
-    PATH  ir al estado 282
+    DELETE  ir al estado 288
 
 
 Estado 198
 
    53 PROPIEDADESFD: ampersand pname guion mayorQ . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 283
+    PATH  ir al estado 289
 
 
 Estado 199
 
-   55 PROPIEDADESFD: porcentaje pfit guion mayorQ . AJUSTE
+   54 PROPIEDADESFD: ampersand padd guion mayorQ . E
 
-    pbf  desplazar e ir al estado 284
-    pff  desplazar e ir al estado 285
-    pwf  desplazar e ir al estado 286
+    numero  desplazar e ir al estado 290
+    guion   desplazar e ir al estado 291
 
-    AJUSTE  ir al estado 287
+    E  ir al estado 292
 
 
 Estado 200
 
-   49 PROPIEDADESFD: porcentaje punit guion mayorQ . UNIDAD
+   56 PROPIEDADESFD: ampersand pallocation guion mayorQ . ALLOCATION
 
-    pb  desplazar e ir al estado 272
-    pk  desplazar e ir al estado 273
-    pm  desplazar e ir al estado 274
+    pe   desplazar e ir al estado 293
+    pc   desplazar e ir al estado 294
+    pix  desplazar e ir al estado 295
 
-    UNIDAD  ir al estado 288
+    ALLOCATION  ir al estado 296
 
 
 Estado 201
 
-   51 PROPIEDADESFD: porcentaje ptype guion mayorQ . TYPE
+   39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion . mayorQ numero
 
-    pp  desplazar e ir al estado 289
-    pe  desplazar e ir al estado 290
-    pl  desplazar e ir al estado 291
-
-    TYPE  ir al estado 292
+    mayorQ  desplazar e ir al estado 297
 
 
 Estado 202
 
-   52 PROPIEDADESFD: porcentaje pdetele guion mayorQ . DELETE
+   46 PROPIEDADESFD: PROPIEDADESFD ampersand pfit guion . mayorQ AJUSTE
 
-    pfast  desplazar e ir al estado 229
-    pfull  desplazar e ir al estado 230
-
-    DELETE  ir al estado 293
+    mayorQ  desplazar e ir al estado 298
 
 
 Estado 203
 
-   54 PROPIEDADESFD: porcentaje padd guion mayorQ . E
+   40 PROPIEDADESFD: PROPIEDADESFD ampersand punit guion . mayorQ UNIDAD
 
-    numero  desplazar e ir al estado 294
-    guion   desplazar e ir al estado 295
-
-    E  ir al estado 296
+    mayorQ  desplazar e ir al estado 299
 
 
 Estado 204
 
-   56 PROPIEDADESFD: porcentaje pallocation guion mayorQ . ALLOCATION
+   41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath guion . mayorQ PATH
 
-    pe   desplazar e ir al estado 297
-    pc   desplazar e ir al estado 298
-    pix  desplazar e ir al estado 299
-
-    ALLOCATION  ir al estado 300
+    mayorQ  desplazar e ir al estado 300
 
 
 Estado 205
 
-   39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion . mayorQ numero
+   42 PROPIEDADESFD: PROPIEDADESFD ampersand ptype guion . mayorQ TYPE
 
     mayorQ  desplazar e ir al estado 301
 
 
 Estado 206
 
-   41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath guion . mayorQ PATH
+   43 PROPIEDADESFD: PROPIEDADESFD ampersand pdetele guion . mayorQ DELETE
 
     mayorQ  desplazar e ir al estado 302
 
@@ -2088,485 +2098,485 @@ Estado 207
 
 Estado 208
 
-   46 PROPIEDADESFD: PROPIEDADESFD porcentaje pfit guion . mayorQ AJUSTE
+   45 PROPIEDADESFD: PROPIEDADESFD ampersand padd guion . mayorQ E
 
     mayorQ  desplazar e ir al estado 304
 
 
 Estado 209
 
-   40 PROPIEDADESFD: PROPIEDADESFD porcentaje punit guion . mayorQ UNIDAD
+   47 PROPIEDADESFD: PROPIEDADESFD ampersand pallocation guion . mayorQ ALLOCATION
 
     mayorQ  desplazar e ir al estado 305
 
 
 Estado 210
 
-   42 PROPIEDADESFD: PROPIEDADESFD porcentaje ptype guion . mayorQ TYPE
-
-    mayorQ  desplazar e ir al estado 306
-
-
-Estado 211
-
-   43 PROPIEDADESFD: PROPIEDADESFD porcentaje pdetele guion . mayorQ DELETE
-
-    mayorQ  desplazar e ir al estado 307
-
-
-Estado 212
-
-   45 PROPIEDADESFD: PROPIEDADESFD porcentaje padd guion . mayorQ E
-
-    mayorQ  desplazar e ir al estado 308
-
-
-Estado 213
-
-   47 PROPIEDADESFD: PROPIEDADESFD porcentaje pallocation guion . mayorQ ALLOCATION
-
-    mayorQ  desplazar e ir al estado 309
-
-
-Estado 214
-
    36 PATH: cadena .
 
     $default  reduce usando la regla 36 (PATH)
 
 
-Estado 215
+Estado 211
 
    37 PATH: id .
 
     $default  reduce usando la regla 37 (PATH)
 
 
-Estado 216
+Estado 212
 
    69 PROPIEDADESMOUNT: guion ppath igual PATH .
 
     $default  reduce usando la regla 69 (PROPIEDADESMOUNT)
 
 
-Estado 217
+Estado 213
 
    70 PROPIEDADESMOUNT: guion pname igual PATH .
 
     $default  reduce usando la regla 70 (PROPIEDADESMOUNT)
 
 
-Estado 218
+Estado 214
 
    67 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 310
+    PATH  ir al estado 306
 
 
-Estado 219
+Estado 215
 
    68 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion pname igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 311
+    PATH  ir al estado 307
 
 
-Estado 220
+Estado 216
 
    76 PROPIEDADESREP: guion ppath igual PATH .
 
     $default  reduce usando la regla 76 (PROPIEDADESREP)
 
 
-Estado 221
+Estado 217
 
    78 NAME: pmbr .
 
     $default  reduce usando la regla 78 (NAME)
 
 
-Estado 222
+Estado 218
 
    79 NAME: pdisk .
 
     $default  reduce usando la regla 79 (NAME)
 
 
-Estado 223
+Estado 219
 
    75 PROPIEDADESREP: guion pname igual NAME .
 
     $default  reduce usando la regla 75 (PROPIEDADESREP)
 
 
-Estado 224
+Estado 220
 
    77 PROPIEDADESREP: guion pid igual id .
 
     $default  reduce usando la regla 77 (PROPIEDADESREP)
 
 
-Estado 225
+Estado 221
 
    73 PROPIEDADESREP: PROPIEDADESREP guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 312
+    PATH  ir al estado 308
 
 
-Estado 226
+Estado 222
 
    72 PROPIEDADESREP: PROPIEDADESREP guion pname igual . NAME
 
-    pmbr   desplazar e ir al estado 221
-    pdisk  desplazar e ir al estado 222
+    pmbr   desplazar e ir al estado 217
+    pdisk  desplazar e ir al estado 218
 
-    NAME  ir al estado 313
+    NAME  ir al estado 309
 
 
-Estado 227
+Estado 223
 
    74 PROPIEDADESREP: PROPIEDADESREP guion pid igual . id
 
-    id  desplazar e ir al estado 314
+    id  desplazar e ir al estado 310
 
 
-Estado 228
+Estado 224
 
    85 PROPIEDADESEXEC: guion ppath igual PATH .
 
     $default  reduce usando la regla 85 (PROPIEDADESEXEC)
 
 
-Estado 229
+Estado 225
 
    57 DELETE: pfast .
 
     $default  reduce usando la regla 57 (DELETE)
 
 
-Estado 230
+Estado 226
 
    58 DELETE: pfull .
 
     $default  reduce usando la regla 58 (DELETE)
 
 
-Estado 231
+Estado 227
 
    90 PROPIEDADESMKFS: guion ptype igual DELETE .
 
     $default  reduce usando la regla 90 (PROPIEDADESMKFS)
 
 
-Estado 232
+Estado 228
 
    89 PROPIEDADESMKFS: guion pid igual id .
 
     $default  reduce usando la regla 89 (PROPIEDADESMKFS)
 
 
-Estado 233
+Estado 229
 
    80 FORMAT: p2fs .
 
     $default  reduce usando la regla 80 (FORMAT)
 
 
-Estado 234
+Estado 230
 
    81 FORMAT: p3fs .
 
     $default  reduce usando la regla 81 (FORMAT)
 
 
-Estado 235
+Estado 231
 
    91 PROPIEDADESMKFS: guion pfs igual FORMAT .
 
     $default  reduce usando la regla 91 (PROPIEDADESMKFS)
 
 
-Estado 236
+Estado 232
 
    87 PROPIEDADESMKFS: PROPIEDADESMKFS guion ptype igual . DELETE
 
-    pfast  desplazar e ir al estado 229
-    pfull  desplazar e ir al estado 230
+    pfast  desplazar e ir al estado 225
+    pfull  desplazar e ir al estado 226
 
-    DELETE  ir al estado 315
+    DELETE  ir al estado 311
 
 
-Estado 237
+Estado 233
 
    86 PROPIEDADESMKFS: PROPIEDADESMKFS guion pid igual . id
 
-    id  desplazar e ir al estado 316
+    id  desplazar e ir al estado 312
 
 
-Estado 238
+Estado 234
 
    88 PROPIEDADESMKFS: PROPIEDADESMKFS guion pfs igual . FORMAT
 
-    p2fs  desplazar e ir al estado 233
-    p3fs  desplazar e ir al estado 234
+    p2fs  desplazar e ir al estado 229
+    p3fs  desplazar e ir al estado 230
 
-    FORMAT  ir al estado 317
+    FORMAT  ir al estado 313
 
 
-Estado 239
+Estado 235
 
    97 PROPIEDADESLOGIN: guion pid igual id .
 
     $default  reduce usando la regla 97 (PROPIEDADESLOGIN)
 
 
-Estado 240
+Estado 236
 
    95 PROPIEDADESLOGIN: guion pusr igual PATH .
 
     $default  reduce usando la regla 95 (PROPIEDADESLOGIN)
 
 
-Estado 241
+Estado 237
 
    84 VALUE: numero .
 
     $default  reduce usando la regla 84 (VALUE)
 
 
-Estado 242
+Estado 238
 
    83 VALUE: cadena .
 
     $default  reduce usando la regla 83 (VALUE)
 
 
-Estado 243
+Estado 239
 
    82 VALUE: id .
 
     $default  reduce usando la regla 82 (VALUE)
 
 
-Estado 244
+Estado 240
 
    96 PROPIEDADESLOGIN: guion ppwd igual VALUE .
 
     $default  reduce usando la regla 96 (PROPIEDADESLOGIN)
 
 
-Estado 245
+Estado 241
 
    94 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pid igual . id
 
-    id  desplazar e ir al estado 318
+    id  desplazar e ir al estado 314
 
 
-Estado 246
+Estado 242
 
    92 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pusr igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 319
+    PATH  ir al estado 315
 
 
-Estado 247
+Estado 243
 
    93 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion ppwd igual . VALUE
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
 
-    VALUE  ir al estado 320
+    VALUE  ir al estado 316
 
 
-Estado 248
+Estado 244
 
    98 PROPIEDADESRMGRP: guion pname igual PATH .
 
     $default  reduce usando la regla 98 (PROPIEDADESRMGRP)
 
 
-Estado 249
+Estado 245
 
    99 PROPIEDADESMKGRP: guion pname igual PATH .
 
     $default  reduce usando la regla 99 (PROPIEDADESMKGRP)
 
 
-Estado 250
+Estado 246
 
   103 PROPIEDADESMKUSR: guion pusr igual VALUE .
 
     $default  reduce usando la regla 103 (PROPIEDADESMKUSR)
 
 
-Estado 251
+Estado 247
 
   104 PROPIEDADESMKUSR: guion ppwd igual VALUE .
 
     $default  reduce usando la regla 104 (PROPIEDADESMKUSR)
 
 
-Estado 252
+Estado 248
 
   105 PROPIEDADESMKUSR: guion pgrp igual VALUE .
 
     $default  reduce usando la regla 105 (PROPIEDADESMKUSR)
 
 
-Estado 253
+Estado 249
 
   100 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pusr igual . VALUE
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
 
-    VALUE  ir al estado 321
+    VALUE  ir al estado 317
 
 
-Estado 254
+Estado 250
 
   101 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion ppwd igual . VALUE
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
 
-    VALUE  ir al estado 322
+    VALUE  ir al estado 318
 
 
-Estado 255
+Estado 251
 
   102 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pgrp igual . VALUE
 
-    numero  desplazar e ir al estado 241
-    cadena  desplazar e ir al estado 242
-    id      desplazar e ir al estado 243
+    numero  desplazar e ir al estado 237
+    cadena  desplazar e ir al estado 238
+    id      desplazar e ir al estado 239
 
-    VALUE  ir al estado 323
+    VALUE  ir al estado 319
 
 
-Estado 256
+Estado 252
 
   106 PROPIEDADESRMUSR: guion pusr igual PATH .
 
     $default  reduce usando la regla 106 (PROPIEDADESRMUSR)
 
 
-Estado 257
+Estado 253
 
   110 PROPIEDADESCHMOD: guion ppath igual PATH .
 
     $default  reduce usando la regla 110 (PROPIEDADESCHMOD)
 
 
-Estado 258
+Estado 254
 
   111 PROPIEDADESCHMOD: guion pugo igual numero .
 
     $default  reduce usando la regla 111 (PROPIEDADESCHMOD)
 
 
-Estado 259
+Estado 255
 
   107 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 324
+    PATH  ir al estado 320
 
 
-Estado 260
+Estado 256
 
   108 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo igual . numero
 
-    numero  desplazar e ir al estado 325
+    numero  desplazar e ir al estado 321
 
 
-Estado 261
+Estado 257
 
   119 PROPIEDADESMKFILE: guion psize igual numero .
 
     $default  reduce usando la regla 119 (PROPIEDADESMKFILE)
 
 
-Estado 262
+Estado 258
 
   117 PROPIEDADESMKFILE: guion ppath igual PATH .
 
     $default  reduce usando la regla 117 (PROPIEDADESMKFILE)
 
 
-Estado 263
+Estado 259
 
   120 PROPIEDADESMKFILE: guion pcont igual PATH .
 
     $default  reduce usando la regla 120 (PROPIEDADESMKFILE)
 
 
-Estado 264
+Estado 260
 
   115 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion psize igual . numero
 
-    numero  desplazar e ir al estado 326
+    numero  desplazar e ir al estado 322
 
 
-Estado 265
+Estado 261
 
   113 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 327
+    PATH  ir al estado 323
 
 
-Estado 266
+Estado 262
 
   116 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion pcont igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 328
+    PATH  ir al estado 324
 
 
-Estado 267
+Estado 263
 
   123 PROPIEDADESMKDIR: guion ppath igual PATH .
 
     $default  reduce usando la regla 123 (PROPIEDADESMKDIR)
 
 
-Estado 268
+Estado 264
 
   121 PROPIEDADESMKDIR: PROPIEDADESMKDIR guion ppath igual . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
-    PATH  ir al estado 329
+    PATH  ir al estado 325
 
 
-Estado 269
+Estado 265
 
    27 PROPIEDADESMK: ampersand psize guion mayorQ numero .
 
     $default  reduce usando la regla 27 (PROPIEDADESMK)
+
+
+Estado 266
+
+   33 UNIDAD: pb .
+
+    $default  reduce usando la regla 33 (UNIDAD)
+
+
+Estado 267
+
+   34 UNIDAD: pk .
+
+    $default  reduce usando la regla 34 (UNIDAD)
+
+
+Estado 268
+
+   35 UNIDAD: pm .
+
+    $default  reduce usando la regla 35 (UNIDAD)
+
+
+Estado 269
+
+   28 PROPIEDADESMK: ampersand punit guion mayorQ UNIDAD .
+
+    $default  reduce usando la regla 28 (PROPIEDADESMK)
 
 
 Estado 270
@@ -2585,492 +2595,492 @@ Estado 271
 
 Estado 272
 
-   33 UNIDAD: pb .
+   22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion mayorQ . numero
 
-    $default  reduce usando la regla 33 (UNIDAD)
+    numero  desplazar e ir al estado 326
 
 
 Estado 273
 
-   34 UNIDAD: pk .
+   23 PROPIEDADESMK: PROPIEDADESMK ampersand punit guion mayorQ . UNIDAD
 
-    $default  reduce usando la regla 34 (UNIDAD)
+    pb  desplazar e ir al estado 266
+    pk  desplazar e ir al estado 267
+    pm  desplazar e ir al estado 268
+
+    UNIDAD  ir al estado 327
 
 
 Estado 274
 
-   35 UNIDAD: pm .
+   24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath guion mayorQ . PATH
 
-    $default  reduce usando la regla 35 (UNIDAD)
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 328
 
 
 Estado 275
 
-   28 PROPIEDADESMK: porcentaje punit guion mayorQ UNIDAD .
+   25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion mayorQ . id
 
-    $default  reduce usando la regla 28 (PROPIEDADESMK)
+    id  desplazar e ir al estado 329
 
 
 Estado 276
-
-   22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion mayorQ . numero
-
-    numero  desplazar e ir al estado 330
-
-
-Estado 277
-
-   24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath guion mayorQ . PATH
-
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
-
-    PATH  ir al estado 331
-
-
-Estado 278
-
-   25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion mayorQ . id
-
-    id  desplazar e ir al estado 332
-
-
-Estado 279
-
-   23 PROPIEDADESMK: PROPIEDADESMK porcentaje punit guion mayorQ . UNIDAD
-
-    pb  desplazar e ir al estado 272
-    pk  desplazar e ir al estado 273
-    pm  desplazar e ir al estado 274
-
-    UNIDAD  ir al estado 333
-
-
-Estado 280
 
    38 PROPIEDADESRM: ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 38 (PROPIEDADESRM)
 
 
-Estado 281
+Estado 277
 
    48 PROPIEDADESFD: ampersand psize guion mayorQ numero .
 
     $default  reduce usando la regla 48 (PROPIEDADESFD)
 
 
-Estado 282
-
-   50 PROPIEDADESFD: ampersand ppath guion mayorQ PATH .
-
-    $default  reduce usando la regla 50 (PROPIEDADESFD)
-
-
-Estado 283
-
-   53 PROPIEDADESFD: ampersand pname guion mayorQ PATH .
-
-    $default  reduce usando la regla 53 (PROPIEDADESFD)
-
-
-Estado 284
+Estado 278
 
    30 AJUSTE: pbf .
 
     $default  reduce usando la regla 30 (AJUSTE)
 
 
-Estado 285
+Estado 279
 
    31 AJUSTE: pff .
 
     $default  reduce usando la regla 31 (AJUSTE)
 
 
-Estado 286
+Estado 280
 
    32 AJUSTE: pwf .
 
     $default  reduce usando la regla 32 (AJUSTE)
 
 
-Estado 287
+Estado 281
 
-   55 PROPIEDADESFD: porcentaje pfit guion mayorQ AJUSTE .
+   55 PROPIEDADESFD: ampersand pfit guion mayorQ AJUSTE .
 
     $default  reduce usando la regla 55 (PROPIEDADESFD)
 
 
-Estado 288
+Estado 282
 
-   49 PROPIEDADESFD: porcentaje punit guion mayorQ UNIDAD .
+   49 PROPIEDADESFD: ampersand punit guion mayorQ UNIDAD .
 
     $default  reduce usando la regla 49 (PROPIEDADESFD)
 
 
-Estado 289
+Estado 283
+
+   50 PROPIEDADESFD: ampersand ppath guion mayorQ PATH .
+
+    $default  reduce usando la regla 50 (PROPIEDADESFD)
+
+
+Estado 284
 
    64 TYPE: pp .
 
     $default  reduce usando la regla 64 (TYPE)
 
 
-Estado 290
+Estado 285
 
    65 TYPE: pe .
 
     $default  reduce usando la regla 65 (TYPE)
 
 
-Estado 291
+Estado 286
 
    66 TYPE: pl .
 
     $default  reduce usando la regla 66 (TYPE)
 
 
-Estado 292
+Estado 287
 
-   51 PROPIEDADESFD: porcentaje ptype guion mayorQ TYPE .
+   51 PROPIEDADESFD: ampersand ptype guion mayorQ TYPE .
 
     $default  reduce usando la regla 51 (PROPIEDADESFD)
 
 
-Estado 293
+Estado 288
 
-   52 PROPIEDADESFD: porcentaje pdetele guion mayorQ DELETE .
+   52 PROPIEDADESFD: ampersand pdetele guion mayorQ DELETE .
 
     $default  reduce usando la regla 52 (PROPIEDADESFD)
 
 
-Estado 294
+Estado 289
+
+   53 PROPIEDADESFD: ampersand pname guion mayorQ PATH .
+
+    $default  reduce usando la regla 53 (PROPIEDADESFD)
+
+
+Estado 290
 
    62 E: numero .
 
     $default  reduce usando la regla 62 (E)
 
 
-Estado 295
+Estado 291
 
    63 E: guion . numero
 
-    numero  desplazar e ir al estado 334
+    numero  desplazar e ir al estado 330
 
 
-Estado 296
+Estado 292
 
-   54 PROPIEDADESFD: porcentaje padd guion mayorQ E .
+   54 PROPIEDADESFD: ampersand padd guion mayorQ E .
 
     $default  reduce usando la regla 54 (PROPIEDADESFD)
 
 
-Estado 297
+Estado 293
 
    60 ALLOCATION: pe .
 
     $default  reduce usando la regla 60 (ALLOCATION)
 
 
-Estado 298
+Estado 294
 
    59 ALLOCATION: pc .
 
     $default  reduce usando la regla 59 (ALLOCATION)
 
 
-Estado 299
+Estado 295
 
    61 ALLOCATION: pix .
 
     $default  reduce usando la regla 61 (ALLOCATION)
 
 
-Estado 300
+Estado 296
 
-   56 PROPIEDADESFD: porcentaje pallocation guion mayorQ ALLOCATION .
+   56 PROPIEDADESFD: ampersand pallocation guion mayorQ ALLOCATION .
 
     $default  reduce usando la regla 56 (PROPIEDADESFD)
 
 
-Estado 301
+Estado 297
 
    39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion mayorQ . numero
 
-    numero  desplazar e ir al estado 335
+    numero  desplazar e ir al estado 331
+
+
+Estado 298
+
+   46 PROPIEDADESFD: PROPIEDADESFD ampersand pfit guion mayorQ . AJUSTE
+
+    pbf  desplazar e ir al estado 278
+    pff  desplazar e ir al estado 279
+    pwf  desplazar e ir al estado 280
+
+    AJUSTE  ir al estado 332
+
+
+Estado 299
+
+   40 PROPIEDADESFD: PROPIEDADESFD ampersand punit guion mayorQ . UNIDAD
+
+    pb  desplazar e ir al estado 266
+    pk  desplazar e ir al estado 267
+    pm  desplazar e ir al estado 268
+
+    UNIDAD  ir al estado 333
+
+
+Estado 300
+
+   41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath guion mayorQ . PATH
+
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
+
+    PATH  ir al estado 334
+
+
+Estado 301
+
+   42 PROPIEDADESFD: PROPIEDADESFD ampersand ptype guion mayorQ . TYPE
+
+    pp  desplazar e ir al estado 284
+    pe  desplazar e ir al estado 285
+    pl  desplazar e ir al estado 286
+
+    TYPE  ir al estado 335
 
 
 Estado 302
 
-   41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath guion mayorQ . PATH
+   43 PROPIEDADESFD: PROPIEDADESFD ampersand pdetele guion mayorQ . DELETE
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    pfast  desplazar e ir al estado 225
+    pfull  desplazar e ir al estado 226
 
-    PATH  ir al estado 336
+    DELETE  ir al estado 336
 
 
 Estado 303
 
    44 PROPIEDADESFD: PROPIEDADESFD ampersand pname guion mayorQ . PATH
 
-    cadena  desplazar e ir al estado 214
-    id      desplazar e ir al estado 215
+    cadena  desplazar e ir al estado 210
+    id      desplazar e ir al estado 211
 
     PATH  ir al estado 337
 
 
 Estado 304
 
-   46 PROPIEDADESFD: PROPIEDADESFD porcentaje pfit guion mayorQ . AJUSTE
+   45 PROPIEDADESFD: PROPIEDADESFD ampersand padd guion mayorQ . E
 
-    pbf  desplazar e ir al estado 284
-    pff  desplazar e ir al estado 285
-    pwf  desplazar e ir al estado 286
+    numero  desplazar e ir al estado 290
+    guion   desplazar e ir al estado 291
 
-    AJUSTE  ir al estado 338
+    E  ir al estado 338
 
 
 Estado 305
 
-   40 PROPIEDADESFD: PROPIEDADESFD porcentaje punit guion mayorQ . UNIDAD
+   47 PROPIEDADESFD: PROPIEDADESFD ampersand pallocation guion mayorQ . ALLOCATION
 
-    pb  desplazar e ir al estado 272
-    pk  desplazar e ir al estado 273
-    pm  desplazar e ir al estado 274
+    pe   desplazar e ir al estado 293
+    pc   desplazar e ir al estado 294
+    pix  desplazar e ir al estado 295
 
-    UNIDAD  ir al estado 339
+    ALLOCATION  ir al estado 339
 
 
 Estado 306
-
-   42 PROPIEDADESFD: PROPIEDADESFD porcentaje ptype guion mayorQ . TYPE
-
-    pp  desplazar e ir al estado 289
-    pe  desplazar e ir al estado 290
-    pl  desplazar e ir al estado 291
-
-    TYPE  ir al estado 340
-
-
-Estado 307
-
-   43 PROPIEDADESFD: PROPIEDADESFD porcentaje pdetele guion mayorQ . DELETE
-
-    pfast  desplazar e ir al estado 229
-    pfull  desplazar e ir al estado 230
-
-    DELETE  ir al estado 341
-
-
-Estado 308
-
-   45 PROPIEDADESFD: PROPIEDADESFD porcentaje padd guion mayorQ . E
-
-    numero  desplazar e ir al estado 294
-    guion   desplazar e ir al estado 295
-
-    E  ir al estado 342
-
-
-Estado 309
-
-   47 PROPIEDADESFD: PROPIEDADESFD porcentaje pallocation guion mayorQ . ALLOCATION
-
-    pe   desplazar e ir al estado 297
-    pc   desplazar e ir al estado 298
-    pix  desplazar e ir al estado 299
-
-    ALLOCATION  ir al estado 343
-
-
-Estado 310
 
    67 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion ppath igual PATH .
 
     $default  reduce usando la regla 67 (PROPIEDADESMOUNT)
 
 
-Estado 311
+Estado 307
 
    68 PROPIEDADESMOUNT: PROPIEDADESMOUNT guion pname igual PATH .
 
     $default  reduce usando la regla 68 (PROPIEDADESMOUNT)
 
 
-Estado 312
+Estado 308
 
    73 PROPIEDADESREP: PROPIEDADESREP guion ppath igual PATH .
 
     $default  reduce usando la regla 73 (PROPIEDADESREP)
 
 
-Estado 313
+Estado 309
 
    72 PROPIEDADESREP: PROPIEDADESREP guion pname igual NAME .
 
     $default  reduce usando la regla 72 (PROPIEDADESREP)
 
 
-Estado 314
+Estado 310
 
    74 PROPIEDADESREP: PROPIEDADESREP guion pid igual id .
 
     $default  reduce usando la regla 74 (PROPIEDADESREP)
 
 
-Estado 315
+Estado 311
 
    87 PROPIEDADESMKFS: PROPIEDADESMKFS guion ptype igual DELETE .
 
     $default  reduce usando la regla 87 (PROPIEDADESMKFS)
 
 
-Estado 316
+Estado 312
 
    86 PROPIEDADESMKFS: PROPIEDADESMKFS guion pid igual id .
 
     $default  reduce usando la regla 86 (PROPIEDADESMKFS)
 
 
-Estado 317
+Estado 313
 
    88 PROPIEDADESMKFS: PROPIEDADESMKFS guion pfs igual FORMAT .
 
     $default  reduce usando la regla 88 (PROPIEDADESMKFS)
 
 
-Estado 318
+Estado 314
 
    94 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pid igual id .
 
     $default  reduce usando la regla 94 (PROPIEDADESLOGIN)
 
 
-Estado 319
+Estado 315
 
    92 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion pusr igual PATH .
 
     $default  reduce usando la regla 92 (PROPIEDADESLOGIN)
 
 
-Estado 320
+Estado 316
 
    93 PROPIEDADESLOGIN: PROPIEDADESLOGIN guion ppwd igual VALUE .
 
     $default  reduce usando la regla 93 (PROPIEDADESLOGIN)
 
 
-Estado 321
+Estado 317
 
   100 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pusr igual VALUE .
 
     $default  reduce usando la regla 100 (PROPIEDADESMKUSR)
 
 
-Estado 322
+Estado 318
 
   101 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion ppwd igual VALUE .
 
     $default  reduce usando la regla 101 (PROPIEDADESMKUSR)
 
 
-Estado 323
+Estado 319
 
   102 PROPIEDADESMKUSR: PROPIEDADESMKUSR guion pgrp igual VALUE .
 
     $default  reduce usando la regla 102 (PROPIEDADESMKUSR)
 
 
-Estado 324
+Estado 320
 
   107 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual PATH .
 
     $default  reduce usando la regla 107 (PROPIEDADESCHMOD)
 
 
-Estado 325
+Estado 321
 
   108 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo igual numero .
 
     $default  reduce usando la regla 108 (PROPIEDADESCHMOD)
 
 
-Estado 326
+Estado 322
 
   115 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion psize igual numero .
 
     $default  reduce usando la regla 115 (PROPIEDADESMKFILE)
 
 
-Estado 327
+Estado 323
 
   113 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion ppath igual PATH .
 
     $default  reduce usando la regla 113 (PROPIEDADESMKFILE)
 
 
-Estado 328
+Estado 324
 
   116 PROPIEDADESMKFILE: PROPIEDADESMKFILE guion pcont igual PATH .
 
     $default  reduce usando la regla 116 (PROPIEDADESMKFILE)
 
 
-Estado 329
+Estado 325
 
   121 PROPIEDADESMKDIR: PROPIEDADESMKDIR guion ppath igual PATH .
 
     $default  reduce usando la regla 121 (PROPIEDADESMKDIR)
 
 
-Estado 330
+Estado 326
 
    22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion mayorQ numero .
 
     $default  reduce usando la regla 22 (PROPIEDADESMK)
 
 
-Estado 331
+Estado 327
+
+   23 PROPIEDADESMK: PROPIEDADESMK ampersand punit guion mayorQ UNIDAD .
+
+    $default  reduce usando la regla 23 (PROPIEDADESMK)
+
+
+Estado 328
 
    24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 24 (PROPIEDADESMK)
 
 
-Estado 332
+Estado 329
 
    25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion mayorQ id .
 
     $default  reduce usando la regla 25 (PROPIEDADESMK)
 
 
-Estado 333
-
-   23 PROPIEDADESMK: PROPIEDADESMK porcentaje punit guion mayorQ UNIDAD .
-
-    $default  reduce usando la regla 23 (PROPIEDADESMK)
-
-
-Estado 334
+Estado 330
 
    63 E: guion numero .
 
     $default  reduce usando la regla 63 (E)
 
 
-Estado 335
+Estado 331
 
    39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion mayorQ numero .
 
     $default  reduce usando la regla 39 (PROPIEDADESFD)
 
 
-Estado 336
+Estado 332
+
+   46 PROPIEDADESFD: PROPIEDADESFD ampersand pfit guion mayorQ AJUSTE .
+
+    $default  reduce usando la regla 46 (PROPIEDADESFD)
+
+
+Estado 333
+
+   40 PROPIEDADESFD: PROPIEDADESFD ampersand punit guion mayorQ UNIDAD .
+
+    $default  reduce usando la regla 40 (PROPIEDADESFD)
+
+
+Estado 334
 
    41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 41 (PROPIEDADESFD)
+
+
+Estado 335
+
+   42 PROPIEDADESFD: PROPIEDADESFD ampersand ptype guion mayorQ TYPE .
+
+    $default  reduce usando la regla 42 (PROPIEDADESFD)
+
+
+Estado 336
+
+   43 PROPIEDADESFD: PROPIEDADESFD ampersand pdetele guion mayorQ DELETE .
+
+    $default  reduce usando la regla 43 (PROPIEDADESFD)
 
 
 Estado 337
@@ -3082,41 +3092,13 @@ Estado 337
 
 Estado 338
 
-   46 PROPIEDADESFD: PROPIEDADESFD porcentaje pfit guion mayorQ AJUSTE .
-
-    $default  reduce usando la regla 46 (PROPIEDADESFD)
-
-
-Estado 339
-
-   40 PROPIEDADESFD: PROPIEDADESFD porcentaje punit guion mayorQ UNIDAD .
-
-    $default  reduce usando la regla 40 (PROPIEDADESFD)
-
-
-Estado 340
-
-   42 PROPIEDADESFD: PROPIEDADESFD porcentaje ptype guion mayorQ TYPE .
-
-    $default  reduce usando la regla 42 (PROPIEDADESFD)
-
-
-Estado 341
-
-   43 PROPIEDADESFD: PROPIEDADESFD porcentaje pdetele guion mayorQ DELETE .
-
-    $default  reduce usando la regla 43 (PROPIEDADESFD)
-
-
-Estado 342
-
-   45 PROPIEDADESFD: PROPIEDADESFD porcentaje padd guion mayorQ E .
+   45 PROPIEDADESFD: PROPIEDADESFD ampersand padd guion mayorQ E .
 
     $default  reduce usando la regla 45 (PROPIEDADESFD)
 
 
-Estado 343
+Estado 339
 
-   47 PROPIEDADESFD: PROPIEDADESFD porcentaje pallocation guion mayorQ ALLOCATION .
+   47 PROPIEDADESFD: PROPIEDADESFD ampersand pallocation guion mayorQ ALLOCATION .
 
     $default  reduce usando la regla 47 (PROPIEDADESFD)

@@ -228,6 +228,17 @@ void Delete_Disk(Rmdisk *rm){
     }
 }
 
+int Tell_Logic(Ebr ebr, FILE *file, int pL){
+    if(ebr.part_next != 0){
+        Ebr ebr2;
+        fseek(file, ebr.part_next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        pL++;
+        pL = Tell_Logic(ebr2, file, pL);
+    }
+    return pL;
+}
+
 void Msg_Disk(Mbr mbr, FILE *file, string nameD){
     cout << "\nDisco: " + nameD + "\n";
     cout << "Tamaño total: " + to_string(mbr.mbr_size) + " bytes\n";
@@ -243,6 +254,12 @@ void Msg_Disk(Mbr mbr, FILE *file, string nameD){
             Ebr ebr;
             fseek(file, mbr.particions[x].part_start, SEEK_SET);
             fread(&ebr, sizeof (Ebr), 1, file);
+            if(ebr.isLogic == 49){
+                pL++;
+                if(ebr.part_next != 0){
+                    pL = Tell_Logic(ebr, file, pL);
+                }
+            }
         }
     }
     cout << "Particiones primarias: " + to_string(pP) + "\n";
@@ -492,6 +509,48 @@ bool Exist_Extended(Mbr mbr){
     return false;
 }
 
+int EbrSpace(Ebr ebr, int diskS, FILE *file){
+    diskS -= sizeof(Ebr);
+    diskS -= ebr.part_size;
+    if(ebr.part_next != 0){
+        Ebr ebr2;
+        fseek(file, ebr.part_next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        return EbrSpace(ebr2, diskS, file);
+    }
+    return diskS;
+}
+
+bool Partition_Extended_Space(FILE *file, Mbr mbr, int size){
+    int u = 0;
+    for(int x=0; x<4; x++){
+        if(mbr.particions[x].part_type == 69){
+            u = x;
+            break;
+        }
+    }
+    int diskS = mbr.particions[u].part_size;
+    Ebr ebr;
+    fseek(file, mbr.particions[u].part_start, SEEK_SET);
+    fread(&ebr, sizeof(Ebr), 1, file);
+    diskS -= sizeof(Ebr);
+    if(ebr.isLogic != 48){
+        diskS -= ebr.part_size;
+        if(ebr.part_next != 0){
+            Ebr ebr2;
+            fseek(file, ebr.part_next, SEEK_SET);
+            fread(&ebr2, sizeof(Ebr), 1, file);
+            diskS = EbrSpace(ebr2, diskS, file);
+        }
+        if((diskS - size) >= 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    return true;
+}
+
 void Create_Partition_Extended(Fdisk *fd){
     if(existDir(fd->path)){
         FILE *file = fopen(fd->path.c_str(), "rb+");
@@ -522,8 +581,9 @@ void Create_Partition_Extended(Fdisk *fd){
                                 strcpy(mbr.particions[parT].part_name, fd->name.c_str());
                                 mbr.particions[parT].part_size = fd->size;
                                 strcpy(mbr.particions[parT].part_fit, fd->fit.c_str());
-                                mbr.particions[parT].part_type == 69;
+                                mbr.particions[parT].part_type = 69;
                                 Ebr ebr;
+                                ebr.part_start = sizeof(Ebr) + mbr.particions[parT].part_start;
                                 fseek(file, mbr.particions[parT].part_start, SEEK_SET);
                                 fwrite(&ebr, sizeof (Ebr), 1, file);
                                 fseek(file, 0, SEEK_SET);
@@ -613,6 +673,113 @@ void Create_Partition_Primary(Fdisk *fd){
     }
 }
 
+void Linked_Ebr(Ebr ebr, FILE *file, Mbr mbr, Fdisk *fd){
+    if(ebr.part_next == 0){
+        Ebr ebr2;
+        ebr.part_next = ebr.part_start + ebr.part_size;
+        ebr2.part_status = 49;
+        if(fd->fit != ""){
+            strcpy(ebr2.part_fit, fd->fit.c_str());
+        }else{
+            strcpy(ebr2.part_fit, "wf");
+        }
+        ebr2.part_start = ebr.part_next + sizeof(Ebr);
+        ebr2.part_size = fd->size;
+        ebr2.part_next = 0;
+        strcpy(ebr2.part_name, fd->name.c_str());
+        fseek(file, (ebr.part_start - sizeof(Ebr)), SEEK_SET);
+        fwrite(&ebr, sizeof(Ebr), 1, file);
+        fseek(file, ebr.part_next, SEEK_SET);
+        fwrite(&ebr2, sizeof(Ebr), 1, file);
+        cout << "Particion logica '" + fd->name + "' creada exitosamente\n";
+        fseek(file, 0, SEEK_SET);
+        fread(&mbr, sizeof(Mbr), 1, file);
+        Msg_Disk(mbr, file, NameDisk(fd->path));
+    }else{
+        Ebr ebr2;
+        fseek(file, ebr.part_next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        Linked_Ebr(ebr2, file, mbr, fd);
+    }
+}
+
+void Create_Partition_Logic(Fdisk *fd){
+    if(existDir(fd->path)){
+        FILE *file = fopen(fd->path.c_str(), "rb+");
+        if(file != nullptr){
+            Mbr mbr;
+            fseek(file, 0, SEEK_SET);
+            fread(&mbr, sizeof (Mbr), 1, file);
+            if(Exist_Extended(mbr)){
+                if(Partition_Extended_Space(file, mbr, fd->size)){
+                    Msg_Disk(mbr, file, NameDisk(fd->path));
+                    int y;
+                    for(int x=0; x<4; x++){
+                        if(mbr.particions[x].part_type == 69){
+                            y = x;
+                            break;
+                        }
+                    }
+                    Ebr ebr;
+                    fseek(file, mbr.particions[y].part_start, SEEK_SET);
+                    fread(&ebr, sizeof(Ebr), 1, file);
+                        if(ebr.isLogic != 48){
+                            if(ebr.part_next != 0){
+                                Linked_Ebr(ebr, file, mbr, fd);
+                            }else{
+                                ebr.part_next = ebr.part_start + ebr.part_size;
+                                Ebr ebr2;
+                                ebr2.part_status = 49;
+                                if(fd->fit != ""){
+                                    strcpy(ebr2.part_fit, fd->fit.c_str());
+                                }else{
+                                    strcpy(ebr2.part_fit, "wf");
+                                }
+                                ebr2.part_start = ebr.part_next + sizeof(Ebr);
+                                ebr2.part_size = fd->size;
+                                ebr2.part_next = 0;
+                                strcpy(ebr2.part_name, fd->name.c_str());
+                                fseek(file, mbr.particions[y].part_start, SEEK_SET);
+                                fwrite(&ebr, sizeof(Ebr), 1, file);
+                                fseek(file, ebr.part_next, SEEK_SET);
+                                fwrite(&ebr2, sizeof(Ebr), 1, file);
+                                cout << "Particion logica '" + fd->name + "' creada exitosamente\n";
+                                fseek(file, 0, SEEK_SET);
+                                fread(&mbr, sizeof(Mbr), 1, file);
+                                Msg_Disk(mbr, file, NameDisk(fd->path));
+                            }
+                        }else{
+                            ebr.part_status = 49;
+                            if(fd->fit != ""){
+                                strcpy(ebr.part_fit, fd->fit.c_str());
+                            }else{
+                                strcpy(ebr.part_fit, "wf");
+                            }
+                            ebr.part_size = fd->size;
+                            ebr.isLogic = 49;
+                            strcpy(ebr.part_name, fd->name.c_str());
+                            fseek(file, mbr.particions[y].part_start, SEEK_SET);
+                            fwrite(&ebr, sizeof(Ebr), 1, file);
+                            cout << "Particion logica '" + fd->name + "' creada exitosamente\n";
+                            fseek(file, 0, SEEK_SET);
+                            fread(&mbr, sizeof(Mbr), 1, file);
+                            Msg_Disk(mbr, file, NameDisk(fd->path));
+                        }
+                 }else{
+                    cout << "Error: no hay espacio en la particion extendida\n";
+                }
+            }else{
+                cout << "Error: no se puede crear logicas sin una particion extendida\n";
+            }
+            fclose(file);
+        }else{
+            cout << "Error: al abrir el archivo\n";
+        }
+    }else{
+        cout << "\nEl archivo " + NameDisk(fd->path) + " no existe \n";
+    }
+}
+
 void Mount_Partition(Mount *mn){
     if(existDir(mn->path)){
         FILE *file = fopen(mn->path.c_str(), "rb+");
@@ -690,7 +857,6 @@ int main()
         for(it = listCommand.begin(); it != listCommand.end(); ++it){
             if(Mkdisk *mk = dynamic_cast<Mkdisk*>((*it))){
                 if(mk->size > 0){
-                    if(mk->size % 8 == 0){
                         if(mk->path != ""){
                             if(mk->name != ""){
                                 if(hasExtension(mk->name)){
@@ -706,9 +872,6 @@ int main()
                         }else{
                             cout << "Error: el 'path' es obligatorio" << endl;
                         }
-                    }else{
-                        cout << "Error: el tamaño debe ser multiplo de 8\n";
-                    }
                 }else{
                     cout << "Error: el tamaño es obligatorio" << endl;
                 }
@@ -739,10 +902,8 @@ int main()
                                 if(fd->type != "" && fd->type != "p"){
                                     if(fd->type == "e"){
                                         Create_Partition_Extended(fd);
-                                        fd->path = Path_Raid(fd->path);
-                                        Create_Partition_Extended(fd);
                                     }else if(fd->type == "l"){
-
+                                        Create_Partition_Logic(fd);
                                     }
                                 }else{
                                     Create_Partition_Primary(fd);

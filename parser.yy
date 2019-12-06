@@ -177,12 +177,12 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |error;
 
 PROPIEDADESMK : PROPIEDADESMK ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
-               |PROPIEDADESMK porcentaje punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
+               |PROPIEDADESMK ampersand punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
                |PROPIEDADESMK ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
                |PROPIEDADESMK ampersand pname guion mayorQ id { $$ = $1; $$->name = $6; }
                |ampersand pname guion mayorQ id { $$ = new Mkdisk(); $$->name = $5; }
                |ampersand psize guion mayorQ numero { $$ =  new Mkdisk(); $$->size = std::stoi($5); }
-               |porcentaje punit guion mayorQ UNIDAD { $$ = new Mkdisk(); $$->unit = $5; }
+               |ampersand punit guion mayorQ UNIDAD { $$ = new Mkdisk(); $$->unit = $5; }
                |ampersand ppath guion mayorQ PATH { $$ = new Mkdisk(); $$->path = $5; };
 
 AJUSTE : pbf { strcpy($$, "bf"); }
@@ -199,23 +199,23 @@ PATH : cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.l
 PROPIEDADESRM : ampersand ppath guion mayorQ PATH { $$ = new Rmdisk(); $$->path = $5; };
 
 PROPIEDADESFD : PROPIEDADESFD ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
-               |PROPIEDADESFD porcentaje punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
+               |PROPIEDADESFD ampersand punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
                |PROPIEDADESFD ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
-               |PROPIEDADESFD porcentaje ptype guion mayorQ TYPE { $$ = $1; $$->type = $6; }
-               |PROPIEDADESFD porcentaje pdetele guion mayorQ DELETE { $$ = $1; $$->toDelete = $6; }
+               |PROPIEDADESFD ampersand ptype guion mayorQ TYPE { $$ = $1; $$->type = $6; }
+               |PROPIEDADESFD ampersand pdetele guion mayorQ DELETE { $$ = $1; $$->toDelete = $6; }
                |PROPIEDADESFD ampersand pname guion mayorQ PATH { $$ = $1; $$->name = $6; }
-               |PROPIEDADESFD porcentaje padd guion mayorQ E { $$ = $1; $$->add = $6; $$->isAdd = true; }
-               |PROPIEDADESFD porcentaje pfit guion mayorQ AJUSTE { $$ = $1; $$->fit = $6; }
-               |PROPIEDADESFD porcentaje pallocation guion mayorQ ALLOCATION { $$ = $1; $$->allocation = $6; }
+               |PROPIEDADESFD ampersand padd guion mayorQ E { $$ = $1; $$->add = $6; $$->isAdd = true; }
+               |PROPIEDADESFD ampersand pfit guion mayorQ AJUSTE { $$ = $1; $$->fit = $6; }
+               |PROPIEDADESFD ampersand pallocation guion mayorQ ALLOCATION { $$ = $1; $$->allocation = $6; }
                |ampersand psize guion mayorQ numero { $$ = new Fdisk(); $$->size = std::stoi($5); }
-               |porcentaje punit guion mayorQ UNIDAD { $$ = new Fdisk(); $$->unit = $5; }
+               |ampersand punit guion mayorQ UNIDAD { $$ = new Fdisk(); $$->unit = $5; }
                |ampersand ppath guion mayorQ PATH { $$ = new Fdisk(); $$->path = $5; }
-               |porcentaje ptype guion mayorQ TYPE { $$ = new Fdisk(); $$->type = $5; }
-               |porcentaje pdetele guion mayorQ DELETE { $$ = new Fdisk(); $$->toDelete = $5; }
+               |ampersand ptype guion mayorQ TYPE { $$ = new Fdisk(); $$->type = $5; }
+               |ampersand pdetele guion mayorQ DELETE { $$ = new Fdisk(); $$->toDelete = $5; }
                |ampersand pname guion mayorQ PATH { $$ = new Fdisk(); $$->name = $5; }
-               |porcentaje padd guion mayorQ E { $$ = new Fdisk(); $$->add = $5; $$->isAdd = true; }
-               |porcentaje pfit guion mayorQ AJUSTE { $$ = new Fdisk(); $$->fit = $5; }
-               |porcentaje pallocation guion mayorQ ALLOCATION { $$ = new Fdisk(); $$->fit = $5; };
+               |ampersand padd guion mayorQ E { $$ = new Fdisk(); $$->add = $5; $$->isAdd = true; }
+               |ampersand pfit guion mayorQ AJUSTE { $$ = new Fdisk(); $$->fit = $5; }
+               |ampersand pallocation guion mayorQ ALLOCATION { $$ = new Fdisk(); $$->fit = $5; };
 
 DELETE : pfast { strcpy($$, "fast"); }
         |pfull { strcpy($$, "full"); };
