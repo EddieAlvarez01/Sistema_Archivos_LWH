@@ -267,21 +267,43 @@ void Msg_Disk(Mbr mbr, FILE *file, string nameD){
     cout << "Particiones logicas: " + to_string(pL) + "\n";
 }
 
+bool Equal_Logic(string name, Ebr bbr, FILE *file, bool rs){
+    if(bbr.part_next != 0){
+        Ebr ebr2;
+        fseek(file, bbr.part_next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        if(strcmp(ebr2.part_name, name.c_str()) == 0){
+            rs = true;
+            return rs;
+        }else{
+            rs = Equal_Logic(name, ebr2, file, rs);
+        }
+    }
+    return rs;
+}
+
 bool Name_Equal_Partition(string name, Mbr mbr, FILE *ff){
     for(int x=0; x<4; x++){
         if(mbr.particions[x].part_type == 80){
             if(strcmp(name.c_str(), mbr.particions[x].part_name) == 0){
                 return true;
             }
-        }else if(mbr.particions[x].part_type == 76 || mbr.particions[x].part_type == 69){
+        }else if(mbr.particions[x].part_type == 69){
             if(strcmp(mbr.particions[x].part_name, name.c_str()) == 0){
                 return true;
             }else{
                 Ebr ebbr;
                 fseek(ff, mbr.particions[x].part_start, SEEK_SET);
                 fread(&ebbr, sizeof (Ebr), 1, ff);
-                if(strcmp(ebbr.part_name, name.c_str()) == 0){
-                    return true;
+                if(ebbr.isLogic == 49){
+                    if(strcmp(ebbr.part_name, name.c_str()) == 0){
+                        return true;
+                    }else{
+                        bool rs = false;
+                        if(Equal_Logic(name, ebbr, ff, rs)){
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -302,6 +324,29 @@ int Position_Partition(Mbr mbr, string name){
     return 0;
 }
 
+void Resize_Ex(Ebr ebr, Ebr ebr2, FILE *file){
+    if(ebr2.part_next != 0){
+
+    }
+}
+
+void Delete_R_Logic(Ebr ebr, FILE *file, string name){
+    if(ebr.part_next != 0){
+        Ebr ebr2;
+        fseek(file, ebr.part_next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        if(strcmp(ebr2.part_name, name.c_str()) == 0){
+            if(ebr2.part_next != 0){
+                Ebr ebr3;
+                fseek(file, ebr2.part_next, SEEK_SET);
+                fread(&ebr3, sizeof(Ebr), 1, file);
+                ebr3.part_start = ebr2.part_start;
+                //ebr3.
+            }
+        }
+    }
+}
+
 void Delete_Partition(Fdisk *fd){
     if(existDir(fd->path)){
         FILE *file = fopen(fd->path.c_str(), "rb+");
@@ -320,14 +365,34 @@ void Delete_Partition(Fdisk *fd){
                     if(strcmp(option.c_str(), "S") == 0 || strcmp(option.c_str(), "s") == 0){
                         isValid = true;
                         int index = Position_Partition(mbr, fd->name);
-                        mbr.particions[index].part_status = 0;
-                        mbr.particions[index].part_type = 0;
-                        strcpy(mbr.particions[index].part_fit, "");
-                        mbr.particions[index].part_start = -1;
-                        mbr.particions[index].part_size = 0;
-                        strcpy(mbr.particions[index].part_name, "");
-                        fseek(file, 0, SEEK_SET);
-                        fwrite(&mbr, sizeof (Mbr), 1, file);
+                        if(index != 0){
+                            mbr.particions[index].part_status = 0;
+                            mbr.particions[index].part_type = 0;
+                            strcpy(mbr.particions[index].part_fit, "");
+                            mbr.particions[index].part_start = -1;
+                            mbr.particions[index].part_size = 0;
+                            strcpy(mbr.particions[index].part_name, "");
+                            fseek(file, 0, SEEK_SET);
+                            fwrite(&mbr, sizeof (Mbr), 1, file);
+                        }else{
+                            for(int x=0; x<4; x++){
+                                if(mbr.particions[x].part_type == 69){
+                                    Ebr ebr;
+                                    fseek(file, mbr.particions[x].part_start, SEEK_SET);
+                                    fread(&ebr, sizeof(Ebr), 1, file);
+                                    if(strcmp(ebr.part_name, fd->name.c_str()) == 0){
+                                        ebr.isLogic = 48;
+                                        strcpy(ebr.part_fit, "");
+                                        ebr.part_status = 48;
+                                        ebr.part_size = -1;
+                                        strcpy(ebr.part_name, "");
+                                    }else{
+
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                         cout << "Particion " + fd->name + " borrada correctamente\n";
                     }else if(strcmp(option.c_str(), "N") == 0 || strcmp(option.c_str(), "n") == 0){
                         isValid = true;
@@ -383,6 +448,87 @@ void Update_Start_B(int x, Mbr *mbr){
     }
 }
 
+int EbrSpace(Ebr ebr, int diskS, FILE *file){
+    diskS -= sizeof(Ebr);
+    diskS -= ebr.part_size;
+    if(ebr.part_next != 0){
+        Ebr ebr2;
+        fseek(file, ebr.part_next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        return EbrSpace(ebr2, diskS, file);
+    }
+    return diskS;
+}
+
+bool Partition_Extended_Space(FILE *file, Mbr mbr, int size){
+    int u = 0;
+    for(int x=0; x<4; x++){
+        if(mbr.particions[x].part_type == 69){
+            u = x;
+            break;
+        }
+    }
+    int diskS = mbr.particions[u].part_size;
+    Ebr ebr;
+    fseek(file, mbr.particions[u].part_start, SEEK_SET);
+    fread(&ebr, sizeof(Ebr), 1, file);
+    diskS -= sizeof(Ebr);
+    if(ebr.isLogic != 48){
+        diskS -= ebr.part_size;
+        if(ebr.part_next != 0){
+            Ebr ebr2;
+            fseek(file, ebr.part_next, SEEK_SET);
+            fread(&ebr2, sizeof(Ebr), 1, file);
+            diskS = EbrSpace(ebr2, diskS, file);
+        }
+        if((diskS - size) >= 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    return true;
+}
+
+void Recalculate_Space_Logic(Ebr ebr, FILE *file, int add){
+    if(ebr.part_next != 0){
+        int start = ebr.part_start;
+        int next = ebr.part_next;
+        Ebr ebr2;
+        fseek(file, next, SEEK_SET);
+        fread(&ebr2, sizeof(Ebr), 1, file);
+        ebr.part_size += add;
+        ebr.part_next = start + ebr.part_size;
+        ebr2.part_start = ebr.part_next + sizeof(Ebr);
+        if(ebr2.part_next == 0){
+            fseek(file, ebr.part_next, SEEK_SET);
+            fwrite(&ebr2, sizeof(Ebr), 1, file);
+        }else{
+            Recalculate_Space_Logic(ebr2, file, add);
+        }
+        fseek(file, (start - sizeof(Ebr)), SEEK_SET);
+        fwrite(&ebr, sizeof(Ebr), 1, file);
+    }else{
+        ebr.part_size += add;
+        fseek(file, (ebr.part_start - sizeof(Ebr)), SEEK_SET);
+        fwrite(&ebr, sizeof(Ebr), 1, file);
+    }
+}
+
+Ebr Search_Ebr(Ebr ebr, FILE *file, string name){
+    if(strcmp(ebr.part_name, name.c_str()) == 0){
+        return ebr;
+    }else{
+        if(ebr.part_next != 0){
+            Ebr ebr2;
+            fseek(file, ebr.part_next, SEEK_SET);
+            fread(&ebr2, sizeof(Ebr), 1, file);
+            ebr = Search_Ebr(ebr2, file, name);
+        }
+    }
+    return ebr;
+}
+
 void addUnits(Fdisk *fd){
     if(existDir(fd->path)){
         FILE *file = fopen(fd->path.c_str(), "rb+");
@@ -430,7 +576,29 @@ void addUnits(Fdisk *fd){
                         }
                         break;
                     }else{
-                        //Logicas
+                        //añadir tamaño a logicas
+                        Ebr ebr;
+                        fseek(file, mbr.particions[x].part_start, SEEK_SET);
+                        fread(&ebr, sizeof(Ebr), 1, file);
+                        if(fd->add < 0){
+
+                        }else{
+                            if(Partition_Extended_Space(file, mbr, fd->add)){
+                                if(strcmp(ebr.part_name, fd->name.c_str()) == 0){
+                                    Recalculate_Space_Logic(ebr, file, fd->add);
+                                }else{
+                                    if(ebr.isLogic != 48){
+                                        Ebr ebr2;
+                                        fseek(file, ebr.part_next, SEEK_SET);
+                                        fread(&ebr2, sizeof(Ebr), 1, file);
+                                        Recalculate_Space_Logic(Search_Ebr(ebr2, file, fd->name), file, fd->add);
+                                    }
+                                }
+                                cout << "Añadido correctamente " + to_string(fd->add) + " bytes a la particion '" + fd->name + "' \n";
+                            }else{
+                                cout << "Error: la cantidad a añadir sobrepasa el tamano de la particion externa\n";
+                            }
+                        }
                     }
                 }else if(strcmp(mbr.particions[x].part_name, fd->name.c_str()) == 0){
                     error = false;
@@ -507,48 +675,6 @@ bool Exist_Extended(Mbr mbr){
         }
     }
     return false;
-}
-
-int EbrSpace(Ebr ebr, int diskS, FILE *file){
-    diskS -= sizeof(Ebr);
-    diskS -= ebr.part_size;
-    if(ebr.part_next != 0){
-        Ebr ebr2;
-        fseek(file, ebr.part_next, SEEK_SET);
-        fread(&ebr2, sizeof(Ebr), 1, file);
-        return EbrSpace(ebr2, diskS, file);
-    }
-    return diskS;
-}
-
-bool Partition_Extended_Space(FILE *file, Mbr mbr, int size){
-    int u = 0;
-    for(int x=0; x<4; x++){
-        if(mbr.particions[x].part_type == 69){
-            u = x;
-            break;
-        }
-    }
-    int diskS = mbr.particions[u].part_size;
-    Ebr ebr;
-    fseek(file, mbr.particions[u].part_start, SEEK_SET);
-    fread(&ebr, sizeof(Ebr), 1, file);
-    diskS -= sizeof(Ebr);
-    if(ebr.isLogic != 48){
-        diskS -= ebr.part_size;
-        if(ebr.part_next != 0){
-            Ebr ebr2;
-            fseek(file, ebr.part_next, SEEK_SET);
-            fread(&ebr2, sizeof(Ebr), 1, file);
-            diskS = EbrSpace(ebr2, diskS, file);
-        }
-        if((diskS - size) >= 0){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    return true;
 }
 
 void Create_Partition_Extended(Fdisk *fd){
@@ -712,59 +838,63 @@ void Create_Partition_Logic(Fdisk *fd){
             fread(&mbr, sizeof (Mbr), 1, file);
             if(Exist_Extended(mbr)){
                 if(Partition_Extended_Space(file, mbr, fd->size)){
-                    Msg_Disk(mbr, file, NameDisk(fd->path));
-                    int y;
-                    for(int x=0; x<4; x++){
-                        if(mbr.particions[x].part_type == 69){
-                            y = x;
-                            break;
+                    if(!Name_Equal_Partition(fd->name, mbr, file)){
+                        Msg_Disk(mbr, file, NameDisk(fd->path));
+                        int y;
+                        for(int x=0; x<4; x++){
+                            if(mbr.particions[x].part_type == 69){
+                                y = x;
+                                break;
+                            }
                         }
-                    }
-                    Ebr ebr;
-                    fseek(file, mbr.particions[y].part_start, SEEK_SET);
-                    fread(&ebr, sizeof(Ebr), 1, file);
-                        if(ebr.isLogic != 48){
-                            if(ebr.part_next != 0){
-                                Linked_Ebr(ebr, file, mbr, fd);
-                            }else{
-                                ebr.part_next = ebr.part_start + ebr.part_size;
-                                Ebr ebr2;
-                                ebr2.part_status = 49;
-                                if(fd->fit != ""){
-                                    strcpy(ebr2.part_fit, fd->fit.c_str());
+                        Ebr ebr;
+                        fseek(file, mbr.particions[y].part_start, SEEK_SET);
+                        fread(&ebr, sizeof(Ebr), 1, file);
+                            if(ebr.isLogic != 48){
+                                if(ebr.part_next != 0){
+                                    Linked_Ebr(ebr, file, mbr, fd);
                                 }else{
-                                    strcpy(ebr2.part_fit, "wf");
+                                    ebr.part_next = ebr.part_start + ebr.part_size;
+                                    Ebr ebr2;
+                                    ebr2.part_status = 49;
+                                    if(fd->fit != ""){
+                                        strcpy(ebr2.part_fit, fd->fit.c_str());
+                                    }else{
+                                        strcpy(ebr2.part_fit, "wf");
+                                    }
+                                    ebr2.part_start = ebr.part_next + sizeof(Ebr);
+                                    ebr2.part_size = fd->size;
+                                    ebr2.part_next = 0;
+                                    strcpy(ebr2.part_name, fd->name.c_str());
+                                    fseek(file, mbr.particions[y].part_start, SEEK_SET);
+                                    fwrite(&ebr, sizeof(Ebr), 1, file);
+                                    fseek(file, ebr.part_next, SEEK_SET);
+                                    fwrite(&ebr2, sizeof(Ebr), 1, file);
+                                    cout << "Particion logica '" + fd->name + "' creada exitosamente\n";
+                                    fseek(file, 0, SEEK_SET);
+                                    fread(&mbr, sizeof(Mbr), 1, file);
+                                    Msg_Disk(mbr, file, NameDisk(fd->path));
                                 }
-                                ebr2.part_start = ebr.part_next + sizeof(Ebr);
-                                ebr2.part_size = fd->size;
-                                ebr2.part_next = 0;
-                                strcpy(ebr2.part_name, fd->name.c_str());
+                            }else{
+                                ebr.part_status = 49;
+                                if(fd->fit != ""){
+                                    strcpy(ebr.part_fit, fd->fit.c_str());
+                                }else{
+                                    strcpy(ebr.part_fit, "wf");
+                                }
+                                ebr.part_size = fd->size;
+                                ebr.isLogic = 49;
+                                strcpy(ebr.part_name, fd->name.c_str());
                                 fseek(file, mbr.particions[y].part_start, SEEK_SET);
                                 fwrite(&ebr, sizeof(Ebr), 1, file);
-                                fseek(file, ebr.part_next, SEEK_SET);
-                                fwrite(&ebr2, sizeof(Ebr), 1, file);
                                 cout << "Particion logica '" + fd->name + "' creada exitosamente\n";
                                 fseek(file, 0, SEEK_SET);
                                 fread(&mbr, sizeof(Mbr), 1, file);
                                 Msg_Disk(mbr, file, NameDisk(fd->path));
                             }
-                        }else{
-                            ebr.part_status = 49;
-                            if(fd->fit != ""){
-                                strcpy(ebr.part_fit, fd->fit.c_str());
-                            }else{
-                                strcpy(ebr.part_fit, "wf");
-                            }
-                            ebr.part_size = fd->size;
-                            ebr.isLogic = 49;
-                            strcpy(ebr.part_name, fd->name.c_str());
-                            fseek(file, mbr.particions[y].part_start, SEEK_SET);
-                            fwrite(&ebr, sizeof(Ebr), 1, file);
-                            cout << "Particion logica '" + fd->name + "' creada exitosamente\n";
-                            fseek(file, 0, SEEK_SET);
-                            fread(&mbr, sizeof(Mbr), 1, file);
-                            Msg_Disk(mbr, file, NameDisk(fd->path));
-                        }
+                    }else{
+                        cout << "Error: el nombre '" + fd->name + "' ya existe en una particion\n";
+                    }
                  }else{
                     cout << "Error: no hay espacio en la particion extendida\n";
                 }
@@ -886,12 +1016,8 @@ int main()
                     if(fd->name != ""){
                         if(fd->toDelete != ""){
                             Delete_Partition(fd);
-                            fd->path = Path_Raid(fd->path);
-                            Delete_Partition(fd);
                         }else if(fd->isAdd){
                             fd->add = Total_Disk_FD(fd->unit, fd->add);
-                            addUnits(fd);
-                            fd->path = Path_Raid(fd->path);
                             addUnits(fd);
                         }else{
                             if(fd->size != -1){
