@@ -4,7 +4,9 @@ Mkfs::Mkfs()
 {
 
     id = "";
-    type = "";
-    fs = "";
+    type = "full";
+    add = 0;
+    isAdd = false;
+    unit = "k";
 
 }

@@ -10,5 +10,6 @@ Ebr::Ebr()
     part_next = 0;
     strcpy(part_name, "");
     isLogic = 48;
+    strcpy(id, "");
 
 }

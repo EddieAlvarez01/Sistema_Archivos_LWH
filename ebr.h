@@ -14,6 +14,7 @@ public:
     int part_next;
     char part_name [30];
     char isLogic;
+    char id [8];
 };
 
 #endif // EBR_H

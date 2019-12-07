@@ -136,7 +136,6 @@ class Mkdir* mkdir;
 %type<TEXT> PATH;
 %type<TEXT> TYPE;
 %type<mkfs> PROPIEDADESMKFS;
-%type<TEXT> FORMAT;
 %type<TEXT> VALUE;
 %type<TEXT> ALLOCATION;
 %type<login> PROPIEDADESLOGIN;
@@ -231,10 +230,10 @@ TYPE :  pp { strcpy($$, "p"); }
        |pe { strcpy($$, "e"); }
        |pl { strcpy($$, "l"); };
 
-PROPIEDADESMOUNT : PROPIEDADESMOUNT guion ppath igual PATH { $$ = $1; $$->path = $5; }
-                  |PROPIEDADESMOUNT guion pname igual PATH { $$ = $1; $$->name = $5; }
-                  |guion ppath igual PATH { $$ = new Mount(); $$->path = $4; }
-                  |guion pname igual PATH { $$ = new Mount(); $$->name = $4; };
+PROPIEDADESMOUNT : PROPIEDADESMOUNT ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
+                  |PROPIEDADESMOUNT ampersand pname guion mayorQ PATH { $$ = $1; $$->name = $6; }
+                  |ampersand ppath guion mayorQ PATH { $$ = new Mount(); $$->path = $5; }
+                  |ampersand pname guion mayorQ PATH { $$ = new Mount(); $$->name = $5; };
 
 PROPIEDADESUNMOUNT : pid igual id { $$ = new Unmount(); $$->id = $3; };
 
@@ -248,21 +247,20 @@ PROPIEDADESREP : PROPIEDADESREP guion pname igual NAME { $$ = $1; $$->name = $5;
 NAME : pmbr { strcpy($$, "mbr"); }
       |pdisk { strcpy($$, "disk"); };
 
-FORMAT : p2fs {strcpy($$, "2fs"); }
-        |p3fs { strcpy($$, "3fs"); };
-
 VALUE : id { strcpy($$, $1); }
         |cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }
         |numero { strcpy($$, $1); };
 
 PROPIEDADESEXEC : guion ppath igual PATH { $$ = new Exec(); $$->path = $4; };
 
-PROPIEDADESMKFS : PROPIEDADESMKFS guion pid igual id { $$ = $1; $$->id = $5; }
-                 |PROPIEDADESMKFS guion ptype igual DELETE { $$ = $1; $$->type = $5; }
-                 |PROPIEDADESMKFS guion pfs igual FORMAT { $$ = $1; $$->fs = $5; }
-                 |guion pid igual id { $$ = new Mkfs(); $$->id = $4; }
-                 |guion ptype igual DELETE { $$ = new Mkfs(); $$->type = $4; }
-                 |guion pfs igual FORMAT { $$ = new Mkfs(); $$->fs = $4; };
+PROPIEDADESMKFS : PROPIEDADESMKFS ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                 |PROPIEDADESMKFS ampersand ptype guion mayorQ DELETE { $$ = $1; $$->type = $6; }
+                 |PROPIEDADESMKFS ampersand padd guion mayorQ E { $$ = $1; $$->add = $6; $$->isAdd = true; }
+                 |PROPIEDADESMKFS ampersand ptype guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
+                 |ampersand pid guion mayorQ id { $$ = new Mkfs(); $$->id = $5; }
+                 |ampersand ptype guion mayorQ DELETE { $$ = new Mkfs(); $$->type = $5; }
+                 |ampersand padd guion mayorQ E { $$ = new Mkfs(); $$->add = $5; $$->isAdd = true; }
+                 |ampersand ptype guion mayorQ UNIDAD { $$ = new Mkfs(); $$->unit = $5; };
 
 PROPIEDADESLOGIN : PROPIEDADESLOGIN guion pusr igual PATH { $$ = $1; $$->usr = $5; }
                   |PROPIEDADESLOGIN guion ppwd igual VALUE { $$ = $1; $$->pwd = $5; }

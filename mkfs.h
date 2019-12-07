@@ -10,7 +10,9 @@ public:
     Mkfs();
     std::string id;
     std::string type;
-    std::string fs;
+    int add;
+    bool isAdd;
+    std::string unit;
 };
 
 #endif // MKFS_H

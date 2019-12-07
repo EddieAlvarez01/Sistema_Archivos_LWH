@@ -30,6 +30,12 @@
 #include "listmount.h"
 #include "nodelist.h"
 #include "plotter.h"
+#include "superboot.h"
+#include "virtualdirectorytree.h"
+#include "directorydetail.h"
+#include "inode.h"
+#include "datablock.h"
+#include "log.h"
 
 using namespace std;
 
@@ -42,6 +48,7 @@ list<string> printExec;
 ListMount list_ram;
 Plotter plot;
 char generateLetter = 'a';
+int countLogic = 1; //Contador para los id de las monturas de las particiones logicas.
 
 int Total_Disk_Size(string unit, int size){
     if(unit == "k"){
@@ -321,7 +328,7 @@ int Position_Partition(Mbr mbr, string name){
             return x;
         }
     }
-    return 0;
+    return -1;
 }
 
 void Resize_Ex(Ebr ebr, Ebr ebr2, FILE *file){
@@ -365,7 +372,7 @@ void Delete_Partition(Fdisk *fd){
                     if(strcmp(option.c_str(), "S") == 0 || strcmp(option.c_str(), "s") == 0){
                         isValid = true;
                         int index = Position_Partition(mbr, fd->name);
-                        if(index != 0){
+                        if(index != -1){
                             mbr.particions[index].part_status = 0;
                             mbr.particions[index].part_type = 0;
                             strcpy(mbr.particions[index].part_fit, "");
@@ -581,13 +588,37 @@ void addUnits(Fdisk *fd){
                         fseek(file, mbr.particions[x].part_start, SEEK_SET);
                         fread(&ebr, sizeof(Ebr), 1, file);
                         if(fd->add < 0){
-
+                            if(strcmp(ebr.part_name, fd->name.c_str()) == 0){
+                                error = false;
+                                if((ebr.part_size + fd->add) > 0){
+                                    Recalculate_Space_Logic(ebr, file, fd->add);
+                                    cout << "Añadido correctamente " + to_string(fd->add) + " bytes a la particion '" + fd->name + "' \n";
+                                }else{
+                                    cout << "Error: al quitarle espacio a una particion no puede quedar negativa o igual a 0\n";
+                                }
+                            }else{
+                                if(ebr.isLogic != 48){
+                                    Ebr ebr2;
+                                    fseek(file, ebr.part_next, SEEK_SET);
+                                    fread(&ebr2, sizeof(Ebr), 1, file);
+                                    Ebr tmpE = Search_Ebr(ebr2, file, fd->name);
+                                    error = false;
+                                    if((tmpE.part_size + fd->add) > 0){
+                                        Recalculate_Space_Logic(tmpE, file, fd->add);
+                                        cout << "Añadido correctamente " + to_string(fd->add) + " bytes a la particion '" + fd->name + "' \n";
+                                    }else{
+                                        cout << "Error: al quitarle espacio a una particion no puede quedar negativa o igual a 0\n";
+                                    }
+                                }
+                            }
                         }else{
                             if(Partition_Extended_Space(file, mbr, fd->add)){
                                 if(strcmp(ebr.part_name, fd->name.c_str()) == 0){
+                                    error = false;
                                     Recalculate_Space_Logic(ebr, file, fd->add);
                                 }else{
                                     if(ebr.isLogic != 48){
+                                        error = false;
                                         Ebr ebr2;
                                         fseek(file, ebr.part_next, SEEK_SET);
                                         fread(&ebr2, sizeof(Ebr), 1, file);
@@ -920,21 +951,44 @@ void Mount_Partition(Mount *mn){
             Msg_Disk(mbr, file, NameDisk(mn->path));
             if(Name_Equal_Partition(mn->name, mbr, file)){
                 int pp = Position_Partition(mbr, mn->name);
-                if(!list_ram.isMount(mbr.particions[pp].id)){
-                    string idd = mbr.id + to_string(pp+1);
-                    strcpy(mbr.particions[pp].id, idd.c_str());
-                    NodeList *node = new NodeList(mbr.particions[pp]);
-                    node->disk = mn->path;
-                    time_t t = time(nullptr);
-                    tm *now = localtime(&t);
-                    node->date = to_string(now->tm_mday) + "-" + to_string(now->tm_mon + 1) + "-" + to_string(now->tm_year + 1900);
-                     list_ram.insert(node);
-                    fseek(file, 0, SEEK_SET);
-                    fwrite(&mbr, sizeof (Mbr), 1, file);
-                    cout << "Particion " + mn->name + " montada correctamente\n";
-                    cout << "\nParticiones montadas:\n";
+                if(pp != -1){
+                    if(!list_ram.isMount(mbr.particions[pp].part_name)){
+                        string idd = mbr.id + to_string(pp+1);
+                        strcpy(mbr.particions[pp].id, idd.c_str());
+                        NodeList *node = new NodeList(mbr.particions[pp]);
+                        node->disk = mn->path;
+                        time_t t = time(nullptr);
+                        tm *now = localtime(&t);
+                        node->date = to_string(now->tm_mday) + "-" + to_string(now->tm_mon + 1) + "-" + to_string(now->tm_year + 1900);
+                         list_ram.insert(node);
+                        cout << "Particion " + mn->name + " montada correctamente\n";
+                        cout << "\nParticiones montadas:\n";
+                    }else{
+                        cout << "Error: la particion " + mn->name + " ya esta montada\n";
+                    }
                 }else{
-                    cout << "Error: la particion " + mn->name + " ya esta montada\n";
+                    for(int x=0; x<4; x++){
+                        if(mbr.particions[x].part_type == 69){                // Se encuentra la extendida
+                            Ebr ebr;
+                            fseek(file, mbr.particions[x].part_start, SEEK_SET);
+                            fread(&ebr, sizeof(Ebr), 1, file);
+                            Ebr ebr2 = Search_Ebr(ebr, file, mn->name);     // Se encuentra la partión logica
+                            if(!list_ram.isMount(ebr2.part_name)){
+                                string idd = mbr.id + to_string(4 + countLogic++);
+                                //Llenar propiedades
+                                strcpy(ebr2.id, idd.c_str());
+                                NodeList *node = new NodeList(ebr2);
+                                node->disk = mn->path;
+                                time_t t = time(nullptr);
+                                tm *now = localtime(&t);
+                                node->date = to_string(now->tm_mday) + "-" + to_string(now->tm_mon + 1) + "-" + to_string(now->tm_year + 1900);
+                                list_ram.insert(node);
+                            }else{
+                                 cout << "Error: la particion " + mn->name + " ya esta montada\n";
+                            }
+                            break;
+                        }
+                    }
                 }
             }else{
                 cout << "Error: la particion '" + mn->name + "' no exite\n";
@@ -961,6 +1015,142 @@ bool hasExtension(string name){
         return true;
     }
     return false;
+}
+
+int Calculate_Structures(int partitionSize){
+    int dividend = partitionSize - (2*(int)sizeof (SuperBoot));
+    int divider = 27 + (int)sizeof (Journaling) + (int)sizeof (Inode) + 3 * (int)sizeof (Folder_Block);
+    double n = dividend / divider;
+    return (int)floor(n);
+}
+
+void Format_Partition(Mkfs *mkfs){
+    if(list_ram.isMount(mkfs->id)){
+        list_ram.FormatPartition(mkfs->id);
+        NodeList *node = list_ram.SearchNode(mkfs->id);
+        int partSize = 0;
+        FILE *file = fopen(node->disk.c_str(), "rb+");
+        if(file != nullptr){
+            Mbr mbr;
+            fseek(file, 0, SEEK_SET);
+            fread(&mbr, sizeof (Mbr), 1, file);
+            if(node->type == 0){
+                partSize = node->data.part_size;
+            }else{
+                partSize = node->data2.part_size;
+            }
+            int calc = Calculate_Structures(partSize);
+            Bitmap_Inode bitIn(calc);
+            Bitmap_Block bBLock(calc);
+            SuperBlock spB;
+            spB.s_filesystem_type = 3;
+            spB.s_inodes_count = calc;
+            spB.s_blocks_count = calc*3;
+            spB.s_free_blocks_count = calc*3;
+            spB.s_free_inodes_count = calc;
+            strcpy(spB.s_mtime, node->date.c_str());
+            spB.s_inode_size = sizeof (Inode);
+            spB.s_block_size = sizeof (File_Block);
+            int readSb = node->data.part_start + (int)sizeof (SuperBlock);
+            int readJour = readSb + calc * (int)sizeof (Journaling);
+            int readBitIn = readJour + calc;
+            int readBitBlock = readBitIn + 3*calc;
+            int readInodes = readBitBlock + calc * (int)sizeof (Inode);
+            spB.s_bm_inode_start = readJour;
+            spB.s_bm_block_start = readBitIn;
+            spB.s_inode_start = readBitBlock;
+            spB.s_block_start = readInodes;
+            fseek(file, node->data.part_start, SEEK_SET);
+            fwrite(&spB, sizeof (SuperBlock), 1, file);
+            Journaling jo;
+            strcpy(jo.op, "mkdir");
+            strcpy(jo.type, "Carpeta");
+            strcpy(jo.name, "/");
+            strcpy(jo.content, "-");
+            time_t t = time(nullptr);
+            tm *now = localtime(&t);
+            string chain;
+            chain = to_string(now->tm_mday) + "-" + to_string((now->tm_mon+1)) + "-" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+            strcpy(jo.date, chain.c_str());
+            int byte = ReturnedByteJournaling(file, readSb, readJour);
+            if(byte != 0){
+                fseek(file, byte, SEEK_SET);
+                fwrite(&jo, sizeof (Journaling), 1, file);
+            }else{
+                cout << "No hay espacio en el journaling para la raiz\n";
+            }
+            ReturnedOfBitmapInodes byteBitmapInode = ReturnByteBitmap(file, readJour, readBitIn);
+            if(byteBitmapInode.position != -1){
+                ReturnedOfBitmapInodes byteBitmapBlock = ReturnByteBitmap(file, readBitIn, readBitBlock);
+                if(byteBitmapBlock.position != -1){
+                    Inode newIn;
+                    newIn.i_uid = -1;
+                    newIn.l_gid = -1;
+                    newIn.i_size = 0;
+                    time_t t = time(nullptr);
+                    tm *now = localtime(&t);
+                    string chain;
+                    chain = to_string(now->tm_mday) + "-" + to_string((now->tm_mon+1)) + "-" + to_string((now->tm_year + 1900));
+                    strcpy(newIn.i_atime, chain.c_str());
+                    strcpy(newIn.i_ctime, chain.c_str());
+                    strcpy(newIn.i_mtime, chain.c_str());
+                    newIn.i_block[IndexBlockInode(newIn)] = byteBitmapBlock.position;
+                    newIn.i_type = 48;
+                    newIn.i_perm = 0;
+                    fseek(file, byteBitmapInode.byte, SEEK_SET);
+                    char ch = 49;
+                    fwrite(&ch, 1, 1, file);
+                    fseek(file, byteBitmapBlock.byte, SEEK_SET);
+                    fwrite(&ch, 1, 1, file);
+                    Folder_Block fBlock;
+                    strcpy(fBlock.b_content[0].b_name, ".");
+                    fBlock.b_content[0].b_inodo = 0;
+                    strcpy(fBlock.b_content[1].b_name, "..");
+                    fBlock.b_content[1].b_inodo = 0;
+                    ReturnedOfBitmapInodes byteBitmapInode2 = ReturnByteBitmap(file, readJour, readBitIn);
+                    ReturnedOfBitmapInodes byteBitmapBlock2 = ReturnByteBitmap(file, readBitIn, readBitBlock);
+                    File_Block fifile;
+                    strcpy(fifile.b_content, "1,G,root\n1,U,root,root,123\n");
+                    Inode newInode2;
+                    newInode2.i_uid = -1;
+                    newInode2.l_gid = -1;
+                    newInode2.i_size = SizeFile(fifile.b_content);
+                    strcpy(newInode2.i_atime, chain.c_str());
+                    strcpy(newInode2.i_ctime, chain.c_str());
+                    strcpy(newInode2.i_mtime, chain.c_str());
+                    newInode2.i_block[IndexBlockInode(newInode2)] = byteBitmapBlock2.position;
+                    newInode2.i_type = 49;
+                    newInode2.i_perm = 0;
+                    strcpy(fBlock.b_content[2].b_name, "users.txt");
+                    fBlock.b_content[2].b_inodo = byteBitmapInode2.position;
+                    fseek(file, byteBitmapInode2.byte, SEEK_SET);
+                    char jj = 49;
+                    fwrite(&jj, 1, 1, file);
+                    fseek(file, byteBitmapBlock2.byte, SEEK_SET);
+                    char gg = 49;
+                    fwrite(&gg, 1, 1, file);
+                    fseek(file, readBitBlock + (byteBitmapInode.position * (int)sizeof (Inode)), SEEK_SET);
+                    fwrite(&newIn, sizeof (Inode), 1, file);
+                    fseek(file, readInodes + (byteBitmapBlock.position * (int)sizeof (Folder_Block)), SEEK_SET);
+                    fwrite(&fBlock, sizeof (Folder_Block), 1, file);
+                    fseek(file, readBitBlock + (byteBitmapInode2.position * (int)sizeof (Inode)), SEEK_SET);
+                    fwrite(&newInode2, sizeof (Inode), 1, file);
+                    fseek(file, readInodes + (byteBitmapBlock2.position * (int)sizeof (Folder_Block)), SEEK_SET);
+                    fwrite(&fifile, sizeof (Folder_Block), 1, file);
+                }else{
+
+                }
+            }else{
+                cout << "Ya no hay espacio en el bitmap de inodos para otro inodo\n";
+            }
+        }else{
+            cout << "No se puede abrir el archivo de la particion\n";
+        }
+        fclose(file);
+        cout << "Particion '" + mkfs->id + "' formateada exitosamente\n";
+    }else{
+        cout << "Error: la particion con el id '" + mkfs->id + "' no esta montada\n";
+    }
 }
 
 
@@ -1048,8 +1238,6 @@ int main()
                 if(mn->name != ""){
                     if(mn->path != ""){
                         Mount_Partition(mn);
-                        mn->path = Path_Raid(mn->path);
-                        Mount_Partition(mn);
                         list_ram.List_Mount();
                     }else{
                         cout << "Error: el 'path' es obligatorio\n";
@@ -1128,13 +1316,31 @@ int main()
                 }else{
                     cout << "Error: el 'name' es obligatorio\n";
                 }
-            }/*else if(Mkfs *mkfs = dynamic_cast<Mkfs*>((*it))){
+            }else if(Mkfs *mkfs = dynamic_cast<Mkfs*>((*it))){
                 if(mkfs->id != ""){
+                    if(mkfs->isAdd){
+                        NodeList *node = list_ram.SearchNode(mkfs->id);
+                        if(node != nullptr){
+                            if(node->type == 0){
+                                Fdisk *fd = new Fdisk();
+                                fd->path = node->disk;
+                                fd->name = node->data.part_name;
+                                fd->add = mkfs->add;
+                                addUnits(fd);
+                            }else{
+                                Fdisk *fd = new Fdisk();
+                                fd->path = node->disk;
+                                fd->name = node->data2.part_name;
+                                fd->add = mkfs->add;
+                                addUnits(fd);
+                            }
+                        }
+                    }
                     Format_Partition(mkfs);
                 }else{
                     cout << "Error: el 'id' es obligatorio\n";
                 }
-            }else if(Login *login = dynamic_cast<Login*>((*it))){
+            }/*else if(Login *login = dynamic_cast<Login*>((*it))){
                 if(login->usr != ""){
                     if(login->pwd != ""){
                         if(login->id != ""){

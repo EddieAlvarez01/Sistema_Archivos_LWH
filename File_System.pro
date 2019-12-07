@@ -29,7 +29,14 @@ SOURCES += main.cpp \
     partition.cpp \
     mbr.cpp \
     ebr.cpp \
-    plotter.cpp
+    plotter.cpp \
+    superboot.cpp \
+    virtualdirectorytree.cpp \
+    contentdetail.cpp \
+    directorydetail.cpp \
+    inode.cpp \
+    datablock.cpp \
+    log.cpp
 
 DISTFILES += \
     lexico.l \
@@ -61,4 +68,11 @@ HEADERS += \
     partition.h \
     mbr.h \
     ebr.h \
-    plotter.h
+    plotter.h \
+    superboot.h \
+    virtualdirectorytree.h \
+    contentdetail.h \
+    directorydetail.h \
+    inode.h \
+    datablock.h \
+    log.h

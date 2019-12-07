@@ -58,8 +58,14 @@ bool ListMount::isMount(std::string id){
     if(first != nullptr){
         NodeList *tmp = first;
         while(tmp != nullptr){
-            if(strcmp(tmp->data.id, id.c_str()) == 0){
-                return true;
+            if(tmp->type == 0){
+                if(strcmp(tmp->data.part_name, id.c_str()) == 0){
+                    return true;
+                }
+            }else{
+                if(strcmp(tmp->data2.part_name, id.c_str()) == 0){
+                    return true;
+                }
             }
             tmp = tmp->next;
         }
@@ -71,12 +77,21 @@ void ListMount::List_Mount(){
     if(first != nullptr){
         NodeList *tmp = first;
         while(tmp != nullptr){
-            std::cout << std::string("\nParticion ") + tmp->data.id + std::string(":\n");
-            std::cout << std::string("Nombre de la particion: ") + tmp->data.part_name + std::string("\n");
-            std::cout << std::string("Ajuste: ") + tmp->data.part_fit + std::string("\n");
-            std::cout << std::string("Tamaño de la particion: ") + std::to_string(tmp->data.part_size) + "\n";
-            std::cout << std::string("Tipo de particion: ") + tmp->data.part_type + std::string("\n");
-            std::cout << "Inicio de la particion: " + std::to_string(tmp->data.part_start) + "\n";
+            if(tmp->type == 0){
+                std::cout << std::string("\nParticion ") + tmp->data.id + std::string(":\n");
+                std::cout << std::string("Nombre de la particion: ") + tmp->data.part_name + std::string("\n");
+                std::cout << std::string("Ajuste: ") + tmp->data.part_fit + std::string("\n");
+                std::cout << std::string("Tamaño de la particion: ") + std::to_string(tmp->data.part_size) + "\n";
+                std::cout << std::string("Tipo de particion: Primaria\n");
+                std::cout << "Inicio de la particion: " + std::to_string(tmp->data.part_start) + "\n";
+            }else{
+                std::cout << std::string("\nParticion ") + tmp->data2.id + std::string(":\n");
+                std::cout << std::string("Nombre de la particion: ") + tmp->data2.part_name + std::string("\n");
+                std::cout << std::string("Ajuste: ") + tmp->data2.part_fit + std::string("\n");
+                std::cout << std::string("Tamaño de la particion: ") + std::to_string(tmp->data2.part_size) + "\n";
+                std::cout << std::string("Tipo de particion: Logica\n");
+                std::cout << "Inicio de la particion: " + std::to_string(tmp->data2.part_start) + "\n";
+            }
             tmp = tmp->next;
         }
     }

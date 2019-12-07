@@ -10,6 +10,7 @@ class NodeList
 {
 public:
     NodeList(Partition _data);
+    NodeList(Ebr _data);
     Partition data;
     Ebr data2;
     int format;
