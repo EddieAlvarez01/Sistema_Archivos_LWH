@@ -6,7 +6,7 @@ class SuperBoot
 {
 public:
     SuperBoot();
-    char sd_nombre_hd [12];
+    char sb_nombre_hd [12];
     int sb_arbol_virtual_count;
     int sb_detalle_directorio_count;
     int sb_inodos_count;

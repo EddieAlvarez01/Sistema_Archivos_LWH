@@ -6,7 +6,7 @@ class DataBlock
 {
 public:
     DataBlock();
-    char db_data [25];
+    char db_data [25] = {0};
 };
 
 #endif // DATABLOCK_H

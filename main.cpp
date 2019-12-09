@@ -14,6 +14,7 @@
 #include <vector>
 #include <stack>
 #include <queue>
+#include <math.h>
 #include "mbr.h"
 #include "ebr.h"
 #include "parser.h"
@@ -36,6 +37,7 @@
 #include "inode.h"
 #include "datablock.h"
 #include "log.h"
+#include "returnedofbitmap.h"
 
 using namespace std;
 
@@ -952,7 +954,7 @@ void Mount_Partition(Mount *mn){
             if(Name_Equal_Partition(mn->name, mbr, file)){
                 int pp = Position_Partition(mbr, mn->name);
                 if(pp != -1){
-                    if(!list_ram.isMount(mbr.particions[pp].part_name)){
+                    if(!list_ram.isMountByName(mbr.particions[pp].part_name)){
                         string idd = mbr.id + to_string(pp+1);
                         strcpy(mbr.particions[pp].id, idd.c_str());
                         NodeList *node = new NodeList(mbr.particions[pp]);
@@ -973,7 +975,7 @@ void Mount_Partition(Mount *mn){
                             fseek(file, mbr.particions[x].part_start, SEEK_SET);
                             fread(&ebr, sizeof(Ebr), 1, file);
                             Ebr ebr2 = Search_Ebr(ebr, file, mn->name);     // Se encuentra la partión logica
-                            if(!list_ram.isMount(ebr2.part_name)){
+                            if(!list_ram.isMountByName(ebr2.part_name)){
                                 string idd = mbr.id + to_string(4 + countLogic++);
                                 //Llenar propiedades
                                 strcpy(ebr2.id, idd.c_str());
@@ -1019,9 +1021,103 @@ bool hasExtension(string name){
 
 int Calculate_Structures(int partitionSize){
     int dividend = partitionSize - (2*(int)sizeof (SuperBoot));
-    int divider = 27 + (int)sizeof (Journaling) + (int)sizeof (Inode) + 3 * (int)sizeof (Folder_Block);
+    int divider = 27 + (int)sizeof (VirtualDirectoryTree) + (int)sizeof (DirectoryDetail) + (5 * (int)sizeof (Inode) + (20 * (int)sizeof(DataBlock)) + (int)sizeof(Log));
     double n = dividend / divider;
     return (int)floor(n);
+}
+
+/*int ReturnedByteJournaling(FILE *file, int initByte, int endByte){
+    Journaling jo;
+    for(int i=initByte; i<=endByte; i += (int)sizeof (Journaling)){
+        fseek(file, i, SEEK_SET);
+        fread(&jo, sizeof (Journaling), 1, file);
+        if(strcmp(jo.op, "mkdir") != 0){
+            return i;
+        }
+    }
+    return 0;
+}*/
+
+ReturnedOfBitmap ReturnByteBitmap(FILE *file, int initByte, int endByte){
+    char bit;
+    ReturnedOfBitmap returnBy;
+    int count = 0;
+    while(initByte <= endByte){
+        fseek(file, initByte, SEEK_SET);
+        fread(&bit, 1, 1, file);
+        int byte = bit;
+        if(byte == 0){
+            returnBy.position = count;
+            returnBy.byte = initByte;
+            return returnBy;
+        }
+        initByte++;
+        count++;
+    }
+    return returnBy;
+}
+
+/*Metodo de escritura en los bloques*/
+string Write_DataBlock(char contentBlock[25], string text){
+    int spaceFree = strlen(contentBlock);
+    while(spaceFree < 25){
+        char character = text[0];
+        contentBlock[spaceFree] = character;
+        text.erase(0, 1);
+        spaceFree++;
+        if(text == ""){
+           break;
+        }
+    }
+    return text;
+}
+
+/*Metodo de asignacion de bloques a un inodo*/
+void Recursive_CreateFile(FILE *file, string text, SuperBoot sb, Inode in, int posInode){
+    for(int i=0; i<4; i++){
+        if(in.i_array_bloques[i] == -1){
+            ReturnedOfBitmap byteBmBlock = ReturnByteBitmap(file, sb.sb_ap_bitmap_bloques, sb.sb_ap_bloques);
+            if(byteBmBlock.position != -1){
+                char a = 49;
+                fseek(file, byteBmBlock.byte, SEEK_SET);
+                fwrite(&a, 1, 1, file);
+                DataBlock dB;
+                text = Write_DataBlock(dB.db_data, text);
+                in.i_array_bloques[i] = byteBmBlock.position;
+                in.i_count_bloques_asignados += 1;
+                fseek(file, sb.sb_ap_bloques + (byteBmBlock.position * (int)sizeof(DataBlock)), SEEK_SET);
+                fwrite(&dB, sizeof(DataBlock), 1, file);
+                if(text == ""){
+                    break;
+                }
+                in.i_size_archivo += 25;
+            }else{
+                cout << "No hay espacio en los bloques\n";
+            }
+        }
+    }
+    if(text != ""){
+        if(in.i_ap_indirecto == -1){
+            ReturnedOfBitmap byteBmInode = ReturnByteBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+            if(byteBmInode.position != -1){
+                char a = 49;
+                fseek(file, byteBmInode.byte, SEEK_SET);
+                fwrite(&a, 1, 1, file);
+                in.i_ap_indirecto = byteBmInode.position;
+                Inode newIn;
+                newIn.i_count_inodo = byteBmInode.position + 1;
+                newIn.i_size_archivo = 100;
+                newIn.i_count_bloques_asignados = 0;
+                newIn.i_id_proper = in.i_id_proper;
+                newIn.i_perm = in.i_perm;
+                Recursive_CreateFile(file, text, sb, newIn, byteBmInode.position);
+            }else{
+                cout << "No hay espacio en inodos\n";
+            }
+        }
+    }
+    fseek(file, sb.sb_ap_tabla_inodo + (posInode * (int)sizeof(Inode)), SEEK_SET);
+    fwrite(&in, sizeof(Inode), 1, file);
 }
 
 void Format_Partition(Mkfs *mkfs){
@@ -1040,29 +1136,58 @@ void Format_Partition(Mkfs *mkfs){
                 partSize = node->data2.part_size;
             }
             int calc = Calculate_Structures(partSize);
-            Bitmap_Inode bitIn(calc);
-            Bitmap_Block bBLock(calc);
-            SuperBlock spB;
-            spB.s_filesystem_type = 3;
-            spB.s_inodes_count = calc;
-            spB.s_blocks_count = calc*3;
-            spB.s_free_blocks_count = calc*3;
-            spB.s_free_inodes_count = calc;
-            strcpy(spB.s_mtime, node->date.c_str());
-            spB.s_inode_size = sizeof (Inode);
-            spB.s_block_size = sizeof (File_Block);
-            int readSb = node->data.part_start + (int)sizeof (SuperBlock);
-            int readJour = readSb + calc * (int)sizeof (Journaling);
-            int readBitIn = readJour + calc;
-            int readBitBlock = readBitIn + 3*calc;
-            int readInodes = readBitBlock + calc * (int)sizeof (Inode);
-            spB.s_bm_inode_start = readJour;
-            spB.s_bm_block_start = readBitIn;
-            spB.s_inode_start = readBitBlock;
-            spB.s_block_start = readInodes;
-            fseek(file, node->data.part_start, SEEK_SET);
-            fwrite(&spB, sizeof (SuperBlock), 1, file);
-            Journaling jo;
+
+            /*Se inicializa el Superboot*/
+
+            SuperBoot sb;
+             int readSb = 0;
+             int dataStart = 0;
+            if(node->type == 0){
+               strcpy(sb.sb_nombre_hd, node->data.id);
+               readSb = node->data.part_start + (int)sizeof (SuperBoot);
+               dataStart = node->data.part_start;
+            }else{
+                strcpy(sb.sb_nombre_hd, node->data2.id);
+                readSb = node->data2.part_start + (int)sizeof (SuperBoot);
+                dataStart = node->data2.part_start;
+            }
+            sb.sb_arbol_virtual_count = calc;
+            sb.sb_detalle_directorio_count = calc;
+            sb.sb_inodos_count = 5 * calc;
+            sb.sb_bloques_count = 20 * calc;
+            sb.sb_arbol_virtual_free = sb.sb_arbol_virtual_count;
+            sb.sb_detalle_directorio_free = sb.sb_detalle_directorio_count;
+            sb.sb_inodos_free = sb.sb_inodos_count;
+            sb.sb_bloques_free = sb.sb_bloques_count;
+            time_t t = time(nullptr);
+            tm *now = localtime(&t);
+            string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+            strcpy(sb.sb_date_creacion, dateC.c_str());
+            strcpy(sb.sb_date_ultimo_montaje, node->date.c_str());
+            sb.sb_montajes_count = 0;
+            sb.sb_ap_bitmap_arbol_directorio = readSb;
+            sb.sb_ap_arbol_directorio = sb.sb_ap_bitmap_arbol_directorio + calc;
+            sb.sb_ap_bitmap_detalle_directorio = sb.sb_ap_arbol_directorio + (calc * (int)sizeof(VirtualDirectoryTree));
+            sb.sb_ap_detalle_directorio = sb.sb_ap_bitmap_detalle_directorio + calc;
+            sb.sb_ap_bitmap_tabla_inodo = sb.sb_ap_detalle_directorio + (calc * (int)sizeof(DirectoryDetail));
+            sb.sb_ap_tabla_inodo = sb.sb_ap_bitmap_tabla_inodo + (5 * calc);
+            sb.sb_ap_bitmap_bloques = sb.sb_ap_tabla_inodo + (5 * calc * (int)sizeof(Inode));
+            sb.sb_ap_bloques = sb.sb_ap_bitmap_bloques + (20 * calc);
+            sb.sb_ap_log = sb.sb_ap_bloques + (20 * calc * (int)sizeof(DataBlock));
+            sb.sb_size_struct_arbol_directorio = sizeof(VirtualDirectoryTree);
+            sb.sb_size_struct_detalle_directorio = sizeof(DirectoryDetail);
+            sb.sb_size_struct_inodo = sizeof(Inode);
+            sb.sb_size_struct_bloque = sizeof(DataBlock);
+            sb.sb_first_free_bit_arbol_directorio = sb.sb_ap_bitmap_arbol_directorio;
+            sb.sb_first_free_bit_detalle_directorio = sb.sb_ap_bitmap_detalle_directorio;
+            sb.sb_first_free_bit_tabla_inodo = sb.sb_ap_bitmap_tabla_inodo;
+            sb.sb_first_free_bit_bloques = sb.sb_ap_bitmap_bloques;
+            sb.sb_magic_num = 201700326;
+            fseek(file, dataStart, SEEK_SET);
+            fwrite(&sb, sizeof (SuperBoot), 1, file);
+            fseek(file, sb.sb_ap_log + (calc * (int)sizeof(Log)), SEEK_SET);
+            fwrite(&sb, sizeof(SuperBoot), 1, file);
+            /*Journaling jo;
             strcpy(jo.op, "mkdir");
             strcpy(jo.type, "Carpeta");
             strcpy(jo.name, "/");
@@ -1078,71 +1203,40 @@ void Format_Partition(Mkfs *mkfs){
                 fwrite(&jo, sizeof (Journaling), 1, file);
             }else{
                 cout << "No hay espacio en el journaling para la raiz\n";
-            }
-            ReturnedOfBitmapInodes byteBitmapInode = ReturnByteBitmap(file, readJour, readBitIn);
-            if(byteBitmapInode.position != -1){
-                ReturnedOfBitmapInodes byteBitmapBlock = ReturnByteBitmap(file, readBitIn, readBitBlock);
-                if(byteBitmapBlock.position != -1){
-                    Inode newIn;
-                    newIn.i_uid = -1;
-                    newIn.l_gid = -1;
-                    newIn.i_size = 0;
-                    time_t t = time(nullptr);
-                    tm *now = localtime(&t);
-                    string chain;
-                    chain = to_string(now->tm_mday) + "-" + to_string((now->tm_mon+1)) + "-" + to_string((now->tm_year + 1900));
-                    strcpy(newIn.i_atime, chain.c_str());
-                    strcpy(newIn.i_ctime, chain.c_str());
-                    strcpy(newIn.i_mtime, chain.c_str());
-                    newIn.i_block[IndexBlockInode(newIn)] = byteBitmapBlock.position;
-                    newIn.i_type = 48;
-                    newIn.i_perm = 0;
-                    fseek(file, byteBitmapInode.byte, SEEK_SET);
-                    char ch = 49;
-                    fwrite(&ch, 1, 1, file);
-                    fseek(file, byteBitmapBlock.byte, SEEK_SET);
-                    fwrite(&ch, 1, 1, file);
-                    Folder_Block fBlock;
-                    strcpy(fBlock.b_content[0].b_name, ".");
-                    fBlock.b_content[0].b_inodo = 0;
-                    strcpy(fBlock.b_content[1].b_name, "..");
-                    fBlock.b_content[1].b_inodo = 0;
-                    ReturnedOfBitmapInodes byteBitmapInode2 = ReturnByteBitmap(file, readJour, readBitIn);
-                    ReturnedOfBitmapInodes byteBitmapBlock2 = ReturnByteBitmap(file, readBitIn, readBitBlock);
-                    File_Block fifile;
-                    strcpy(fifile.b_content, "1,G,root\n1,U,root,root,123\n");
-                    Inode newInode2;
-                    newInode2.i_uid = -1;
-                    newInode2.l_gid = -1;
-                    newInode2.i_size = SizeFile(fifile.b_content);
-                    strcpy(newInode2.i_atime, chain.c_str());
-                    strcpy(newInode2.i_ctime, chain.c_str());
-                    strcpy(newInode2.i_mtime, chain.c_str());
-                    newInode2.i_block[IndexBlockInode(newInode2)] = byteBitmapBlock2.position;
-                    newInode2.i_type = 49;
-                    newInode2.i_perm = 0;
-                    strcpy(fBlock.b_content[2].b_name, "users.txt");
-                    fBlock.b_content[2].b_inodo = byteBitmapInode2.position;
-                    fseek(file, byteBitmapInode2.byte, SEEK_SET);
-                    char jj = 49;
-                    fwrite(&jj, 1, 1, file);
-                    fseek(file, byteBitmapBlock2.byte, SEEK_SET);
-                    char gg = 49;
-                    fwrite(&gg, 1, 1, file);
-                    fseek(file, readBitBlock + (byteBitmapInode.position * (int)sizeof (Inode)), SEEK_SET);
-                    fwrite(&newIn, sizeof (Inode), 1, file);
-                    fseek(file, readInodes + (byteBitmapBlock.position * (int)sizeof (Folder_Block)), SEEK_SET);
-                    fwrite(&fBlock, sizeof (Folder_Block), 1, file);
-                    fseek(file, readBitBlock + (byteBitmapInode2.position * (int)sizeof (Inode)), SEEK_SET);
-                    fwrite(&newInode2, sizeof (Inode), 1, file);
-                    fseek(file, readInodes + (byteBitmapBlock2.position * (int)sizeof (Folder_Block)), SEEK_SET);
-                    fwrite(&fifile, sizeof (Folder_Block), 1, file);
-                }else{
-
-                }
-            }else{
-                cout << "Ya no hay espacio en el bitmap de inodos para otro inodo\n";
-            }
+            }*/
+            char a = 49;
+            ReturnedOfBitmap byteBmVirtual = ReturnByteBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio);
+            ReturnedOfBitmap byteBmDetail = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
+            ReturnedOfBitmap byteBmInode = ReturnByteBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+            fseek(file, byteBmInode.byte, SEEK_SET);
+            fwrite(&a, 1, 1, file);
+            Inode usersInode;
+            usersInode.i_count_inodo = byteBmInode.position + 1;
+            usersInode.i_count_bloques_asignados = 0;
+            usersInode.i_id_proper = 1;
+            usersInode.i_size_archivo = 0;
+            usersInode.i_perm = 764;
+            string text = "1,G,root\n1,U,root,root,201700326\n";
+            Recursive_CreateFile(file, text, sb, usersInode, byteBmInode.position);
+            DirectoryDetail rootDirec;
+            strcpy(rootDirec.dd_array_files[0].dd_file_nombre, "users.txt");
+            strcpy(rootDirec.dd_array_files[0].dd_file_date_creacion, sb.sb_date_creacion);
+            strcpy(rootDirec.dd_array_files[0].dd_file_date_modificacion, sb.sb_date_creacion);
+            rootDirec.dd_array_files[0].dd_file_app_inodo = byteBmInode.position;
+            VirtualDirectoryTree root;
+            strcpy(root.avd_fecha_creacion, sb.sb_date_creacion);
+            strcpy(root.avd_nombre_directorio, "/");
+            root.avd_proper = 1;
+            root.i_perm = 764;
+            root.avd_ap_detalle_directorio = byteBmDetail.position;
+            fseek(file, byteBmVirtual.byte, SEEK_SET);
+            fwrite(&a, 1, 1, file);
+            fseek(file, byteBmDetail.byte, SEEK_SET);
+            fwrite(&a, 1, 1, file);
+            fseek(file, sb.sb_ap_arbol_directorio + (byteBmVirtual.position * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fwrite(&root, sizeof(VirtualDirectoryTree), 1, file);
+            fseek(file, sb.sb_ap_detalle_directorio + (byteBmDetail.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fwrite(&rootDirec, sizeof(DirectoryDetail), 1, file);
         }else{
             cout << "No se puede abrir el archivo de la particion\n";
         }

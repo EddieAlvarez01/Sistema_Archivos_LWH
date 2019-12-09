@@ -59,11 +59,30 @@ bool ListMount::isMount(std::string id){
         NodeList *tmp = first;
         while(tmp != nullptr){
             if(tmp->type == 0){
-                if(strcmp(tmp->data.part_name, id.c_str()) == 0){
+                if(strcmp(tmp->data.id, id.c_str()) == 0){
                     return true;
                 }
             }else{
-                if(strcmp(tmp->data2.part_name, id.c_str()) == 0){
+                if(strcmp(tmp->data2.id, id.c_str()) == 0){
+                    return true;
+                }
+            }
+            tmp = tmp->next;
+        }
+    }
+    return false;
+}
+
+bool ListMount::isMountByName(std::string name){
+    if(first != nullptr){
+        NodeList *tmp = first;
+        while(tmp != nullptr){
+            if(tmp->type == 0){
+                if(strcmp(tmp->data.part_name, name.c_str()) == 0){
+                    return true;
+                }
+            }else{
+                if(strcmp(tmp->data2.part_name, name.c_str()) == 0){
                     return true;
                 }
             }
@@ -100,9 +119,16 @@ void ListMount::List_Mount(){
 void ListMount::FormatPartition(std::string id){
     NodeList *tmp = first;
     while(tmp != nullptr){
-        if(strcmp(tmp->data.id, id.c_str()) == 0){
-            tmp->format = 1;
-            return;
+        if(tmp->type == 0){
+            if(strcmp(tmp->data.id, id.c_str()) == 0){
+                tmp->format = 1;
+                return;
+            }
+        }else{
+            if(strcmp(tmp->data2.id, id.c_str()) == 0){
+                tmp->format = 1;
+                return;
+            }
         }
         tmp = tmp->next;
     }
@@ -112,8 +138,14 @@ NodeList* ListMount::SearchNode(std::string id){
     if(first != nullptr){
         NodeList *tmp = first;
         while(tmp != nullptr){
-            if(strcmp(tmp->data.id, id.c_str()) == 0){
-                return tmp;
+            if(tmp->type == 0){
+                if(strcmp(tmp->data.id, id.c_str()) == 0){
+                    return tmp;
+                }
+            }else{
+                if(strcmp(tmp->data2.id, id.c_str()) == 0){
+                    return tmp;
+                }
             }
             tmp = tmp->next;
         }
