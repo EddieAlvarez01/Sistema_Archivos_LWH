@@ -37,7 +37,8 @@ SOURCES += main.cpp \
     inode.cpp \
     datablock.cpp \
     log.cpp \
-    returnedofbitmap.cpp
+    returnedofbitmap.cpp \
+    user.cpp
 
 DISTFILES += \
     lexico.l \
@@ -77,4 +78,5 @@ HEADERS += \
     inode.h \
     datablock.h \
     log.h \
-    returnedofbitmap.h
+    returnedofbitmap.h \
+    user.h

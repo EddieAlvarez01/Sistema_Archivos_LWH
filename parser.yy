@@ -262,12 +262,12 @@ PROPIEDADESMKFS : PROPIEDADESMKFS ampersand pid guion mayorQ id { $$ = $1; $$->i
                  |ampersand padd guion mayorQ E { $$ = new Mkfs(); $$->add = $5; $$->isAdd = true; }
                  |ampersand ptype guion mayorQ UNIDAD { $$ = new Mkfs(); $$->unit = $5; };
 
-PROPIEDADESLOGIN : PROPIEDADESLOGIN guion pusr igual PATH { $$ = $1; $$->usr = $5; }
-                  |PROPIEDADESLOGIN guion ppwd igual VALUE { $$ = $1; $$->pwd = $5; }
-                  |PROPIEDADESLOGIN guion pid igual id { $$ = $1; $$->id = $5; }
-                  |guion pusr igual PATH { $$ = new Login(); $$->usr = $4; }
-                  |guion ppwd igual VALUE { $$ = new Login(); $$->pwd = $4; }
-                  |guion pid igual id { $$ = new Login(); $$->id = $4; }
+PROPIEDADESLOGIN : PROPIEDADESLOGIN ampersand pusr guion mayorQ PATH { $$ = $1; $$->usr = $6; }
+                  |PROPIEDADESLOGIN ampersand ppwd guion mayorQ VALUE { $$ = $1; $$->pwd = $6; }
+                  |PROPIEDADESLOGIN ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                  |ampersand pusr guion mayorQ PATH { $$ = new Login(); $$->usr = $5; }
+                  |ampersand ppwd guion mayorQ VALUE { $$ = new Login(); $$->pwd = $5; }
+                  |ampersand pid guion mayorQ id { $$ = new Login(); $$->id = $5; }
 
 PROPIEDADESRMGRP : guion pname igual PATH { $$ = new Rmgrp(); $$->name = $4; }
 

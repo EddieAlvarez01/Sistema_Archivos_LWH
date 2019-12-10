@@ -38,6 +38,8 @@
 #include "datablock.h"
 #include "log.h"
 #include "returnedofbitmap.h"
+#include "user.h"
+#include "login.h"
 
 using namespace std;
 
@@ -51,6 +53,7 @@ ListMount list_ram;
 Plotter plot;
 char generateLetter = 'a';
 int countLogic = 1; //Contador para los id de las monturas de las particiones logicas.
+User ussr;  //Usuario para inicio de sesion
 
 int Total_Disk_Size(string unit, int size){
     if(unit == "k"){
@@ -1120,6 +1123,83 @@ void Recursive_CreateFile(FILE *file, string text, SuperBoot sb, Inode in, int p
     fwrite(&in, sizeof(Inode), 1, file);
 }
 
+/*Trae el texto de un archivo o inodo*/
+string RetrieveText(Inode fL, FILE *file, string text, SuperBoot sb){
+    for(int x=0; x<4; x++){
+        if(fL.i_array_bloques[x] != -1){
+            DataBlock dB;
+            fseek(file, sb.sb_ap_bloques + (fL.i_array_bloques[x] * (int)sizeof(DataBlock)), SEEK_SET);
+            fread(&dB, sizeof(DataBlock), 1, file);
+            for(int i=0; i<25; i++){
+                if(dB.db_data[i] != 0){
+                    text += dB.db_data[i];
+                }
+            }
+        }
+    }
+    if(fL.i_ap_indirecto != -1){
+        Inode apIn;
+        fseek(file, sb.sb_ap_tabla_inodo + (fL.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+        fread(&apIn, sizeof(Inode), 1, file);
+        text = RetrieveText(fL, file, text, sb);
+    }
+    return text;
+}
+
+string Trim(string line){
+    line.erase(remove(line.begin(), line.end(), ' '), line.end());
+    return line;
+}
+
+vector<string> Separate_Content(string line){
+    vector<string> ll;
+    size_t pos1 = 0;
+    size_t pos2 = 0;
+    while(pos2 != line.npos){
+        pos2 = line.find(",", pos1);
+        if(pos2 != line.npos){
+            if(pos2 > pos1){
+                ll.push_back(Trim(line.substr(pos1, pos2-pos1)));
+            }
+            pos1 = pos2+1;
+        }
+    }
+
+    ll.push_back(Trim(line.substr(pos1, line.size() - pos1)));
+    return ll;
+}
+
+/*Separa el texto por salto de linea*/
+vector<string> SplitJump(string line){
+    vector<string> ll;
+    size_t pos1 = 0;
+    size_t pos2 = 0;
+    while(pos2 != line.npos){
+        pos2 = line.find("\n", pos1);
+        if(pos2 != line.npos){
+            if(pos2 > pos1){
+                ll.push_back(line.substr(pos1, pos2-pos1));
+            }
+            pos1 = pos2+1;
+        }
+    }
+    ll.push_back(line.substr(pos1, line.size() - pos1));
+    return ll;
+}
+
+string SearchIdGroup(string name, vector<string>file){
+     for(size_t i=0; i<file.size(); i++){
+         string line = file[i];
+         if(line.substr(2, 1) == "G"){
+             vector<string> group = Separate_Content(line);
+             if(group.at(2) == name){
+                return group.at(0);
+             }
+         }
+     }
+     return "";
+}
+
 void Format_Partition(Mkfs *mkfs){
     if(list_ram.isMount(mkfs->id)){
         list_ram.FormatPartition(mkfs->id);
@@ -1246,6 +1326,60 @@ void Format_Partition(Mkfs *mkfs){
         cout << "Error: la particion con el id '" + mkfs->id + "' no esta montada\n";
     }
 }
+
+void Session(Login *login){
+    if(list_ram.isMount(login->id)){
+        NodeList *node = list_ram.SearchNode(login->id);
+        if(node->format == 1){
+            FILE *file = fopen(node->disk.c_str(), "rb+");
+            if(file != nullptr){
+                SuperBoot sb;
+                int part_start = 0;
+                if(node->type == 0){
+                    part_start = node->data.part_start;
+                }else{
+                    part_start = node->data2.part_start;
+                }
+                fseek(file, part_start, SEEK_SET);
+                fread(&sb, sizeof(SuperBoot), 1, file);
+                Inode users;
+                fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+                fread(&users, sizeof(Inode), 1, file);
+                string txtUsers = "";
+                txtUsers = RetrieveText(users, file, txtUsers, sb);
+                vector<string> textJump = SplitJump(txtUsers);
+                for(size_t i=0; i<textJump.size() - 1; i++){
+                    string usr = textJump[i];
+                    if(usr.substr(2, 1) == "U"){
+                        vector<string> usr2 = Separate_Content(usr);
+                        if(usr2.at(3) == login->usr && usr2.at(4) == login->pwd && usr2.at(0) != "0"){
+                            ussr.user = login->usr;
+                            ussr.id = usr2.at(0);
+                            ussr.idGroup = SearchIdGroup(usr2.at(2), textJump);
+                            ussr.group = usr2.at(2);
+                            ussr.isSession = true;
+                            ussr.partition = node;
+                            break;
+                        }
+                    }
+                }
+                if(ussr.isSession){
+                    cout << "Sesion iniciada correctamente\n";
+                }else{
+                    cout << "No se pudo iniciar sesion, contrasena o usuario incorrecto\n";
+                }
+                fclose(file);
+            }else{
+                cout << "No se pudo abrir el archivo " + node->disk + "\n";
+            }
+        }else{
+            cout << "La particion montada " + login->id + " no esta formateada\n";
+        }
+    }else{
+        cout << "Error: la particion '" + login->id + "' no esta montada\n";
+    }
+}
+
 
 
 int main()
@@ -1434,7 +1568,7 @@ int main()
                 }else{
                     cout << "Error: el 'id' es obligatorio\n";
                 }
-            }/*else if(Login *login = dynamic_cast<Login*>((*it))){
+            }else if(Login *login = dynamic_cast<Login*>((*it))){
                 if(login->usr != ""){
                     if(login->pwd != ""){
                         if(login->id != ""){
@@ -1452,7 +1586,7 @@ int main()
                 }else{
                     cout << "El nombre de usuario es obligatorio\n";
                 }
-            }else if(Logout *logout = dynamic_cast<Logout*>((*it))){
+            }/*else if(Logout *logout = dynamic_cast<Logout*>((*it))){
                 if(ussr.isSession){
                     ussr.id = "";
                     ussr.user = "";
