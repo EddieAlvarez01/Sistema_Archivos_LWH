@@ -1586,7 +1586,7 @@ int main()
                 }else{
                     cout << "El nombre de usuario es obligatorio\n";
                 }
-            }/*else if(Logout *logout = dynamic_cast<Logout*>((*it))){
+            }else if(Logout *logout = dynamic_cast<Logout*>((*it))){
                 if(ussr.isSession){
                     ussr.id = "";
                     ussr.user = "";
@@ -1596,9 +1596,9 @@ int main()
                     ussr.partition = nullptr;
                     cout << "Session cerrada correctamente\n";
                 }else{
-                    cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
+                    cout << "Error: no hay ninguna sesion iniciada, porfavor inicie sesion para poder usar este comando\n";
                 }
-            }else if(Mkgrp *mkgr = dynamic_cast<Mkgrp*>((*it))){
+            }/*else if(Mkgrp *mkgr = dynamic_cast<Mkgrp*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(mkgr->name != ""){
