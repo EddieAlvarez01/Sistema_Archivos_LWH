@@ -3,6 +3,7 @@
 Mkgrp::Mkgrp()
 {
 
+    id = "";
     name = "";
 
 }

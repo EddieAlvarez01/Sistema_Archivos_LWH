@@ -8,4 +8,5 @@ User::User()
     group = "";
     idGroup = "";
     partition = nullptr;
+    idPartition = "";
 }

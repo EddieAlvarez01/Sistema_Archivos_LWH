@@ -40,6 +40,8 @@
 #include "returnedofbitmap.h"
 #include "user.h"
 #include "login.h"
+#include "logout.h"
+#include "mkgrp.h"
 
 using namespace std;
 
@@ -1359,6 +1361,7 @@ void Session(Login *login){
                             ussr.group = usr2.at(2);
                             ussr.isSession = true;
                             ussr.partition = node;
+                            ussr.idPartition = login->id;
                             break;
                         }
                     }
@@ -1380,6 +1383,118 @@ void Session(Login *login){
     }
 }
 
+int IdForNewGroup(FILE *file, Inode users, SuperBoot sb, string nameGroup){
+    vector<string> groups;
+    string text = "";
+    text = RetrieveText(users, file, text, sb);
+    vector<string> lines = SplitJump(text);
+    for(size_t i=0; i<lines.size() - 1; i++){
+        string line = lines[i];
+        if(line.substr(2,1) == "G"){
+            vector<string> group = Separate_Content(line);
+            if(group.at(2) == nameGroup){
+                return -1;
+            }else{
+                groups.push_back(line);
+            }
+        }
+    }
+    return groups.size() + 1;
+}
+
+int addTextFile(FILE *file, SuperBoot sb, Inode in, int posIn, string text, int status){
+    for(int x=0; x<4; x++){
+        if(in.i_array_bloques[x] != -1){
+            DataBlock dB;
+            fseek(file, sb.sb_ap_bloques + (in.i_array_bloques[x] * (int)sizeof(DataBlock)), SEEK_SET);
+            fread(&dB, sizeof(DataBlock), 1, file);
+            text = Write_DataBlock(dB.db_data, text);
+            fseek(file, sb.sb_ap_bloques + (in.i_array_bloques[x] * (int)sizeof(DataBlock)), SEEK_SET);
+            fwrite(&dB, sizeof(DataBlock), 1, file);
+        }else{
+            if(text != ""){
+                ReturnedOfBitmap byteBlock = ReturnByteBitmap(file, sb.sb_ap_bitmap_bloques, sb.sb_ap_bloques);
+                if(byteBlock.position != -1){
+                    char a = 49;
+                    fseek(file, byteBlock.byte, SEEK_SET);
+                    fwrite(&a, 1, 1, file);
+                    in.i_array_bloques[x] = byteBlock.position;
+                    DataBlock dB2;
+                    text = Write_DataBlock(dB2.db_data, text);
+                    fseek(file, sb.sb_ap_bloques + (byteBlock.position * (int)sizeof(DataBlock)), SEEK_SET);
+                    fwrite(&dB2, sizeof(DataBlock), 1, file);
+                    fseek(file, sb.sb_ap_tabla_inodo + (posIn * (int)sizeof(Inode)), SEEK_SET);
+                    fwrite(&in, sizeof(Inode), 1, file);
+                }else{
+                    status = 0;
+                    return status;
+                }
+            }else{
+                status = 1;
+                return status;
+            }
+        }
+    }
+    if(text != ""){
+        if(in.i_ap_indirecto != -1){
+            Inode in2;
+            fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+            fread(&in2, sizeof(Inode), 1, file);
+            status = addTextFile(file, sb, in2, in.i_ap_indirecto, text, status);
+        }else{
+            ReturnedOfBitmap byteInode = ReturnByteBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+            if(byteInode.position != -1){
+                char a = 49;
+                fseek(file, byteInode.byte, SEEK_SET);
+                fwrite(&a, 1, 1, file);
+                in.i_ap_indirecto = byteInode.position;
+                Inode in2;
+                Recursive_CreateFile(file, text, sb, in2, byteInode.position);
+                fseek(file, sb.sb_ap_tabla_inodo + (byteInode.position * (int)sizeof(Inode)), SEEK_SET);
+                fwrite(&in, sizeof(Inode), 1, file);
+                status = 1;
+                return status;
+            }else{
+                status = 0;
+                return status;
+            }
+        }
+    }
+    return status;
+}
+
+void AddGroup(Mkgrp *mkgr){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partitionStart = 0;
+        if(ussr.partition->type == 0){
+            partitionStart = ussr.partition->data.part_start;
+        }else{
+            partitionStart = ussr.partition->data2.part_start;
+        }
+        fseek(file, partitionStart, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        Inode users;
+        fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+        fread(&users, sizeof(Inode), 1, file);
+        int idNewGroup = IdForNewGroup(file, users, sb, mkgr->name);
+        if(idNewGroup != -1){
+            string newGroup = to_string(idNewGroup) + ",G," + mkgr->name + "\n";
+            int status = addTextFile(file, sb, users, 0, newGroup, 0);
+            if(status == 1){
+                cout << "Grupo '" + mkgr->name + "' creado exitosamente\n";
+            }else{
+                cout << "Error al crear el grupo, no hay suficiente espacio en users.txt, puee que el archivo se escribio incompleto, error fatal del sistema\n";
+            }
+        }else{
+            cout << "Error: Ya existe un grupo con el nombre '" + mkgr->name + "'\n";
+        }
+    }else{
+        cout << "Error al abrir el archivo\n";
+    }
+    fclose(file);
+}
 
 
 int main()
@@ -1594,15 +1709,24 @@ int main()
                     ussr.idGroup = "";
                     ussr.isSession = false;
                     ussr.partition = nullptr;
+                    ussr.idPartition = "";
                     cout << "Session cerrada correctamente\n";
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inicie sesion para poder usar este comando\n";
                 }
-            }/*else if(Mkgrp *mkgr = dynamic_cast<Mkgrp*>((*it))){
+            }else if(Mkgrp *mkgr = dynamic_cast<Mkgrp*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(mkgr->name != ""){
-                            AddGroup(mkgr);
+                            if(mkgr->id != ""){
+                                if(ussr.idPartition == mkgr->id){
+                                    AddGroup(mkgr);
+                                }else{
+                                    cout << "Error: el usuario que esta en sesion no es admin en '" + mkgr->id + "'\n";
+                                }
+                            }else{
+                                cout << "El id es obligatorio\n";
+                            }
                         }else{
                             cout << "El name es obligatorio\n";
                         }
@@ -1612,7 +1736,7 @@ int main()
                 }else{
                     cout << "Error: no hay sesion iniciada para usar este comando\n";
                 }
-            }else if(Rmgrp *rmgrp = dynamic_cast<Rmgrp*>((*it))){
+            }/*else if(Rmgrp *rmgrp = dynamic_cast<Rmgrp*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(rmgrp->name != ""){

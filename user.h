@@ -14,6 +14,7 @@ public:
     std::string idGroup;
     bool isSession;
     NodeList *partition;
+    std::string idPartition;
 };
 
 #endif // USER_H

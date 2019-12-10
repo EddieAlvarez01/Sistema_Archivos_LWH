@@ -8,6 +8,7 @@ class Mkgrp : public Command
 {
 public:
     Mkgrp();
+    std::string id;
     std::string name;
 };
 
