@@ -9,6 +9,7 @@ class Rmgrp : public Command
 public:
     Rmgrp();
     std::string name;
+    std::string id;
 };
 
 #endif // RMGRP_H

@@ -269,7 +269,10 @@ PROPIEDADESLOGIN : PROPIEDADESLOGIN ampersand pusr guion mayorQ PATH { $$ = $1; 
                   |ampersand ppwd guion mayorQ VALUE { $$ = new Login(); $$->pwd = $5; }
                   |ampersand pid guion mayorQ id { $$ = new Login(); $$->id = $5; }
 
-PROPIEDADESRMGRP : guion pname igual PATH { $$ = new Rmgrp(); $$->name = $4; }
+PROPIEDADESRMGRP : PROPIEDADESRMGRP ampersand pname guion mayorQ PATH { $$ = $1; $$->name = $6; }
+                  |PROPIEDADESRMGRP ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                  |ampersand pname guion mayorQ PATH { $$ = new Rmgrp(); $$->name = $5; }
+                  |ampersand pid guion mayorQ id { $$ = new Rmgrp(); $$->id = $5; }
 
 PROPIEDADESMKGRP : PROPIEDADESMKGRP ampersand pname guion mayorQ PATH { $$ = $1; $$->name = $6; }
                   |PROPIEDADESMKGRP ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }

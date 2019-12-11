@@ -42,6 +42,7 @@
 #include "login.h"
 #include "logout.h"
 #include "mkgrp.h"
+#include "rmgrp.h"
 
 using namespace std;
 
@@ -1496,6 +1497,70 @@ void AddGroup(Mkgrp *mkgr){
     fclose(file);
 }
 
+void EditTxt_Users(FILE *file, SuperBoot sb, string text, Inode in, int posIn){
+    for(int x=0; x<4; x++){
+        if(in.i_array_bloques[x] != -1){
+            DataBlock dB;
+            text = Write_DataBlock(dB.db_data, text);
+            fseek(file, sb.sb_ap_bloques + (in.i_array_bloques[x] * (int)sizeof(DataBlock)), SEEK_SET);
+            fwrite(&dB, sizeof(DataBlock), 1, file);
+        }
+    }
+    if(in.i_ap_indirecto != -1){
+        Inode in2;
+        fseek(file, sb.sb_ap_tabla_inodo + (posIn * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in2, sizeof(Inode), 1, file);
+        EditTxt_Users(file, sb, text, in, in.i_ap_indirecto);
+    }
+}
+
+void RemoveGroup(Rmgrp *rmgrp){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partSize = 0;
+        if(ussr.partition->type == 0){
+            partSize = ussr.partition->data.part_start;
+        }else{
+            partSize = ussr.partition->data2.part_start;
+        }
+        fseek(file, partSize, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        Inode users;
+        fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+        fread(&users, sizeof(Inode), 1, file);
+        string textUsr = "";
+        textUsr = RetrieveText(users, file, textUsr, sb);
+        string newTxt = "";
+        vector<string> listUsr = SplitJump(textUsr);
+        bool isDelete = false;
+        for(size_t x=0; x<listUsr.size() - 1; x++){
+            string line = listUsr[x];
+            if(line.substr(2, 1) == "G"){
+                vector<string> group = Separate_Content(line);
+                if(group.at(2) == rmgrp->name){
+                    string aux = "0,G," + group.at(2) + "\n";
+                    newTxt += aux;
+                    isDelete = true;
+                }else{
+                    newTxt += line + "\n";
+                }
+            }else{
+                newTxt += line + "\n";
+            }
+        }
+        if(isDelete){
+            EditTxt_Users(file, sb, newTxt, users, 0);
+            cout << "Grupo '" + rmgrp->name + "' eliminado correctamente\n";
+        }else{
+            cout << "Error: el grupo no existe\n";
+        }
+     fclose(file);
+    }else{
+        cout << "Error al abrir el archivo\n";
+    }
+}
+
 
 int main()
 {
@@ -1736,11 +1801,19 @@ int main()
                 }else{
                     cout << "Error: no hay sesion iniciada para usar este comando\n";
                 }
-            }/*else if(Rmgrp *rmgrp = dynamic_cast<Rmgrp*>((*it))){
+            }else if(Rmgrp *rmgrp = dynamic_cast<Rmgrp*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(rmgrp->name != ""){
-                            RemoveGroup(rmgrp);
+                            if(rmgrp->id != ""){
+                                if(ussr.idPartition == rmgrp->id){
+                                    RemoveGroup(rmgrp);
+                                }else{
+                                    cout << "Error: el usuario que esta en sesion no es admin en '" + rmgrp->id + "'\n";
+                                }
+                            }else{
+                                cout << "El id es obligatorio\n";
+                            }
                         }else{
                             cout << "El name es obligatorio\n";
                         }
@@ -1750,7 +1823,7 @@ int main()
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }else if(Mkusr *mkusr = dynamic_cast<Mkusr*>((*it))){
+            }/*else if(Mkusr *mkusr = dynamic_cast<Mkusr*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(mkusr->usr != ""){

@@ -4,5 +4,6 @@ Rmgrp::Rmgrp()
 {
 
     name = "";
+    id = "";
 
 }
