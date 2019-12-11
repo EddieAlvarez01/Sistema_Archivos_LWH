@@ -279,12 +279,14 @@ PROPIEDADESMKGRP : PROPIEDADESMKGRP ampersand pname guion mayorQ PATH { $$ = $1;
                   |ampersand pname guion mayorQ PATH { $$ = new Mkgrp(); $$->name = $5; }
                   |ampersand pid guion mayorQ id { $$ = new Mkgrp(); $$->id = $5; }
 
-PROPIEDADESMKUSR : PROPIEDADESMKUSR guion pusr igual VALUE { $$ = $1; $$->usr = $5; }
-                  |PROPIEDADESMKUSR guion ppwd igual VALUE { $$ = $1; $$->pwd = $5; }
-                  |PROPIEDADESMKUSR guion pgrp igual VALUE { $$ = $1; $$->grp = $5; }
-                  |guion pusr igual VALUE { $$ = new Mkusr(); $$->usr = $4; }
-                  |guion ppwd igual VALUE { $$ = new Mkusr(); $$->pwd = $4; }
-                  |guion pgrp igual VALUE { $$ = new Mkusr(); $$->grp = $4; }
+PROPIEDADESMKUSR : PROPIEDADESMKUSR ampersand pusr guion mayorQ VALUE { $$ = $1; $$->usr = $6; }
+                  |PROPIEDADESMKUSR ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                  |PROPIEDADESMKUSR ampersand ppwd guion mayorQ VALUE { $$ = $1; $$->pwd = $6; }
+                  |PROPIEDADESMKUSR ampersand pgrp guion mayorQ VALUE { $$ = $1; $$->grp = $6; }
+                  |ampersand pusr guion mayorQ VALUE { $$ = new Mkusr(); $$->usr = $5; }
+                  |ampersand ppwd guion mayorQ VALUE { $$ = new Mkusr(); $$->pwd = $5; }
+                  |ampersand pgrp guion mayorQ VALUE { $$ = new Mkusr(); $$->grp = $5; }
+                  |ampersand pid guion mayorQ id { $$ = new Mkusr(); $1; $$->id = $5; };
 
 PROPIEDADESRMUSR : guion pusr igual PATH { $$ = new Rmusr(); $$->usr = $4; }
 

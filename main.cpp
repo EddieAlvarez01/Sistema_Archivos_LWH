@@ -43,6 +43,7 @@
 #include "logout.h"
 #include "mkgrp.h"
 #include "rmgrp.h"
+#include "mkusr.h"
 
 using namespace std;
 
@@ -1403,6 +1404,28 @@ int IdForNewGroup(FILE *file, Inode users, SuperBoot sb, string nameGroup){
     return groups.size() + 1;
 }
 
+int IdForNewUser(FILE *file, Inode users, SuperBoot sb, string nameUser, string nameGroup){
+    vector<string> userss;
+    string text = "";
+    text = RetrieveText(users, file, text, sb);
+    vector<string> lines = SplitJump(text);
+    for(size_t i=0; i<lines.size() - 1; i++){
+        string line = lines[i];
+        if(line.substr(2,1) == "U"){
+            vector<string> user = Separate_Content(line);
+            if(user.at(3) == nameUser){
+                return -1;
+            }else{
+                userss.push_back(line);
+            }
+        }
+    }
+    if(IdForNewGroup(file, users, sb, nameGroup) != -1){
+        return -2;
+    }
+    return userss.size() + 1;
+}
+
 int addTextFile(FILE *file, SuperBoot sb, Inode in, int posIn, string text, int status){
     for(int x=0; x<4; x++){
         if(in.i_array_bloques[x] != -1){
@@ -1486,7 +1509,7 @@ void AddGroup(Mkgrp *mkgr){
             if(status == 1){
                 cout << "Grupo '" + mkgr->name + "' creado exitosamente\n";
             }else{
-                cout << "Error al crear el grupo, no hay suficiente espacio en users.txt, puee que el archivo se escribio incompleto, error fatal del sistema\n";
+                cout << "Error al crear el grupo, no hay suficiente espacio en users.txt, puede que el archivo se escribio incompleto, error fatal del sistema\n";
             }
         }else{
             cout << "Error: Ya existe un grupo con el nombre '" + mkgr->name + "'\n";
@@ -1558,6 +1581,45 @@ void RemoveGroup(Rmgrp *rmgrp){
      fclose(file);
     }else{
         cout << "Error al abrir el archivo\n";
+    }
+}
+
+void CreateNewUser(Mkusr *mkusr){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partStatus = 0;
+        if(ussr.partition->type == 0){
+            partStatus = ussr.partition->data.part_start;
+        }else{
+            partStatus = ussr.partition->data2.part_start;
+        }
+        fseek(file, partStatus, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        Inode users;
+        fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+        fread(&users, sizeof(Inode), 1, file);
+        int idNewUs = IdForNewUser(file, users, sb, mkusr->usr, mkusr->grp);
+        switch(idNewUs){
+            case -1:
+                cout << "El usuario ya existe\n";
+            break;
+            case -2:
+                cout << "EL grupo que se le esta indicando, no existe\n";
+            break;
+            default:
+                string text = to_string(idNewUs) + ",U," + mkusr->grp + "," + mkusr->usr + "," + mkusr->pwd + "\n";
+                int status = addTextFile(file, sb, users, 0, text, 0);
+                if(status == 1){
+                    cout << "Usuario '" + mkusr->usr + "' creado exitosamente\n";
+                }else{
+                    cout << "Error: al crear el usuario, no hay espacio sufciente en users.txt, puede que el archivo se escribio incompleto, error fatal del sistema\n";
+                }
+            break;
+        }
+        fclose(file);
+    }else{
+        cout << "Error: al abrir el archivo\n";
     }
 }
 
@@ -1823,13 +1885,21 @@ int main()
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }/*else if(Mkusr *mkusr = dynamic_cast<Mkusr*>((*it))){
+            }else if(Mkusr *mkusr = dynamic_cast<Mkusr*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(mkusr->usr != ""){
                             if(mkusr->pwd != ""){
                                 if(mkusr->grp != ""){
-                                    CreateNewUser(mkusr);
+                                    if(mkusr->id != ""){
+                                        if(ussr.idPartition == mkusr->id){
+                                            CreateNewUser(mkusr);
+                                        }else{
+                                            cout << "Error: el usuario que esta en sesion no es admin en '" + rmgrp->id + "'\n";
+                                        }
+                                    }else{
+                                        cout << "El id es obligatorio\n";
+                                    }
                                 }else{
                                     cout << "El grp es obligatorio\n";
                                 }
@@ -1845,7 +1915,7 @@ int main()
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }else if(Rmusr *rmusr = dynamic_cast<Rmusr*>((*it))){
+            }/*else if(Rmusr *rmusr = dynamic_cast<Rmusr*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(rmusr->usr != ""){

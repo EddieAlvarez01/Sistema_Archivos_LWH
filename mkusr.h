@@ -11,6 +11,7 @@ public:
     std::string usr;
     std::string pwd;
     std::string grp;
+    std::string id;
 };
 
 #endif // MKUSR_H

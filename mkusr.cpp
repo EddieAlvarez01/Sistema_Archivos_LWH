@@ -6,5 +6,6 @@ Mkusr::Mkusr()
     usr = "";
     pwd = "";
     grp = "";
+    id = "";
 
 }
