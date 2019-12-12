@@ -9,6 +9,7 @@ class Rmusr : public Command
 public:
     Rmusr();
     std::string usr;
+    std::string id;
 };
 
 #endif // RMUSR_H

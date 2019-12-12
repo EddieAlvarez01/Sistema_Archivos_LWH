@@ -5,5 +5,6 @@ Rmusr::Rmusr()
 {
 
     usr = "";
+    id = "";
 
 }

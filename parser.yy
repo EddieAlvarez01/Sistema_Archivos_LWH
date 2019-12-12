@@ -195,7 +195,7 @@ UNIDAD : pb { strcpy($$, "b"); }
 PATH : cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }
       |id { strcpy($$, $1); };
 
-PROPIEDADESRM : ampersand ppath guion mayorQ PATH { $$ = new Rmdisk(); $$->path = $5; };
+PROPIEDADESRM :  ampersand ppath guion mayorQ PATH { $$ = new Rmdisk(); $$->path = $5; };
 
 PROPIEDADESFD : PROPIEDADESFD ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
                |PROPIEDADESFD ampersand punit guion mayorQ UNIDAD { $$ = $1; $$->unit = $6; }
@@ -288,7 +288,10 @@ PROPIEDADESMKUSR : PROPIEDADESMKUSR ampersand pusr guion mayorQ VALUE { $$ = $1;
                   |ampersand pgrp guion mayorQ VALUE { $$ = new Mkusr(); $$->grp = $5; }
                   |ampersand pid guion mayorQ id { $$ = new Mkusr(); $1; $$->id = $5; };
 
-PROPIEDADESRMUSR : guion pusr igual PATH { $$ = new Rmusr(); $$->usr = $4; }
+PROPIEDADESRMUSR : PROPIEDADESRMUSR ampersand pusr guion mayorQ PATH { $$ = $1; $$->usr = $6; }
+                  |PROPIEDADESRMUSR ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                  |ampersand pusr guion mayorQ PATH { $$ = new Rmusr(); $$->usr = $5; }
+                  |ampersand pid guion mayorQ id { $$ = new Rmusr(); $$->id = $5; };
 
 PROPIEDADESCHMOD : PROPIEDADESCHMOD guion ppath igual PATH { $$ = $1; $$->path = $5; }
                   |PROPIEDADESCHMOD guion pugo igual numero { $$ = $1; $$->ugo = std::stoi($5); }

@@ -44,6 +44,7 @@
 #include "mkgrp.h"
 #include "rmgrp.h"
 #include "mkusr.h"
+#include "rmusr.h"
 
 using namespace std;
 
@@ -1623,6 +1624,53 @@ void CreateNewUser(Mkusr *mkusr){
     }
 }
 
+void RemoveUser(Rmusr *rmusr){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partSize = 0;
+        if(ussr.partition->type == 0){
+            partSize = ussr.partition->data.part_start;
+        }else{
+            partSize = ussr.partition->data2.part_start;
+        }
+        fseek(file, partSize, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        Inode users;
+        fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+        fread(&users, sizeof(Inode), 1, file);
+        string txtUsr = "";
+        txtUsr = RetrieveText(users, file, txtUsr, sb);
+        string txt = "";
+        vector<string> listUsr = SplitJump(txtUsr);
+        bool isDelete = false;
+        for(size_t x=0; x<listUsr.size() - 1; x++){
+            string line = listUsr[x];
+            if(line.substr(2, 1) == "U"){
+                vector<string> user = Separate_Content(line);
+                if(user.at(3) == rmusr->usr){
+                    string aux = "0,U," + user.at(2) + "," + user.at(3) + "," + user.at(4) + "\n";
+                    txt += aux;
+                    isDelete = true;
+                }else{
+                    txt += line + "\n";
+                }
+            }else{
+                txt += line + "\n";
+            }
+        }
+        if(isDelete){
+            EditTxt_Users(file, sb, txt, users, 0);
+            cout << "Usuario '" + rmusr->usr + "' eliminado correctamente\n";
+        }else{
+            cout << "Error: el usuario no existe\n";
+        }
+        fclose(file);
+    }else{
+        cout << "Error: al abrir el archivo\n";
+    }
+}
+
 
 int main()
 {
@@ -1915,7 +1963,7 @@ int main()
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }/*else if(Rmusr *rmusr = dynamic_cast<Rmusr*>((*it))){
+            }else if(Rmusr *rmusr = dynamic_cast<Rmusr*>((*it))){
                 if(ussr.isSession){
                     if(strcmp(ussr.group.c_str(), "root") == 0){
                         if(rmusr->usr != ""){
@@ -1929,7 +1977,7 @@ int main()
                 }else{
                    cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }else if(Mkfile *mkfile = dynamic_cast<Mkfile*>((*it))){
+            }/*else if(Mkfile *mkfile = dynamic_cast<Mkfile*>((*it))){
                 if(ussr.isSession){
                     if(mkfile->path != ""){
                         if(mkfile->cont != ""){
