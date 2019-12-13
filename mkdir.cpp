@@ -5,5 +5,6 @@ Mkdir::Mkdir()
 
     path = "";
     isP = false;
+    id = "";
 
 }

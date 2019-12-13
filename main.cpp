@@ -45,6 +45,7 @@
 #include "rmgrp.h"
 #include "mkusr.h"
 #include "rmusr.h"
+#include "mkdir.h"
 
 using namespace std;
 
@@ -1671,6 +1672,176 @@ void RemoveUser(Rmusr *rmusr){
     }
 }
 
+queue<string> FolderTheInodes(string path){
+    queue<string> pathToEvaluate;
+    size_t pos1 = 0;
+    size_t pos2 = 0;
+    while(pos2 != path.npos){
+        pos2 = path.find("/", pos1);
+        if(pos2 != path.npos){
+            if(pos2 > pos1){
+                pathToEvaluate.push(path.substr(pos1, pos2-pos1));
+            }
+            pos1 = pos2+1;
+        }
+    }
+    pathToEvaluate.push(path.substr(pos1, path.size() - pos1));
+    return pathToEvaluate;
+}
+
+void FolderPointer(FILE *file, SuperBoot sb, VirtualDirectoryTree avd, int pointer, int posAvd){
+    bool isW = false;
+    for(int x=0; x<6; x++){
+        if(avd.avd_ap_array_subdirectorios[x] == -1){
+            avd.avd_ap_array_subdirectorios[x] = pointer;
+            fseek(file, sb.sb_ap_arbol_directorio + (posAvd * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fwrite(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            isW = true;
+            break;
+        }
+    }
+    if(!isW){
+        if(avd.avd_ap_arbol_virtual_directorio != -1){
+            VirtualDirectoryTree avd2;
+            fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+            FolderPointer(file, sb, avd2, pointer, avd.avd_ap_arbol_virtual_directorio);
+        }else{
+            ReturnedOfBitmap byteAvd = ReturnByteBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio);
+            if(byteAvd.position != -1){
+                char a = 49;
+                fseek(file, byteAvd.byte, SEEK_SET);
+                fwrite(&a, 1, 1, file);
+                VirtualDirectoryTree avd3;
+                time_t t = time(nullptr);
+                tm *now = localtime(&t);
+                string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+                strcpy(avd3.avd_fecha_creacion, dateC.c_str());
+                strcpy(avd3.avd_nombre_directorio, avd.avd_nombre_directorio);
+                avd3.avd_proper = stoi(ussr.id);
+                avd3.i_perm = 765;
+                avd.avd_ap_arbol_virtual_directorio = byteAvd.position;
+                fseek(file, sb.sb_ap_arbol_directorio + (posAvd * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                fwrite(&avd, sizeof(VirtualDirectoryTree), 1, file);
+                fseek(file, sb.sb_ap_arbol_directorio + (byteAvd.position * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                fwrite(&avd3, sizeof(VirtualDirectoryTree), 1, file);
+                FolderPointer(file, sb, avd3, pointer, byteAvd.position);
+            }
+        }
+    }
+}
+
+int CreateNewFolder(FILE *file, SuperBoot sb ,Mkdir *mkdir, queue<string> pathEvaluate, int isOk, VirtualDirectoryTree root, string path, int posAvd){
+    bool isFinded = false;
+    for(int i=0; i<6; i++){
+        if(root.avd_ap_array_subdirectorios[i] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[i] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            if(avd.avd_nombre_directorio == path){
+                isFinded = true;
+                if(!pathEvaluate.empty()){
+                    string folder = pathEvaluate.front();
+                    pathEvaluate.pop();
+                    isOk = CreateNewFolder(file, sb, mkdir, pathEvaluate, isOk, avd, folder, root.avd_ap_array_subdirectorios[i]);
+                    break;
+                }else{
+                    isOk = 2;
+                    break;
+                }
+            }
+        }
+    }
+    if(!isFinded){
+        if(root.avd_ap_arbol_virtual_directorio != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            isOk = CreateNewFolder(file, sb, mkdir, pathEvaluate, isOk, avd, path, root.avd_ap_arbol_virtual_directorio);
+        }
+    }
+    if(!isFinded && isOk == -1){
+        if(mkdir->isP || pathEvaluate.empty()){
+            ReturnedOfBitmap byteAvd = ReturnByteBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio);
+            if(byteAvd.position != -1){
+                ReturnedOfBitmap byteDD = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
+                if(byteDD.position != -1){
+                    char a = 49;
+                    fseek(file, byteAvd.byte, SEEK_SET);
+                    fwrite(&a, 1, 1, file);
+                    fseek(file, byteDD.byte, SEEK_SET);
+                    fwrite(&a, 1, 1, file);
+                    VirtualDirectoryTree newDir;
+                    DirectoryDetail newDetail;
+                    time_t t = time(nullptr);
+                    tm *now = localtime(&t);
+                    string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+                    strcpy(newDir.avd_fecha_creacion, dateC.c_str());
+                    strcpy(newDir.avd_nombre_directorio, path.c_str());
+                    newDir.avd_ap_detalle_directorio = byteDD.position;
+                    newDir.avd_proper = stoi(ussr.id);
+                    newDir.i_perm = 765;
+                    fseek(file, sb.sb_ap_detalle_directorio + (byteDD.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                    fwrite(&newDetail, sizeof(DirectoryDetail), 1, file);
+                    fseek(file, sb.sb_ap_arbol_directorio + (byteAvd.position * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                    fwrite(&newDir, sizeof(VirtualDirectoryTree), 1, file);
+                    FolderPointer(file, sb, root, byteAvd.position, posAvd);
+                    if(!pathEvaluate.empty()){
+                        string inFolder = pathEvaluate.front();
+                        pathEvaluate.pop();
+                        isOk = CreateNewFolder(file, sb, mkdir, pathEvaluate, isOk, newDir, inFolder, byteAvd.position);
+                    }else{
+                        isOk = 1;
+                    }
+                }else{
+                    isOk = -1;
+                }
+            }else{
+                isOk = -1;
+            }
+        }else{
+            isOk = -1;
+        }
+    }
+    return isOk;
+}
+
+void NewDir(Mkdir *mkdir){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partSize = 0;
+        if(ussr.partition->type == 0){
+            partSize = ussr.partition->data.part_start;
+        }else{
+            partSize = ussr.partition->data2.part_start;
+        }
+        fseek(file, partSize, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        VirtualDirectoryTree root;
+        fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+        fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+        queue<string> pathEvaluate = FolderTheInodes(mkdir->path);
+        string path = pathEvaluate.front();
+        pathEvaluate.pop();
+        int status = CreateNewFolder(file, sb, mkdir, pathEvaluate, -1, root, path, 0);
+        switch (status) {
+        case 1:
+            cout << "Carpeta creada exitosamente\n";
+            break;
+        case -1:
+            cout << "No se encontro el path o error en la creacion\n";
+            break;
+        default:
+            cout << "Error: ya hay una carpeta con ese nombre\n";
+            break;
+        }
+        fclose(file);
+    }else{
+        cout << "Error al abrir el archivo\n";
+    }
+}
+
 
 int main()
 {
@@ -1997,17 +2168,25 @@ int main()
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }else if(Mkdir *mkdir = dynamic_cast<Mkdir*>((*it))){
+            }*/else if(Mkdir *mkdir = dynamic_cast<Mkdir*>((*it))){
                 if(ussr.isSession){
                     if(mkdir->path != ""){
-                        NewDir(mkdir);
+                        if(mkdir->id != ""){
+                            if(mkdir->id == ussr.idPartition){
+                                NewDir(mkdir);
+                            }else{
+                                cout << "Error: el usuario que esta en sesion no es admin en '" + mkusr->id + "'\n";
+                            }
+                        }else{
+                            cout << "Error: el id es obligatorio\n";
+                        }
                     }else{
                         cout << "Error: el path es obligatorio\n";
                     }
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }*/
+            }
         }
     }else{
         cout << "Incorrecto" << endl;

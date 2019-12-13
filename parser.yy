@@ -309,10 +309,12 @@ PROPIEDADESMKFILE : PROPIEDADESMKFILE guion ppath igual PATH { $$ = $1; $$->path
                    |guion psize igual numero { $$ = new Mkfile(); $$->size = std::stoi($4); }
                    |guion pcont igual PATH { $$ = new Mkfile(); $$->cont = $4; }
 
-PROPIEDADESMKDIR : PROPIEDADESMKDIR guion ppath igual PATH { $$ = $1; $$->path = $5; }
-                  |PROPIEDADESMKDIR guion pp { $$ = $1; $$->isP = true; }
-                  |guion ppath igual PATH { $$ = new Mkdir(); $$->path = $4; }
-                  |guion pp { $$ = new Mkdir(); $$->isP = true; }
+PROPIEDADESMKDIR : PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
+                  |PROPIEDADESMKDIR ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                  |PROPIEDADESMKDIR ampersand pp { $$ = $1; $$->isP = true; }
+                  |ampersand ppath guion mayorQ PATH { $$ = new Mkdir(); $$->path = $5; }
+                  |ampersand pp { $$ = new Mkdir(); $$->isP = true; }
+                  |ampersand pid guion mayorQ id { $$ = new Mkdir(); $$->id = $5; };
 
 
 %%
