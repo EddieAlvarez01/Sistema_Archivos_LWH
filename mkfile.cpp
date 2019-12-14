@@ -7,5 +7,6 @@ Mkfile::Mkfile()
     isP = false;
     size = -1;
     cont = "";
+    id = "";
 
 }

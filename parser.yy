@@ -300,14 +300,16 @@ PROPIEDADESCHMOD : PROPIEDADESCHMOD guion ppath igual PATH { $$ = $1; $$->path =
                   |guion pugo igual numero { $$ = new Chmod(); $$->ugo = std::stoi($4); }
                   |guion pr { $$ = new Chmod(); $$->isRecursive = true; }
 
-PROPIEDADESMKFILE : PROPIEDADESMKFILE guion ppath igual PATH { $$ = $1; $$->path = $5; }
-                   |PROPIEDADESMKFILE guion pp { $$ = $1; $$->isP = true; }
-                   |PROPIEDADESMKFILE guion psize igual numero { $$ = $1; $$->size = std::stoi($5); }
-                   |PROPIEDADESMKFILE guion pcont igual PATH { $$ = $1; $$->cont = $5; }
-                   |guion ppath igual PATH { $$ = new Mkfile(); $$->path = $4; }
-                   |guion pp { $$ = new Mkfile(); $$->isP = true; }
-                   |guion psize igual numero { $$ = new Mkfile(); $$->size = std::stoi($4); }
-                   |guion pcont igual PATH { $$ = new Mkfile(); $$->cont = $4; }
+PROPIEDADESMKFILE : PROPIEDADESMKFILE ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
+                   |PROPIEDADESMKFILE ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                   |PROPIEDADESMKFILE ampersand pp { $$ = $1; $$->isP = true; }
+                   |PROPIEDADESMKFILE ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
+                   |PROPIEDADESMKFILE ampersand pcont guion mayorQ PATH { $$ = $1; $$->cont = $6; }
+                   |ampersand ppath guion mayorQ PATH { $$ = new Mkfile(); $$->path = $5; }
+                   |ampersand pp { $$ = new Mkfile(); $$->isP = true; }
+                   |ampersand pid guion mayorQ id { $$ = new Mkfile(); $$->id = $5; }
+                   |ampersand psize guion mayorQ numero { $$ = new Mkfile(); $$->size = std::stoi($5); }
+                   |ampersand pcont guion mayorQ PATH { $$ = new Mkfile(); $$->cont = $5; }
 
 PROPIEDADESMKDIR : PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
                   |PROPIEDADESMKDIR ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }

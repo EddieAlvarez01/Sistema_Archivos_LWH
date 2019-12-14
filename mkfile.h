@@ -9,6 +9,7 @@ class Mkfile : public Command
 public:
     Mkfile();
     std::string path;
+    std::string id;
     bool isP;
     int size;
     std::string cont;

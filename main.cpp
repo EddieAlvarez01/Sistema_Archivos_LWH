@@ -46,6 +46,7 @@
 #include "mkusr.h"
 #include "rmusr.h"
 #include "mkdir.h"
+#include "mkfile.h"
 
 using namespace std;
 
@@ -1842,6 +1843,228 @@ void NewDir(Mkdir *mkdir){
     }
 }
 
+stack<string> PathbyInodes(string path){
+    stack<string> pathToEvaluate;
+    vector<string> ll;
+    size_t pos1 = 0;
+    size_t pos2 = 0;
+    while(pos2 != path.npos){
+        pos2 = path.find("/", pos1);
+        if(pos2 != path.npos){
+            if(pos2 > pos1){
+                ll.push_back(path.substr(pos1, pos2-pos1));
+            }
+            pos1 = pos2+1;
+        }
+    }
+    ll.push_back(path.substr(pos1, path.size() - pos1));
+    for(int i=ll.size() - 1; i >= 0; i--){
+        pathToEvaluate.push(ll.at(i));
+    }
+    return pathToEvaluate;
+}
+
+void PointerDDInode(FILE *file, DirectoryDetail dd, SuperBoot sb, int posDD, int pointer, string nameFile){
+    bool isW = false;
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo == -1){
+            dd.dd_array_files[x].dd_file_app_inodo = pointer;
+            strcpy(dd.dd_array_files[x].dd_file_nombre, nameFile.c_str());
+            time_t t = time(nullptr);
+            tm *now = localtime(&t);
+            string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+            strcpy(dd.dd_array_files[x].dd_file_date_creacion, dateC.c_str());
+            strcpy(dd.dd_array_files[x].dd_file_date_modificacion, dateC.c_str());
+            fseek(file, sb.sb_ap_detalle_directorio + (posDD * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fwrite(&dd, sizeof(DirectoryDetail), 1, file);
+            isW = true;
+            break;
+        }
+    }
+    if(!isW){
+        if(dd.dd_ap_detalle_directorio != -1){
+            DirectoryDetail dd2;
+            fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fread(&dd2, sizeof(DirectoryDetail), 1, file);
+            PointerDDInode(file, dd2, sb, dd.dd_ap_detalle_directorio, pointer, nameFile);
+        }else{
+            ReturnedOfBitmap byteDD = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
+            if(byteDD.position != -1){
+                char a = 49;
+                fseek(file, byteDD.byte, SEEK_SET);
+                fwrite(&a, 1, 1, file);
+                DirectoryDetail dd2;
+                dd.dd_ap_detalle_directorio = byteDD.position;
+                fseek(file, sb.sb_ap_detalle_directorio + (posDD * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                fwrite(&dd, sizeof(DirectoryDetail), 1, file);
+                fseek(file, sb.sb_ap_detalle_directorio + (byteDD.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                fwrite(&dd2, sizeof(DirectoryDetail), 1, file);
+                PointerDDInode(file, dd2, sb, byteDD.position, pointer, nameFile);
+            }
+        }
+    }
+}
+
+bool CreateNewFile(FILE *file, SuperBoot sb, DirectoryDetail dd, int posDD, string nameFile, bool isCreate, string toWrite){
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            if(strcmp(dd.dd_array_files[x].dd_file_nombre, nameFile.c_str()) == 0){
+                return true;
+            }
+        }
+    }
+    if(!isCreate){
+        if(dd.dd_ap_detalle_directorio != -1){
+            DirectoryDetail dd2;
+            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fread(&dd2, sizeof(DirectoryDetail), 1, file);
+            isCreate = CreateNewFile(file, sb, dd2, dd.dd_ap_detalle_directorio, nameFile, isCreate, toWrite);
+        }
+    }
+    if(!isCreate){
+        ReturnedOfBitmap byteInode = ReturnByteBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+        if(byteInode.position != -1){
+            char a = 49;
+            fseek(file, byteInode.byte, SEEK_SET);
+            fwrite(&a, 1, 1, file);
+            Inode newFile;
+            newFile.i_count_inodo = byteInode.position;
+            newFile.i_id_proper = stoi(ussr.id);
+            newFile.i_perm = 664;
+            fseek(file, sb.sb_ap_tabla_inodo + (byteInode.position * (int)sizeof(Inode)), SEEK_SET);
+            fwrite(&newFile, sizeof(Inode), 1, file);
+            Recursive_CreateFile(file, toWrite, sb, newFile, byteInode.position);
+            PointerDDInode(file, dd, sb, posDD, byteInode.position, nameFile);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    return isCreate;
+}
+
+int CreatePath(FILE *file, SuperBoot sb, VirtualDirectoryTree root, int isOk, Mkfile *mkfile, string path, int posAvd, stack<string> pathEvaluate, string toWrite){
+    bool isFinded = false;
+    if(path.find(".") != string::npos){
+        if(root.avd_ap_detalle_directorio != -1){
+            DirectoryDetail dd;
+            fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fread(&dd, sizeof(DirectoryDetail), 1, file);
+            if(CreateNewFile(file, sb, dd, root.avd_ap_detalle_directorio, path, false, toWrite)){
+                isOk = 1;
+            }else{
+                isOk = -1;
+            }
+        }
+    }else{
+        for(int x=0; x<6; x++){
+            if(root.avd_ap_array_subdirectorios[x] != -1){
+                VirtualDirectoryTree avd;
+                fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+                if(avd.avd_nombre_directorio == path){
+                    isFinded = true;
+                    string txt = pathEvaluate.top();
+                    pathEvaluate.pop();
+                    isOk = CreatePath(file, sb, avd, isOk, mkfile, txt, root.avd_ap_array_subdirectorios[x], pathEvaluate, toWrite);
+                    break;
+                }
+            }
+        }
+        if(!isFinded){
+            if(root.avd_ap_arbol_virtual_directorio != -1){
+                VirtualDirectoryTree avd2;
+                fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+                isOk = CreatePath(file, sb, avd2, isOk, mkfile, path, root.avd_ap_arbol_virtual_directorio, pathEvaluate, toWrite);
+            }
+        }
+        if(!isFinded){
+            if(mkfile->isP && isOk == -1){
+                ReturnedOfBitmap byteAvd = ReturnByteBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio);
+                if(byteAvd.position != -1){
+                    ReturnedOfBitmap byteDD = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
+                    if(byteDD.position != -1){
+                        char a = 49;
+                        fseek(file, byteAvd.byte, SEEK_SET);
+                        fwrite(&a, 1, 1, file);
+                        fseek(file, byteDD.byte, SEEK_SET);
+                        fwrite(&a, 1, 1, file);
+                        VirtualDirectoryTree newDir;
+                        DirectoryDetail newDetail;
+                        time_t t = time(nullptr);
+                        tm *now = localtime(&t);
+                        string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+                        strcpy(newDir.avd_fecha_creacion, dateC.c_str());
+                        strcpy(newDir.avd_nombre_directorio, path.c_str());
+                        newDir.avd_ap_detalle_directorio = byteDD.position;
+                        newDir.avd_proper = stoi(ussr.id);
+                        newDir.i_perm = 765;
+                        fseek(file, sb.sb_ap_detalle_directorio + (byteDD.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                        fwrite(&newDetail, sizeof(DirectoryDetail), 1, file);
+                        fseek(file, sb.sb_ap_arbol_directorio + (byteAvd.position * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                        fwrite(&newDir, sizeof(VirtualDirectoryTree), 1, file);
+                        FolderPointer(file, sb, root, byteAvd.position, posAvd);
+                        string inFolder = pathEvaluate.top();
+                        pathEvaluate.pop();
+                        isOk = CreatePath(file, sb, newDir, isOk, mkfile, inFolder, byteAvd.position, pathEvaluate, toWrite);
+                    }else{
+                        isOk = -1;
+                    }
+                }else{
+                    isOk = -1;
+                }
+            }else{
+                isOk = -1;
+            }
+        }
+    }
+    return isOk;
+}
+
+void NewFile(Mkfile *mkfile, stack<string> pathEvaluate){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partStart = 0;
+        if(ussr.partition->type == 0){
+            partStart = ussr.partition->data.part_start;
+        }else{
+            partStart = ussr.partition->data2.part_start;
+        }
+        fseek(file, partStart, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        VirtualDirectoryTree root;
+        fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+        fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+        string txtFile = "";
+        if(mkfile->cont != ""){
+            txtFile = mkfile->cont;
+        }else if(mkfile->size > 0){
+            char abc = 97;
+            for(int x=0; x<mkfile->size; x++){
+                txtFile += abc++;
+                if(abc == 123){
+                    abc = 97;
+                }
+            }
+        }
+        string txt = pathEvaluate.top();
+        pathEvaluate.pop();
+        switch (CreatePath(file, sb, root, -1, mkfile, txt, 0, pathEvaluate, txtFile)) {
+        case 1:
+            cout << "Archivo creado exitosamente\n";
+            break;
+        default:
+            cout << "Error al crear el archivo, ya existe o error durante la creacion\n";
+            break;
+        }
+        fclose(file);
+    }else{
+        cout << "Error: al abrir el archivo\n";
+    }
+}
+
 
 int main()
 {
@@ -2148,19 +2371,18 @@ int main()
                 }else{
                    cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }/*else if(Mkfile *mkfile = dynamic_cast<Mkfile*>((*it))){
+            }else if(Mkfile *mkfile = dynamic_cast<Mkfile*>((*it))){
                 if(ussr.isSession){
                     if(mkfile->path != ""){
-                        if(mkfile->cont != ""){
-                            if(existDir(mkfile->cont)){
+                        if(mkfile->id != ""){
+                            if(mkfile->id == ussr.idPartition){
                                 stack<string> evaluatePath = PathbyInodes(mkfile->path);
                                 NewFile(mkfile, evaluatePath);
                             }else{
-                                cout << "Error: el archivo de cont no existe\n";
+                                cout << "Error: el usuario que esta en sesion no es admin en '" + rmgrp->id + "'\n";
                             }
                         }else{
-                            stack<string> evaluatePath = PathbyInodes(mkfile->path);
-                            NewFile(mkfile, evaluatePath);
+                            cout << "Error: el id es obligatorio\n";
                         }
                     }else{
                         cout << "Error: el path es obligatorio\n";
@@ -2168,7 +2390,7 @@ int main()
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
                 }
-            }*/else if(Mkdir *mkdir = dynamic_cast<Mkdir*>((*it))){
+            }else if(Mkdir *mkdir = dynamic_cast<Mkdir*>((*it))){
                 if(ussr.isSession){
                     if(mkdir->path != ""){
                         if(mkdir->id != ""){
