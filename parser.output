@@ -107,118 +107,122 @@ Gramática
 
    80 NAME: pmbr
    81     | pdisk
+   82     | pbm_arbdir
+   83     | pbm_detdir
+   84     | pbm_inode
+   85     | pbm_block
 
-   82 VALUE: id
-   83      | cadena
-   84      | numero
+   86 VALUE: id
+   87      | cadena
+   88      | numero
 
-   85 PROPIEDADESEXEC: guion ppath igual PATH
+   89 PROPIEDADESEXEC: guion ppath igual PATH
 
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion mayorQ id
-   87                | PROPIEDADESMKFS ampersand ptype guion mayorQ DELETE
-   88                | PROPIEDADESMKFS ampersand padd guion mayorQ E
-   89                | PROPIEDADESMKFS ampersand ptype guion mayorQ UNIDAD
-   90                | ampersand pid guion mayorQ id
-   91                | ampersand ptype guion mayorQ DELETE
-   92                | ampersand padd guion mayorQ E
-   93                | ampersand ptype guion mayorQ UNIDAD
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion mayorQ id
+   91                | PROPIEDADESMKFS ampersand ptype guion mayorQ DELETE
+   92                | PROPIEDADESMKFS ampersand padd guion mayorQ E
+   93                | PROPIEDADESMKFS ampersand ptype guion mayorQ UNIDAD
+   94                | ampersand pid guion mayorQ id
+   95                | ampersand ptype guion mayorQ DELETE
+   96                | ampersand padd guion mayorQ E
+   97                | ampersand ptype guion mayorQ UNIDAD
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion mayorQ PATH
-   95                 | PROPIEDADESLOGIN ampersand ppwd guion mayorQ VALUE
-   96                 | PROPIEDADESLOGIN ampersand pid guion mayorQ id
-   97                 | ampersand pusr guion mayorQ PATH
-   98                 | ampersand ppwd guion mayorQ VALUE
-   99                 | ampersand pid guion mayorQ id
-
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion mayorQ PATH
-  101                 | PROPIEDADESRMGRP ampersand pid guion mayorQ id
-  102                 | ampersand pname guion mayorQ PATH
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion mayorQ PATH
+   99                 | PROPIEDADESLOGIN ampersand ppwd guion mayorQ VALUE
+  100                 | PROPIEDADESLOGIN ampersand pid guion mayorQ id
+  101                 | ampersand pusr guion mayorQ PATH
+  102                 | ampersand ppwd guion mayorQ VALUE
   103                 | ampersand pid guion mayorQ id
 
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion mayorQ PATH
-  105                 | PROPIEDADESMKGRP ampersand pid guion mayorQ id
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion mayorQ PATH
+  105                 | PROPIEDADESRMGRP ampersand pid guion mayorQ id
   106                 | ampersand pname guion mayorQ PATH
   107                 | ampersand pid guion mayorQ id
 
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion mayorQ VALUE
-  109                 | PROPIEDADESMKUSR ampersand pid guion mayorQ id
-  110                 | PROPIEDADESMKUSR ampersand ppwd guion mayorQ VALUE
-  111                 | PROPIEDADESMKUSR ampersand pgrp guion mayorQ VALUE
-  112                 | ampersand pusr guion mayorQ VALUE
-  113                 | ampersand ppwd guion mayorQ VALUE
-  114                 | ampersand pgrp guion mayorQ VALUE
-  115                 | ampersand pid guion mayorQ id
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion mayorQ PATH
+  109                 | PROPIEDADESMKGRP ampersand pid guion mayorQ id
+  110                 | ampersand pname guion mayorQ PATH
+  111                 | ampersand pid guion mayorQ id
 
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion mayorQ PATH
-  117                 | PROPIEDADESRMUSR ampersand pid guion mayorQ id
-  118                 | ampersand pusr guion mayorQ PATH
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion mayorQ VALUE
+  113                 | PROPIEDADESMKUSR ampersand pid guion mayorQ id
+  114                 | PROPIEDADESMKUSR ampersand ppwd guion mayorQ VALUE
+  115                 | PROPIEDADESMKUSR ampersand pgrp guion mayorQ VALUE
+  116                 | ampersand pusr guion mayorQ VALUE
+  117                 | ampersand ppwd guion mayorQ VALUE
+  118                 | ampersand pgrp guion mayorQ VALUE
   119                 | ampersand pid guion mayorQ id
 
-  120 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual PATH
-  121                 | PROPIEDADESCHMOD guion pugo igual numero
-  122                 | PROPIEDADESCHMOD guion pr
-  123                 | guion ppath igual PATH
-  124                 | guion pugo igual numero
-  125                 | guion pr
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion mayorQ PATH
+  121                 | PROPIEDADESRMUSR ampersand pid guion mayorQ id
+  122                 | ampersand pusr guion mayorQ PATH
+  123                 | ampersand pid guion mayorQ id
 
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion mayorQ PATH
-  127                  | PROPIEDADESMKFILE ampersand pid guion mayorQ id
-  128                  | PROPIEDADESMKFILE ampersand pp
-  129                  | PROPIEDADESMKFILE ampersand psize guion mayorQ numero
-  130                  | PROPIEDADESMKFILE ampersand pcont guion mayorQ PATH
-  131                  | ampersand ppath guion mayorQ PATH
-  132                  | ampersand pp
-  133                  | ampersand pid guion mayorQ id
-  134                  | ampersand psize guion mayorQ numero
-  135                  | ampersand pcont guion mayorQ PATH
+  124 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual PATH
+  125                 | PROPIEDADESCHMOD guion pugo igual numero
+  126                 | PROPIEDADESCHMOD guion pr
+  127                 | guion ppath igual PATH
+  128                 | guion pugo igual numero
+  129                 | guion pr
 
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH
-  137                 | PROPIEDADESMKDIR ampersand pid guion mayorQ id
-  138                 | PROPIEDADESMKDIR ampersand pp
-  139                 | ampersand ppath guion mayorQ PATH
-  140                 | ampersand pp
-  141                 | ampersand pid guion mayorQ id
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion mayorQ PATH
+  131                  | PROPIEDADESMKFILE ampersand pid guion mayorQ id
+  132                  | PROPIEDADESMKFILE ampersand pp
+  133                  | PROPIEDADESMKFILE ampersand psize guion mayorQ numero
+  134                  | PROPIEDADESMKFILE ampersand pcont guion mayorQ PATH
+  135                  | ampersand ppath guion mayorQ PATH
+  136                  | ampersand pp
+  137                  | ampersand pid guion mayorQ id
+  138                  | ampersand psize guion mayorQ numero
+  139                  | ampersand pcont guion mayorQ PATH
+
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH
+  141                 | PROPIEDADESMKDIR ampersand pid guion mayorQ id
+  142                 | PROPIEDADESMKDIR ampersand pp
+  143                 | ampersand ppath guion mayorQ PATH
+  144                 | ampersand pp
+  145                 | ampersand pid guion mayorQ id
 
 
 Terminales con las reglas donde aparecen
 
 $end (0) 0
 error (256) 21
-numero (258) 22 27 39 48 62 63 84 121 124 129 134
-cadena (259) 36 83
+numero (258) 22 27 39 48 62 63 88 125 128 133 138
+cadena (259) 36 87
 pmkdisk (260) 4
-psize (261) 22 27 39 48 129 134
+psize (261) 22 27 39 48 133 138
 pfit (262) 46 55
 punit (263) 23 28 40 49
-ppath (264) 24 29 38 41 50 67 69 73 77 85 120 123 126 131 136 139
+ppath (264) 24 29 38 41 50 67 69 73 77 89 124 127 130 135 140 143
 prmdisk (265) 5
 pfdisk (266) 6
-ptype (267) 42 51 87 89 91 93
+ptype (267) 42 51 91 93 95 97
 pdetele (268) 43 52
-pname (269) 25 26 44 53 68 70 72 76 100 102 104 106
-padd (270) 45 54 88 92
+pname (269) 25 26 44 53 68 70 72 76 104 106 108 110
+padd (270) 45 54 92 96
 pmount (271) 7
 punmount (272) 8
-pid (273) 71 74 78 86 90 96 99 101 103 105 107 109 115 117 119 127
-    133 137 141
+pid (273) 71 74 78 90 94 100 103 105 107 109 111 113 119 121 123 131
+    137 141 145
 prep (274) 9
 pexec (275) 10
-id (276) 25 26 37 71 74 78 82 86 90 96 99 101 103 105 107 109 115 117
-    119 127 133 137 141
-igual (277) 71 85 120 121 123 124
+id (276) 25 26 37 71 74 78 86 90 94 100 103 105 107 109 111 113 119
+    121 123 131 137 141 145
+igual (277) 71 89 124 125 127 128
 guion (278) 22 23 24 25 26 27 28 29 38 39 40 41 42 43 44 45 46 47 48
     49 50 51 52 53 54 55 56 63 67 68 69 70 72 73 74 75 76 77 78 79
-    85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104
-    105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120
-    121 122 123 124 125 126 127 129 130 131 133 134 135 136 137 139
-    141
+    89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107
+    108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123
+    124 125 126 127 128 129 130 131 133 134 135 137 138 139 140 141
+    143 145
 pb (279) 33
 pk (280) 34
 pm (281) 35
 pbf (282) 30
 pff (283) 31
 pwf (284) 32
-pp (285) 64 128 132 138 140
+pp (285) 64 132 136 142 144
 pe (286) 60 65
 pl (287) 66
 pfast (288) 57
@@ -230,109 +234,114 @@ pfs (293)
 p2fs (294)
 p3fs (295)
 plogin (296) 12
-pusr (297) 94 97 108 112 116 118
-ppwd (298) 95 98 110 113
+pusr (297) 98 101 112 116 120 122
+ppwd (298) 99 102 114 117
 plogout (299) 13
 prmgrp (300) 15
 pmkgrp (301) 14
 pmkusr (302) 16
-pgrp (303) 111 114
+pgrp (303) 115 118
 prmusr (304) 17
 pchmod (305) 18
-pr (306) 122 125
-pugo (307) 121 124
+pr (306) 126 129
+pugo (307) 125 128
 pmkfile (308) 19
-pcont (309) 130 135
+pcont (309) 134 139
 pmkdir (310) 20
 ampersand (311) 22 23 24 25 26 27 28 29 38 39 40 41 42 43 44 45 46
     47 48 49 50 51 52 53 54 55 56 67 68 69 70 72 73 74 75 76 77 78
-    79 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104
-    105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 126
-    127 128 129 130 131 132 133 134 135 136 137 138 139 140 141
+    79 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107
+    108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123
+    130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145
 mayorQ (312) 22 23 24 25 26 27 28 29 38 39 40 41 42 43 44 45 46 47
     48 49 50 51 52 53 54 55 56 67 68 69 70 72 73 74 75 76 77 78 79
-    86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105
-    106 107 108 109 110 111 112 113 114 115 116 117 118 119 126 127
-    129 130 131 133 134 135 136 137 139 141
+    90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108
+    109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 130
+    131 133 134 135 137 138 139 140 141 143 145
 porcentaje (313)
 pallocation (314) 47 56
 pc (315) 59
 pix (316) 61
 pruta (317) 75 79
+pbm_arbdir (318) 82
+pbm_detdir (319) 83
+pbm_inode (320) 84
+pbm_block (321) 85
 
 
 No terminales con las reglas donde aparecen
 
-$accept (63)
+$accept (67)
     en la izquierda: 0
-INICIO (64)
+INICIO (68)
     en la izquierda: 1, en la derecha: 0
-LCOMANDOS (65)
+LCOMANDOS (69)
     en la izquierda: 2 3, en la derecha: 1 2
-COMANDO (66)
+COMANDO (70)
     en la izquierda: 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21,
     en la derecha: 2 3
-PROPIEDADESMK (67)
+PROPIEDADESMK (71)
     en la izquierda: 22 23 24 25 26 27 28 29, en la derecha: 4 22 23
     24 25
-AJUSTE (68)
+AJUSTE (72)
     en la izquierda: 30 31 32, en la derecha: 46 55
-UNIDAD (69)
-    en la izquierda: 33 34 35, en la derecha: 23 28 40 49 89 93
-PATH (70)
+UNIDAD (73)
+    en la izquierda: 33 34 35, en la derecha: 23 28 40 49 93 97
+PATH (74)
     en la izquierda: 36 37, en la derecha: 24 29 38 41 44 50 53 67
-    68 69 70 73 75 77 79 85 94 97 100 102 104 106 116 118 120 123 126
-    130 131 135 136 139
-PROPIEDADESRM (71)
+    68 69 70 73 75 77 79 89 98 101 104 106 108 110 120 122 124 127
+    130 134 135 139 140 143
+PROPIEDADESRM (75)
     en la izquierda: 38, en la derecha: 5
-PROPIEDADESFD (72)
+PROPIEDADESFD (76)
     en la izquierda: 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54
     55 56, en la derecha: 6 39 40 41 42 43 44 45 46 47
-DELETE (73)
-    en la izquierda: 57 58, en la derecha: 43 52 87 91
-ALLOCATION (74)
+DELETE (77)
+    en la izquierda: 57 58, en la derecha: 43 52 91 95
+ALLOCATION (78)
     en la izquierda: 59 60 61, en la derecha: 47 56
-E (75)
-    en la izquierda: 62 63, en la derecha: 45 54 88 92
-TYPE (76)
+E (79)
+    en la izquierda: 62 63, en la derecha: 45 54 92 96
+TYPE (80)
     en la izquierda: 64 65 66, en la derecha: 42 51
-PROPIEDADESMOUNT (77)
+PROPIEDADESMOUNT (81)
     en la izquierda: 67 68 69 70, en la derecha: 7 67 68
-PROPIEDADESUNMOUNT (78)
+PROPIEDADESUNMOUNT (82)
     en la izquierda: 71, en la derecha: 8
-PROPIEDADESREP (79)
+PROPIEDADESREP (83)
     en la izquierda: 72 73 74 75 76 77 78 79, en la derecha: 9 72 73
     74 75
-NAME (80)
-    en la izquierda: 80 81, en la derecha: 72 76
-VALUE (81)
-    en la izquierda: 82 83 84, en la derecha: 95 98 108 110 111 112
-    113 114
-PROPIEDADESEXEC (82)
-    en la izquierda: 85, en la derecha: 10
-PROPIEDADESMKFS (83)
-    en la izquierda: 86 87 88 89 90 91 92 93, en la derecha: 11 86
-    87 88 89
-PROPIEDADESLOGIN (84)
-    en la izquierda: 94 95 96 97 98 99, en la derecha: 12 94 95 96
-PROPIEDADESRMGRP (85)
-    en la izquierda: 100 101 102 103, en la derecha: 15 100 101
-PROPIEDADESMKGRP (86)
-    en la izquierda: 104 105 106 107, en la derecha: 14 104 105
-PROPIEDADESMKUSR (87)
-    en la izquierda: 108 109 110 111 112 113 114 115, en la derecha:
-    16 108 109 110 111
-PROPIEDADESRMUSR (88)
-    en la izquierda: 116 117 118 119, en la derecha: 17 116 117
-PROPIEDADESCHMOD (89)
-    en la izquierda: 120 121 122 123 124 125, en la derecha: 18 120
-    121 122
-PROPIEDADESMKFILE (90)
-    en la izquierda: 126 127 128 129 130 131 132 133 134 135, en la derecha:
-    19 126 127 128 129 130
-PROPIEDADESMKDIR (91)
-    en la izquierda: 136 137 138 139 140 141, en la derecha: 20 136
-    137 138
+NAME (84)
+    en la izquierda: 80 81 82 83 84 85, en la derecha: 72 76
+VALUE (85)
+    en la izquierda: 86 87 88, en la derecha: 99 102 112 114 115 116
+    117 118
+PROPIEDADESEXEC (86)
+    en la izquierda: 89, en la derecha: 10
+PROPIEDADESMKFS (87)
+    en la izquierda: 90 91 92 93 94 95 96 97, en la derecha: 11 90
+    91 92 93
+PROPIEDADESLOGIN (88)
+    en la izquierda: 98 99 100 101 102 103, en la derecha: 12 98 99
+    100
+PROPIEDADESRMGRP (89)
+    en la izquierda: 104 105 106 107, en la derecha: 15 104 105
+PROPIEDADESMKGRP (90)
+    en la izquierda: 108 109 110 111, en la derecha: 14 108 109
+PROPIEDADESMKUSR (91)
+    en la izquierda: 112 113 114 115 116 117 118 119, en la derecha:
+    16 112 113 114 115
+PROPIEDADESRMUSR (92)
+    en la izquierda: 120 121 122 123, en la derecha: 17 120 121
+PROPIEDADESCHMOD (93)
+    en la izquierda: 124 125 126 127 128 129, en la derecha: 18 124
+    125 126
+PROPIEDADESMKFILE (94)
+    en la izquierda: 130 131 132 133 134 135 136 137 138 139, en la derecha:
+    19 130 131 132 133 134
+PROPIEDADESMKDIR (95)
+    en la izquierda: 140 141 142 143 144 145, en la derecha: 20 140
+    141 142
 
 
 Estado 0
@@ -707,7 +716,7 @@ Estado 33
 
 Estado 34
 
-   85 PROPIEDADESEXEC: guion . ppath igual PATH
+   89 PROPIEDADESEXEC: guion . ppath igual PATH
 
     ppath  desplazar e ir al estado 81
 
@@ -721,10 +730,10 @@ Estado 35
 
 Estado 36
 
-   90 PROPIEDADESMKFS: ampersand . pid guion mayorQ id
-   91                | ampersand . ptype guion mayorQ DELETE
-   92                | ampersand . padd guion mayorQ E
-   93                | ampersand . ptype guion mayorQ UNIDAD
+   94 PROPIEDADESMKFS: ampersand . pid guion mayorQ id
+   95                | ampersand . ptype guion mayorQ DELETE
+   96                | ampersand . padd guion mayorQ E
+   97                | ampersand . ptype guion mayorQ UNIDAD
 
     ptype  desplazar e ir al estado 82
     padd   desplazar e ir al estado 83
@@ -734,10 +743,10 @@ Estado 36
 Estado 37
 
    11 COMANDO: pmkfs PROPIEDADESMKFS .
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS . ampersand pid guion mayorQ id
-   87                | PROPIEDADESMKFS . ampersand ptype guion mayorQ DELETE
-   88                | PROPIEDADESMKFS . ampersand padd guion mayorQ E
-   89                | PROPIEDADESMKFS . ampersand ptype guion mayorQ UNIDAD
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS . ampersand pid guion mayorQ id
+   91                | PROPIEDADESMKFS . ampersand ptype guion mayorQ DELETE
+   92                | PROPIEDADESMKFS . ampersand padd guion mayorQ E
+   93                | PROPIEDADESMKFS . ampersand ptype guion mayorQ UNIDAD
 
     ampersand  desplazar e ir al estado 85
 
@@ -746,9 +755,9 @@ Estado 37
 
 Estado 38
 
-   97 PROPIEDADESLOGIN: ampersand . pusr guion mayorQ PATH
-   98                 | ampersand . ppwd guion mayorQ VALUE
-   99                 | ampersand . pid guion mayorQ id
+  101 PROPIEDADESLOGIN: ampersand . pusr guion mayorQ PATH
+  102                 | ampersand . ppwd guion mayorQ VALUE
+  103                 | ampersand . pid guion mayorQ id
 
     pid   desplazar e ir al estado 86
     pusr  desplazar e ir al estado 87
@@ -758,9 +767,9 @@ Estado 38
 Estado 39
 
    12 COMANDO: plogin PROPIEDADESLOGIN .
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN . ampersand pusr guion mayorQ PATH
-   95                 | PROPIEDADESLOGIN . ampersand ppwd guion mayorQ VALUE
-   96                 | PROPIEDADESLOGIN . ampersand pid guion mayorQ id
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN . ampersand pusr guion mayorQ PATH
+   99                 | PROPIEDADESLOGIN . ampersand ppwd guion mayorQ VALUE
+  100                 | PROPIEDADESLOGIN . ampersand pid guion mayorQ id
 
     ampersand  desplazar e ir al estado 89
 
@@ -769,8 +778,8 @@ Estado 39
 
 Estado 40
 
-  102 PROPIEDADESRMGRP: ampersand . pname guion mayorQ PATH
-  103                 | ampersand . pid guion mayorQ id
+  106 PROPIEDADESRMGRP: ampersand . pname guion mayorQ PATH
+  107                 | ampersand . pid guion mayorQ id
 
     pname  desplazar e ir al estado 90
     pid    desplazar e ir al estado 91
@@ -779,8 +788,8 @@ Estado 40
 Estado 41
 
    15 COMANDO: prmgrp PROPIEDADESRMGRP .
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP . ampersand pname guion mayorQ PATH
-  101                 | PROPIEDADESRMGRP . ampersand pid guion mayorQ id
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP . ampersand pname guion mayorQ PATH
+  105                 | PROPIEDADESRMGRP . ampersand pid guion mayorQ id
 
     ampersand  desplazar e ir al estado 92
 
@@ -789,8 +798,8 @@ Estado 41
 
 Estado 42
 
-  106 PROPIEDADESMKGRP: ampersand . pname guion mayorQ PATH
-  107                 | ampersand . pid guion mayorQ id
+  110 PROPIEDADESMKGRP: ampersand . pname guion mayorQ PATH
+  111                 | ampersand . pid guion mayorQ id
 
     pname  desplazar e ir al estado 93
     pid    desplazar e ir al estado 94
@@ -799,8 +808,8 @@ Estado 42
 Estado 43
 
    14 COMANDO: pmkgrp PROPIEDADESMKGRP .
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP . ampersand pname guion mayorQ PATH
-  105                 | PROPIEDADESMKGRP . ampersand pid guion mayorQ id
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP . ampersand pname guion mayorQ PATH
+  109                 | PROPIEDADESMKGRP . ampersand pid guion mayorQ id
 
     ampersand  desplazar e ir al estado 95
 
@@ -809,10 +818,10 @@ Estado 43
 
 Estado 44
 
-  112 PROPIEDADESMKUSR: ampersand . pusr guion mayorQ VALUE
-  113                 | ampersand . ppwd guion mayorQ VALUE
-  114                 | ampersand . pgrp guion mayorQ VALUE
-  115                 | ampersand . pid guion mayorQ id
+  116 PROPIEDADESMKUSR: ampersand . pusr guion mayorQ VALUE
+  117                 | ampersand . ppwd guion mayorQ VALUE
+  118                 | ampersand . pgrp guion mayorQ VALUE
+  119                 | ampersand . pid guion mayorQ id
 
     pid   desplazar e ir al estado 96
     pusr  desplazar e ir al estado 97
@@ -823,10 +832,10 @@ Estado 44
 Estado 45
 
    16 COMANDO: pmkusr PROPIEDADESMKUSR .
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR . ampersand pusr guion mayorQ VALUE
-  109                 | PROPIEDADESMKUSR . ampersand pid guion mayorQ id
-  110                 | PROPIEDADESMKUSR . ampersand ppwd guion mayorQ VALUE
-  111                 | PROPIEDADESMKUSR . ampersand pgrp guion mayorQ VALUE
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR . ampersand pusr guion mayorQ VALUE
+  113                 | PROPIEDADESMKUSR . ampersand pid guion mayorQ id
+  114                 | PROPIEDADESMKUSR . ampersand ppwd guion mayorQ VALUE
+  115                 | PROPIEDADESMKUSR . ampersand pgrp guion mayorQ VALUE
 
     ampersand  desplazar e ir al estado 100
 
@@ -835,8 +844,8 @@ Estado 45
 
 Estado 46
 
-  118 PROPIEDADESRMUSR: ampersand . pusr guion mayorQ PATH
-  119                 | ampersand . pid guion mayorQ id
+  122 PROPIEDADESRMUSR: ampersand . pusr guion mayorQ PATH
+  123                 | ampersand . pid guion mayorQ id
 
     pid   desplazar e ir al estado 101
     pusr  desplazar e ir al estado 102
@@ -845,8 +854,8 @@ Estado 46
 Estado 47
 
    17 COMANDO: prmusr PROPIEDADESRMUSR .
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR . ampersand pusr guion mayorQ PATH
-  117                 | PROPIEDADESRMUSR . ampersand pid guion mayorQ id
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR . ampersand pusr guion mayorQ PATH
+  121                 | PROPIEDADESRMUSR . ampersand pid guion mayorQ id
 
     ampersand  desplazar e ir al estado 103
 
@@ -855,9 +864,9 @@ Estado 47
 
 Estado 48
 
-  123 PROPIEDADESCHMOD: guion . ppath igual PATH
-  124                 | guion . pugo igual numero
-  125                 | guion . pr
+  127 PROPIEDADESCHMOD: guion . ppath igual PATH
+  128                 | guion . pugo igual numero
+  129                 | guion . pr
 
     ppath  desplazar e ir al estado 104
     pr     desplazar e ir al estado 105
@@ -867,9 +876,9 @@ Estado 48
 Estado 49
 
    18 COMANDO: pchmod PROPIEDADESCHMOD .
-  120 PROPIEDADESCHMOD: PROPIEDADESCHMOD . guion ppath igual PATH
-  121                 | PROPIEDADESCHMOD . guion pugo igual numero
-  122                 | PROPIEDADESCHMOD . guion pr
+  124 PROPIEDADESCHMOD: PROPIEDADESCHMOD . guion ppath igual PATH
+  125                 | PROPIEDADESCHMOD . guion pugo igual numero
+  126                 | PROPIEDADESCHMOD . guion pr
 
     guion  desplazar e ir al estado 107
 
@@ -878,11 +887,11 @@ Estado 49
 
 Estado 50
 
-  131 PROPIEDADESMKFILE: ampersand . ppath guion mayorQ PATH
-  132                  | ampersand . pp
-  133                  | ampersand . pid guion mayorQ id
-  134                  | ampersand . psize guion mayorQ numero
-  135                  | ampersand . pcont guion mayorQ PATH
+  135 PROPIEDADESMKFILE: ampersand . ppath guion mayorQ PATH
+  136                  | ampersand . pp
+  137                  | ampersand . pid guion mayorQ id
+  138                  | ampersand . psize guion mayorQ numero
+  139                  | ampersand . pcont guion mayorQ PATH
 
     psize  desplazar e ir al estado 108
     ppath  desplazar e ir al estado 109
@@ -894,11 +903,11 @@ Estado 50
 Estado 51
 
    19 COMANDO: pmkfile PROPIEDADESMKFILE .
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE . ampersand ppath guion mayorQ PATH
-  127                  | PROPIEDADESMKFILE . ampersand pid guion mayorQ id
-  128                  | PROPIEDADESMKFILE . ampersand pp
-  129                  | PROPIEDADESMKFILE . ampersand psize guion mayorQ numero
-  130                  | PROPIEDADESMKFILE . ampersand pcont guion mayorQ PATH
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE . ampersand ppath guion mayorQ PATH
+  131                  | PROPIEDADESMKFILE . ampersand pid guion mayorQ id
+  132                  | PROPIEDADESMKFILE . ampersand pp
+  133                  | PROPIEDADESMKFILE . ampersand psize guion mayorQ numero
+  134                  | PROPIEDADESMKFILE . ampersand pcont guion mayorQ PATH
 
     ampersand  desplazar e ir al estado 113
 
@@ -907,9 +916,9 @@ Estado 51
 
 Estado 52
 
-  139 PROPIEDADESMKDIR: ampersand . ppath guion mayorQ PATH
-  140                 | ampersand . pp
-  141                 | ampersand . pid guion mayorQ id
+  143 PROPIEDADESMKDIR: ampersand . ppath guion mayorQ PATH
+  144                 | ampersand . pp
+  145                 | ampersand . pid guion mayorQ id
 
     ppath  desplazar e ir al estado 114
     pid    desplazar e ir al estado 115
@@ -919,9 +928,9 @@ Estado 52
 Estado 53
 
    20 COMANDO: pmkdir PROPIEDADESMKDIR .
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR . ampersand ppath guion mayorQ PATH
-  137                 | PROPIEDADESMKDIR . ampersand pid guion mayorQ id
-  138                 | PROPIEDADESMKDIR . ampersand pp
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR . ampersand ppath guion mayorQ PATH
+  141                 | PROPIEDADESMKDIR . ampersand pid guion mayorQ id
+  142                 | PROPIEDADESMKDIR . ampersand pp
 
     ampersand  desplazar e ir al estado 117
 
@@ -1149,39 +1158,39 @@ Estado 80
 
 Estado 81
 
-   85 PROPIEDADESEXEC: guion ppath . igual PATH
+   89 PROPIEDADESEXEC: guion ppath . igual PATH
 
     igual  desplazar e ir al estado 158
 
 
 Estado 82
 
-   91 PROPIEDADESMKFS: ampersand ptype . guion mayorQ DELETE
-   93                | ampersand ptype . guion mayorQ UNIDAD
+   95 PROPIEDADESMKFS: ampersand ptype . guion mayorQ DELETE
+   97                | ampersand ptype . guion mayorQ UNIDAD
 
     guion  desplazar e ir al estado 159
 
 
 Estado 83
 
-   92 PROPIEDADESMKFS: ampersand padd . guion mayorQ E
+   96 PROPIEDADESMKFS: ampersand padd . guion mayorQ E
 
     guion  desplazar e ir al estado 160
 
 
 Estado 84
 
-   90 PROPIEDADESMKFS: ampersand pid . guion mayorQ id
+   94 PROPIEDADESMKFS: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 161
 
 
 Estado 85
 
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand . pid guion mayorQ id
-   87                | PROPIEDADESMKFS ampersand . ptype guion mayorQ DELETE
-   88                | PROPIEDADESMKFS ampersand . padd guion mayorQ E
-   89                | PROPIEDADESMKFS ampersand . ptype guion mayorQ UNIDAD
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand . pid guion mayorQ id
+   91                | PROPIEDADESMKFS ampersand . ptype guion mayorQ DELETE
+   92                | PROPIEDADESMKFS ampersand . padd guion mayorQ E
+   93                | PROPIEDADESMKFS ampersand . ptype guion mayorQ UNIDAD
 
     ptype  desplazar e ir al estado 162
     padd   desplazar e ir al estado 163
@@ -1190,30 +1199,30 @@ Estado 85
 
 Estado 86
 
-   99 PROPIEDADESLOGIN: ampersand pid . guion mayorQ id
+  103 PROPIEDADESLOGIN: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 165
 
 
 Estado 87
 
-   97 PROPIEDADESLOGIN: ampersand pusr . guion mayorQ PATH
+  101 PROPIEDADESLOGIN: ampersand pusr . guion mayorQ PATH
 
     guion  desplazar e ir al estado 166
 
 
 Estado 88
 
-   98 PROPIEDADESLOGIN: ampersand ppwd . guion mayorQ VALUE
+  102 PROPIEDADESLOGIN: ampersand ppwd . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 167
 
 
 Estado 89
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand . pusr guion mayorQ PATH
-   95                 | PROPIEDADESLOGIN ampersand . ppwd guion mayorQ VALUE
-   96                 | PROPIEDADESLOGIN ampersand . pid guion mayorQ id
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand . pusr guion mayorQ PATH
+   99                 | PROPIEDADESLOGIN ampersand . ppwd guion mayorQ VALUE
+  100                 | PROPIEDADESLOGIN ampersand . pid guion mayorQ id
 
     pid   desplazar e ir al estado 168
     pusr  desplazar e ir al estado 169
@@ -1222,22 +1231,22 @@ Estado 89
 
 Estado 90
 
-  102 PROPIEDADESRMGRP: ampersand pname . guion mayorQ PATH
+  106 PROPIEDADESRMGRP: ampersand pname . guion mayorQ PATH
 
     guion  desplazar e ir al estado 171
 
 
 Estado 91
 
-  103 PROPIEDADESRMGRP: ampersand pid . guion mayorQ id
+  107 PROPIEDADESRMGRP: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 172
 
 
 Estado 92
 
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand . pname guion mayorQ PATH
-  101                 | PROPIEDADESRMGRP ampersand . pid guion mayorQ id
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand . pname guion mayorQ PATH
+  105                 | PROPIEDADESRMGRP ampersand . pid guion mayorQ id
 
     pname  desplazar e ir al estado 173
     pid    desplazar e ir al estado 174
@@ -1245,22 +1254,22 @@ Estado 92
 
 Estado 93
 
-  106 PROPIEDADESMKGRP: ampersand pname . guion mayorQ PATH
+  110 PROPIEDADESMKGRP: ampersand pname . guion mayorQ PATH
 
     guion  desplazar e ir al estado 175
 
 
 Estado 94
 
-  107 PROPIEDADESMKGRP: ampersand pid . guion mayorQ id
+  111 PROPIEDADESMKGRP: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 176
 
 
 Estado 95
 
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand . pname guion mayorQ PATH
-  105                 | PROPIEDADESMKGRP ampersand . pid guion mayorQ id
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand . pname guion mayorQ PATH
+  109                 | PROPIEDADESMKGRP ampersand . pid guion mayorQ id
 
     pname  desplazar e ir al estado 177
     pid    desplazar e ir al estado 178
@@ -1268,38 +1277,38 @@ Estado 95
 
 Estado 96
 
-  115 PROPIEDADESMKUSR: ampersand pid . guion mayorQ id
+  119 PROPIEDADESMKUSR: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 179
 
 
 Estado 97
 
-  112 PROPIEDADESMKUSR: ampersand pusr . guion mayorQ VALUE
+  116 PROPIEDADESMKUSR: ampersand pusr . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 180
 
 
 Estado 98
 
-  113 PROPIEDADESMKUSR: ampersand ppwd . guion mayorQ VALUE
+  117 PROPIEDADESMKUSR: ampersand ppwd . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 181
 
 
 Estado 99
 
-  114 PROPIEDADESMKUSR: ampersand pgrp . guion mayorQ VALUE
+  118 PROPIEDADESMKUSR: ampersand pgrp . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 182
 
 
 Estado 100
 
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand . pusr guion mayorQ VALUE
-  109                 | PROPIEDADESMKUSR ampersand . pid guion mayorQ id
-  110                 | PROPIEDADESMKUSR ampersand . ppwd guion mayorQ VALUE
-  111                 | PROPIEDADESMKUSR ampersand . pgrp guion mayorQ VALUE
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand . pusr guion mayorQ VALUE
+  113                 | PROPIEDADESMKUSR ampersand . pid guion mayorQ id
+  114                 | PROPIEDADESMKUSR ampersand . ppwd guion mayorQ VALUE
+  115                 | PROPIEDADESMKUSR ampersand . pgrp guion mayorQ VALUE
 
     pid   desplazar e ir al estado 183
     pusr  desplazar e ir al estado 184
@@ -1309,22 +1318,22 @@ Estado 100
 
 Estado 101
 
-  119 PROPIEDADESRMUSR: ampersand pid . guion mayorQ id
+  123 PROPIEDADESRMUSR: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 187
 
 
 Estado 102
 
-  118 PROPIEDADESRMUSR: ampersand pusr . guion mayorQ PATH
+  122 PROPIEDADESRMUSR: ampersand pusr . guion mayorQ PATH
 
     guion  desplazar e ir al estado 188
 
 
 Estado 103
 
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand . pusr guion mayorQ PATH
-  117                 | PROPIEDADESRMUSR ampersand . pid guion mayorQ id
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand . pusr guion mayorQ PATH
+  121                 | PROPIEDADESRMUSR ampersand . pid guion mayorQ id
 
     pid   desplazar e ir al estado 189
     pusr  desplazar e ir al estado 190
@@ -1332,30 +1341,30 @@ Estado 103
 
 Estado 104
 
-  123 PROPIEDADESCHMOD: guion ppath . igual PATH
+  127 PROPIEDADESCHMOD: guion ppath . igual PATH
 
     igual  desplazar e ir al estado 191
 
 
 Estado 105
 
-  125 PROPIEDADESCHMOD: guion pr .
+  129 PROPIEDADESCHMOD: guion pr .
 
-    $default  reduce usando la regla 125 (PROPIEDADESCHMOD)
+    $default  reduce usando la regla 129 (PROPIEDADESCHMOD)
 
 
 Estado 106
 
-  124 PROPIEDADESCHMOD: guion pugo . igual numero
+  128 PROPIEDADESCHMOD: guion pugo . igual numero
 
     igual  desplazar e ir al estado 192
 
 
 Estado 107
 
-  120 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion . ppath igual PATH
-  121                 | PROPIEDADESCHMOD guion . pugo igual numero
-  122                 | PROPIEDADESCHMOD guion . pr
+  124 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion . ppath igual PATH
+  125                 | PROPIEDADESCHMOD guion . pugo igual numero
+  126                 | PROPIEDADESCHMOD guion . pr
 
     ppath  desplazar e ir al estado 193
     pr     desplazar e ir al estado 194
@@ -1364,46 +1373,46 @@ Estado 107
 
 Estado 108
 
-  134 PROPIEDADESMKFILE: ampersand psize . guion mayorQ numero
+  138 PROPIEDADESMKFILE: ampersand psize . guion mayorQ numero
 
     guion  desplazar e ir al estado 196
 
 
 Estado 109
 
-  131 PROPIEDADESMKFILE: ampersand ppath . guion mayorQ PATH
+  135 PROPIEDADESMKFILE: ampersand ppath . guion mayorQ PATH
 
     guion  desplazar e ir al estado 197
 
 
 Estado 110
 
-  133 PROPIEDADESMKFILE: ampersand pid . guion mayorQ id
+  137 PROPIEDADESMKFILE: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 198
 
 
 Estado 111
 
-  132 PROPIEDADESMKFILE: ampersand pp .
+  136 PROPIEDADESMKFILE: ampersand pp .
 
-    $default  reduce usando la regla 132 (PROPIEDADESMKFILE)
+    $default  reduce usando la regla 136 (PROPIEDADESMKFILE)
 
 
 Estado 112
 
-  135 PROPIEDADESMKFILE: ampersand pcont . guion mayorQ PATH
+  139 PROPIEDADESMKFILE: ampersand pcont . guion mayorQ PATH
 
     guion  desplazar e ir al estado 199
 
 
 Estado 113
 
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand . ppath guion mayorQ PATH
-  127                  | PROPIEDADESMKFILE ampersand . pid guion mayorQ id
-  128                  | PROPIEDADESMKFILE ampersand . pp
-  129                  | PROPIEDADESMKFILE ampersand . psize guion mayorQ numero
-  130                  | PROPIEDADESMKFILE ampersand . pcont guion mayorQ PATH
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand . ppath guion mayorQ PATH
+  131                  | PROPIEDADESMKFILE ampersand . pid guion mayorQ id
+  132                  | PROPIEDADESMKFILE ampersand . pp
+  133                  | PROPIEDADESMKFILE ampersand . psize guion mayorQ numero
+  134                  | PROPIEDADESMKFILE ampersand . pcont guion mayorQ PATH
 
     psize  desplazar e ir al estado 200
     ppath  desplazar e ir al estado 201
@@ -1414,30 +1423,30 @@ Estado 113
 
 Estado 114
 
-  139 PROPIEDADESMKDIR: ampersand ppath . guion mayorQ PATH
+  143 PROPIEDADESMKDIR: ampersand ppath . guion mayorQ PATH
 
     guion  desplazar e ir al estado 205
 
 
 Estado 115
 
-  141 PROPIEDADESMKDIR: ampersand pid . guion mayorQ id
+  145 PROPIEDADESMKDIR: ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 206
 
 
 Estado 116
 
-  140 PROPIEDADESMKDIR: ampersand pp .
+  144 PROPIEDADESMKDIR: ampersand pp .
 
-    $default  reduce usando la regla 140 (PROPIEDADESMKDIR)
+    $default  reduce usando la regla 144 (PROPIEDADESMKDIR)
 
 
 Estado 117
 
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand . ppath guion mayorQ PATH
-  137                 | PROPIEDADESMKDIR ampersand . pid guion mayorQ id
-  138                 | PROPIEDADESMKDIR ampersand . pp
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand . ppath guion mayorQ PATH
+  141                 | PROPIEDADESMKDIR ampersand . pid guion mayorQ id
+  142                 | PROPIEDADESMKDIR ampersand . pp
 
     ppath  desplazar e ir al estado 207
     pid    desplazar e ir al estado 208
@@ -1726,7 +1735,7 @@ Estado 157
 
 Estado 158
 
-   85 PROPIEDADESEXEC: guion ppath igual . PATH
+   89 PROPIEDADESEXEC: guion ppath igual . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
@@ -1736,233 +1745,233 @@ Estado 158
 
 Estado 159
 
-   91 PROPIEDADESMKFS: ampersand ptype guion . mayorQ DELETE
-   93                | ampersand ptype guion . mayorQ UNIDAD
+   95 PROPIEDADESMKFS: ampersand ptype guion . mayorQ DELETE
+   97                | ampersand ptype guion . mayorQ UNIDAD
 
     mayorQ  desplazar e ir al estado 252
 
 
 Estado 160
 
-   92 PROPIEDADESMKFS: ampersand padd guion . mayorQ E
+   96 PROPIEDADESMKFS: ampersand padd guion . mayorQ E
 
     mayorQ  desplazar e ir al estado 253
 
 
 Estado 161
 
-   90 PROPIEDADESMKFS: ampersand pid guion . mayorQ id
+   94 PROPIEDADESMKFS: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 254
 
 
 Estado 162
 
-   87 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype . guion mayorQ DELETE
-   89                | PROPIEDADESMKFS ampersand ptype . guion mayorQ UNIDAD
+   91 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype . guion mayorQ DELETE
+   93                | PROPIEDADESMKFS ampersand ptype . guion mayorQ UNIDAD
 
     guion  desplazar e ir al estado 255
 
 
 Estado 163
 
-   88 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd . guion mayorQ E
+   92 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd . guion mayorQ E
 
     guion  desplazar e ir al estado 256
 
 
 Estado 164
 
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid . guion mayorQ id
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 257
 
 
 Estado 165
 
-   99 PROPIEDADESLOGIN: ampersand pid guion . mayorQ id
+  103 PROPIEDADESLOGIN: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 258
 
 
 Estado 166
 
-   97 PROPIEDADESLOGIN: ampersand pusr guion . mayorQ PATH
+  101 PROPIEDADESLOGIN: ampersand pusr guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 259
 
 
 Estado 167
 
-   98 PROPIEDADESLOGIN: ampersand ppwd guion . mayorQ VALUE
+  102 PROPIEDADESLOGIN: ampersand ppwd guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 260
 
 
 Estado 168
 
-   96 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid . guion mayorQ id
+  100 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 261
 
 
 Estado 169
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr . guion mayorQ PATH
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr . guion mayorQ PATH
 
     guion  desplazar e ir al estado 262
 
 
 Estado 170
 
-   95 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd . guion mayorQ VALUE
+   99 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 263
 
 
 Estado 171
 
-  102 PROPIEDADESRMGRP: ampersand pname guion . mayorQ PATH
+  106 PROPIEDADESRMGRP: ampersand pname guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 264
 
 
 Estado 172
 
-  103 PROPIEDADESRMGRP: ampersand pid guion . mayorQ id
+  107 PROPIEDADESRMGRP: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 265
 
 
 Estado 173
 
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname . guion mayorQ PATH
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname . guion mayorQ PATH
 
     guion  desplazar e ir al estado 266
 
 
 Estado 174
 
-  101 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid . guion mayorQ id
+  105 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 267
 
 
 Estado 175
 
-  106 PROPIEDADESMKGRP: ampersand pname guion . mayorQ PATH
+  110 PROPIEDADESMKGRP: ampersand pname guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 268
 
 
 Estado 176
 
-  107 PROPIEDADESMKGRP: ampersand pid guion . mayorQ id
+  111 PROPIEDADESMKGRP: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 269
 
 
 Estado 177
 
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname . guion mayorQ PATH
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname . guion mayorQ PATH
 
     guion  desplazar e ir al estado 270
 
 
 Estado 178
 
-  105 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid . guion mayorQ id
+  109 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 271
 
 
 Estado 179
 
-  115 PROPIEDADESMKUSR: ampersand pid guion . mayorQ id
+  119 PROPIEDADESMKUSR: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 272
 
 
 Estado 180
 
-  112 PROPIEDADESMKUSR: ampersand pusr guion . mayorQ VALUE
+  116 PROPIEDADESMKUSR: ampersand pusr guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 273
 
 
 Estado 181
 
-  113 PROPIEDADESMKUSR: ampersand ppwd guion . mayorQ VALUE
+  117 PROPIEDADESMKUSR: ampersand ppwd guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 274
 
 
 Estado 182
 
-  114 PROPIEDADESMKUSR: ampersand pgrp guion . mayorQ VALUE
+  118 PROPIEDADESMKUSR: ampersand pgrp guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 275
 
 
 Estado 183
 
-  109 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid . guion mayorQ id
+  113 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 276
 
 
 Estado 184
 
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr . guion mayorQ VALUE
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 277
 
 
 Estado 185
 
-  110 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd . guion mayorQ VALUE
+  114 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 278
 
 
 Estado 186
 
-  111 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp . guion mayorQ VALUE
+  115 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp . guion mayorQ VALUE
 
     guion  desplazar e ir al estado 279
 
 
 Estado 187
 
-  119 PROPIEDADESRMUSR: ampersand pid guion . mayorQ id
+  123 PROPIEDADESRMUSR: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 280
 
 
 Estado 188
 
-  118 PROPIEDADESRMUSR: ampersand pusr guion . mayorQ PATH
+  122 PROPIEDADESRMUSR: ampersand pusr guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 281
 
 
 Estado 189
 
-  117 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid . guion mayorQ id
+  121 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 282
 
 
 Estado 190
 
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr . guion mayorQ PATH
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr . guion mayorQ PATH
 
     guion  desplazar e ir al estado 283
 
 
 Estado 191
 
-  123 PROPIEDADESCHMOD: guion ppath igual . PATH
+  127 PROPIEDADESCHMOD: guion ppath igual . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
@@ -1972,128 +1981,128 @@ Estado 191
 
 Estado 192
 
-  124 PROPIEDADESCHMOD: guion pugo igual . numero
+  128 PROPIEDADESCHMOD: guion pugo igual . numero
 
     numero  desplazar e ir al estado 285
 
 
 Estado 193
 
-  120 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath . igual PATH
+  124 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath . igual PATH
 
     igual  desplazar e ir al estado 286
 
 
 Estado 194
 
-  122 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pr .
+  126 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pr .
 
-    $default  reduce usando la regla 122 (PROPIEDADESCHMOD)
+    $default  reduce usando la regla 126 (PROPIEDADESCHMOD)
 
 
 Estado 195
 
-  121 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo . igual numero
+  125 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo . igual numero
 
     igual  desplazar e ir al estado 287
 
 
 Estado 196
 
-  134 PROPIEDADESMKFILE: ampersand psize guion . mayorQ numero
+  138 PROPIEDADESMKFILE: ampersand psize guion . mayorQ numero
 
     mayorQ  desplazar e ir al estado 288
 
 
 Estado 197
 
-  131 PROPIEDADESMKFILE: ampersand ppath guion . mayorQ PATH
+  135 PROPIEDADESMKFILE: ampersand ppath guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 289
 
 
 Estado 198
 
-  133 PROPIEDADESMKFILE: ampersand pid guion . mayorQ id
+  137 PROPIEDADESMKFILE: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 290
 
 
 Estado 199
 
-  135 PROPIEDADESMKFILE: ampersand pcont guion . mayorQ PATH
+  139 PROPIEDADESMKFILE: ampersand pcont guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 291
 
 
 Estado 200
 
-  129 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize . guion mayorQ numero
+  133 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize . guion mayorQ numero
 
     guion  desplazar e ir al estado 292
 
 
 Estado 201
 
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath . guion mayorQ PATH
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath . guion mayorQ PATH
 
     guion  desplazar e ir al estado 293
 
 
 Estado 202
 
-  127 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid . guion mayorQ id
+  131 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 294
 
 
 Estado 203
 
-  128 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pp .
+  132 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pp .
 
-    $default  reduce usando la regla 128 (PROPIEDADESMKFILE)
+    $default  reduce usando la regla 132 (PROPIEDADESMKFILE)
 
 
 Estado 204
 
-  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont . guion mayorQ PATH
+  134 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont . guion mayorQ PATH
 
     guion  desplazar e ir al estado 295
 
 
 Estado 205
 
-  139 PROPIEDADESMKDIR: ampersand ppath guion . mayorQ PATH
+  143 PROPIEDADESMKDIR: ampersand ppath guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 296
 
 
 Estado 206
 
-  141 PROPIEDADESMKDIR: ampersand pid guion . mayorQ id
+  145 PROPIEDADESMKDIR: ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 297
 
 
 Estado 207
 
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath . guion mayorQ PATH
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath . guion mayorQ PATH
 
     guion  desplazar e ir al estado 298
 
 
 Estado 208
 
-  137 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid . guion mayorQ id
+  141 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid . guion mayorQ id
 
     guion  desplazar e ir al estado 299
 
 
 Estado 209
 
-  138 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pp .
+  142 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pp .
 
-    $default  reduce usando la regla 138 (PROPIEDADESMKDIR)
+    $default  reduce usando la regla 142 (PROPIEDADESMKDIR)
 
 
 Estado 210
@@ -2371,17 +2380,21 @@ Estado 242
 
    76 PROPIEDADESREP: ampersand pname guion mayorQ . NAME
 
-    pmbr   desplazar e ir al estado 348
-    pdisk  desplazar e ir al estado 349
+    pmbr        desplazar e ir al estado 348
+    pdisk       desplazar e ir al estado 349
+    pbm_arbdir  desplazar e ir al estado 350
+    pbm_detdir  desplazar e ir al estado 351
+    pbm_inode   desplazar e ir al estado 352
+    pbm_block   desplazar e ir al estado 353
 
-    NAME  ir al estado 350
+    NAME  ir al estado 354
 
 
 Estado 243
 
    78 PROPIEDADESREP: ampersand pid guion mayorQ . id
 
-    id  desplazar e ir al estado 351
+    id  desplazar e ir al estado 355
 
 
 Estado 244
@@ -2391,35 +2404,35 @@ Estado 244
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 352
+    PATH  ir al estado 356
 
 
 Estado 245
 
    73 PROPIEDADESREP: PROPIEDADESREP ampersand ppath guion . mayorQ PATH
 
-    mayorQ  desplazar e ir al estado 353
+    mayorQ  desplazar e ir al estado 357
 
 
 Estado 246
 
    72 PROPIEDADESREP: PROPIEDADESREP ampersand pname guion . mayorQ NAME
 
-    mayorQ  desplazar e ir al estado 354
+    mayorQ  desplazar e ir al estado 358
 
 
 Estado 247
 
    74 PROPIEDADESREP: PROPIEDADESREP ampersand pid guion . mayorQ id
 
-    mayorQ  desplazar e ir al estado 355
+    mayorQ  desplazar e ir al estado 359
 
 
 Estado 248
 
    75 PROPIEDADESREP: PROPIEDADESREP ampersand pruta guion . mayorQ PATH
 
-    mayorQ  desplazar e ir al estado 356
+    mayorQ  desplazar e ir al estado 360
 
 
 Estado 249
@@ -2438,15 +2451,15 @@ Estado 250
 
 Estado 251
 
-   85 PROPIEDADESEXEC: guion ppath igual PATH .
+   89 PROPIEDADESEXEC: guion ppath igual PATH .
 
-    $default  reduce usando la regla 85 (PROPIEDADESEXEC)
+    $default  reduce usando la regla 89 (PROPIEDADESEXEC)
 
 
 Estado 252
 
-   91 PROPIEDADESMKFS: ampersand ptype guion mayorQ . DELETE
-   93                | ampersand ptype guion mayorQ . UNIDAD
+   95 PROPIEDADESMKFS: ampersand ptype guion mayorQ . DELETE
+   97                | ampersand ptype guion mayorQ . UNIDAD
 
     pb     desplazar e ir al estado 301
     pk     desplazar e ir al estado 302
@@ -2454,132 +2467,101 @@ Estado 252
     pfast  desplazar e ir al estado 323
     pfull  desplazar e ir al estado 324
 
-    UNIDAD  ir al estado 357
-    DELETE  ir al estado 358
+    UNIDAD  ir al estado 361
+    DELETE  ir al estado 362
 
 
 Estado 253
 
-   92 PROPIEDADESMKFS: ampersand padd guion mayorQ . E
+   96 PROPIEDADESMKFS: ampersand padd guion mayorQ . E
 
     numero  desplazar e ir al estado 327
     guion   desplazar e ir al estado 328
 
-    E  ir al estado 359
+    E  ir al estado 363
 
 
 Estado 254
 
-   90 PROPIEDADESMKFS: ampersand pid guion mayorQ . id
-
-    id  desplazar e ir al estado 360
-
-
-Estado 255
-
-   87 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion . mayorQ DELETE
-   89                | PROPIEDADESMKFS ampersand ptype guion . mayorQ UNIDAD
-
-    mayorQ  desplazar e ir al estado 361
-
-
-Estado 256
-
-   88 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd guion . mayorQ E
-
-    mayorQ  desplazar e ir al estado 362
-
-
-Estado 257
-
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion . mayorQ id
-
-    mayorQ  desplazar e ir al estado 363
-
-
-Estado 258
-
-   99 PROPIEDADESLOGIN: ampersand pid guion mayorQ . id
+   94 PROPIEDADESMKFS: ampersand pid guion mayorQ . id
 
     id  desplazar e ir al estado 364
 
 
+Estado 255
+
+   91 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion . mayorQ DELETE
+   93                | PROPIEDADESMKFS ampersand ptype guion . mayorQ UNIDAD
+
+    mayorQ  desplazar e ir al estado 365
+
+
+Estado 256
+
+   92 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd guion . mayorQ E
+
+    mayorQ  desplazar e ir al estado 366
+
+
+Estado 257
+
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion . mayorQ id
+
+    mayorQ  desplazar e ir al estado 367
+
+
+Estado 258
+
+  103 PROPIEDADESLOGIN: ampersand pid guion mayorQ . id
+
+    id  desplazar e ir al estado 368
+
+
 Estado 259
 
-   97 PROPIEDADESLOGIN: ampersand pusr guion mayorQ . PATH
+  101 PROPIEDADESLOGIN: ampersand pusr guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 365
+    PATH  ir al estado 369
 
 
 Estado 260
 
-   98 PROPIEDADESLOGIN: ampersand ppwd guion mayorQ . VALUE
+  102 PROPIEDADESLOGIN: ampersand ppwd guion mayorQ . VALUE
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
 
-    VALUE  ir al estado 369
+    VALUE  ir al estado 373
 
 
 Estado 261
 
-   96 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid guion . mayorQ id
+  100 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid guion . mayorQ id
 
-    mayorQ  desplazar e ir al estado 370
+    mayorQ  desplazar e ir al estado 374
 
 
 Estado 262
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion . mayorQ PATH
-
-    mayorQ  desplazar e ir al estado 371
-
-
-Estado 263
-
-   95 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd guion . mayorQ VALUE
-
-    mayorQ  desplazar e ir al estado 372
-
-
-Estado 264
-
-  102 PROPIEDADESRMGRP: ampersand pname guion mayorQ . PATH
-
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
-
-    PATH  ir al estado 373
-
-
-Estado 265
-
-  103 PROPIEDADESRMGRP: ampersand pid guion mayorQ . id
-
-    id  desplazar e ir al estado 374
-
-
-Estado 266
-
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion . mayorQ PATH
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 375
 
 
-Estado 267
+Estado 263
 
-  101 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid guion . mayorQ id
+   99 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 376
 
 
-Estado 268
+Estado 264
 
-  106 PROPIEDADESMKGRP: ampersand pname guion mayorQ . PATH
+  106 PROPIEDADESRMGRP: ampersand pname guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
@@ -2587,248 +2569,279 @@ Estado 268
     PATH  ir al estado 377
 
 
-Estado 269
+Estado 265
 
-  107 PROPIEDADESMKGRP: ampersand pid guion mayorQ . id
+  107 PROPIEDADESRMGRP: ampersand pid guion mayorQ . id
 
     id  desplazar e ir al estado 378
 
 
-Estado 270
+Estado 266
 
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion . mayorQ PATH
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 379
 
 
-Estado 271
+Estado 267
 
-  105 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid guion . mayorQ id
+  105 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 380
 
 
+Estado 268
+
+  110 PROPIEDADESMKGRP: ampersand pname guion mayorQ . PATH
+
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 381
+
+
+Estado 269
+
+  111 PROPIEDADESMKGRP: ampersand pid guion mayorQ . id
+
+    id  desplazar e ir al estado 382
+
+
+Estado 270
+
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion . mayorQ PATH
+
+    mayorQ  desplazar e ir al estado 383
+
+
+Estado 271
+
+  109 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid guion . mayorQ id
+
+    mayorQ  desplazar e ir al estado 384
+
+
 Estado 272
 
-  115 PROPIEDADESMKUSR: ampersand pid guion mayorQ . id
+  119 PROPIEDADESMKUSR: ampersand pid guion mayorQ . id
 
-    id  desplazar e ir al estado 381
+    id  desplazar e ir al estado 385
 
 
 Estado 273
 
-  112 PROPIEDADESMKUSR: ampersand pusr guion mayorQ . VALUE
+  116 PROPIEDADESMKUSR: ampersand pusr guion mayorQ . VALUE
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
 
-    VALUE  ir al estado 382
+    VALUE  ir al estado 386
 
 
 Estado 274
 
-  113 PROPIEDADESMKUSR: ampersand ppwd guion mayorQ . VALUE
+  117 PROPIEDADESMKUSR: ampersand ppwd guion mayorQ . VALUE
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
 
-    VALUE  ir al estado 383
+    VALUE  ir al estado 387
 
 
 Estado 275
 
-  114 PROPIEDADESMKUSR: ampersand pgrp guion mayorQ . VALUE
+  118 PROPIEDADESMKUSR: ampersand pgrp guion mayorQ . VALUE
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
 
-    VALUE  ir al estado 384
+    VALUE  ir al estado 388
 
 
 Estado 276
 
-  109 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid guion . mayorQ id
+  113 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid guion . mayorQ id
 
-    mayorQ  desplazar e ir al estado 385
+    mayorQ  desplazar e ir al estado 389
 
 
 Estado 277
 
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion . mayorQ VALUE
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion . mayorQ VALUE
 
-    mayorQ  desplazar e ir al estado 386
+    mayorQ  desplazar e ir al estado 390
 
 
 Estado 278
 
-  110 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd guion . mayorQ VALUE
-
-    mayorQ  desplazar e ir al estado 387
-
-
-Estado 279
-
-  111 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp guion . mayorQ VALUE
-
-    mayorQ  desplazar e ir al estado 388
-
-
-Estado 280
-
-  119 PROPIEDADESRMUSR: ampersand pid guion mayorQ . id
-
-    id  desplazar e ir al estado 389
-
-
-Estado 281
-
-  118 PROPIEDADESRMUSR: ampersand pusr guion mayorQ . PATH
-
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
-
-    PATH  ir al estado 390
-
-
-Estado 282
-
-  117 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid guion . mayorQ id
+  114 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 391
 
 
-Estado 283
+Estado 279
 
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion . mayorQ PATH
+  115 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp guion . mayorQ VALUE
 
     mayorQ  desplazar e ir al estado 392
 
 
+Estado 280
+
+  123 PROPIEDADESRMUSR: ampersand pid guion mayorQ . id
+
+    id  desplazar e ir al estado 393
+
+
+Estado 281
+
+  122 PROPIEDADESRMUSR: ampersand pusr guion mayorQ . PATH
+
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 394
+
+
+Estado 282
+
+  121 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid guion . mayorQ id
+
+    mayorQ  desplazar e ir al estado 395
+
+
+Estado 283
+
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion . mayorQ PATH
+
+    mayorQ  desplazar e ir al estado 396
+
+
 Estado 284
 
-  123 PROPIEDADESCHMOD: guion ppath igual PATH .
+  127 PROPIEDADESCHMOD: guion ppath igual PATH .
 
-    $default  reduce usando la regla 123 (PROPIEDADESCHMOD)
+    $default  reduce usando la regla 127 (PROPIEDADESCHMOD)
 
 
 Estado 285
 
-  124 PROPIEDADESCHMOD: guion pugo igual numero .
+  128 PROPIEDADESCHMOD: guion pugo igual numero .
 
-    $default  reduce usando la regla 124 (PROPIEDADESCHMOD)
+    $default  reduce usando la regla 128 (PROPIEDADESCHMOD)
 
 
 Estado 286
 
-  120 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual . PATH
+  124 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 393
+    PATH  ir al estado 397
 
 
 Estado 287
 
-  121 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo igual . numero
+  125 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo igual . numero
 
-    numero  desplazar e ir al estado 394
+    numero  desplazar e ir al estado 398
 
 
 Estado 288
 
-  134 PROPIEDADESMKFILE: ampersand psize guion mayorQ . numero
+  138 PROPIEDADESMKFILE: ampersand psize guion mayorQ . numero
 
-    numero  desplazar e ir al estado 395
+    numero  desplazar e ir al estado 399
 
 
 Estado 289
 
-  131 PROPIEDADESMKFILE: ampersand ppath guion mayorQ . PATH
+  135 PROPIEDADESMKFILE: ampersand ppath guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 396
+    PATH  ir al estado 400
 
 
 Estado 290
 
-  133 PROPIEDADESMKFILE: ampersand pid guion mayorQ . id
+  137 PROPIEDADESMKFILE: ampersand pid guion mayorQ . id
 
-    id  desplazar e ir al estado 397
+    id  desplazar e ir al estado 401
 
 
 Estado 291
 
-  135 PROPIEDADESMKFILE: ampersand pcont guion mayorQ . PATH
+  139 PROPIEDADESMKFILE: ampersand pcont guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 398
+    PATH  ir al estado 402
 
 
 Estado 292
 
-  129 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize guion . mayorQ numero
+  133 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize guion . mayorQ numero
 
-    mayorQ  desplazar e ir al estado 399
+    mayorQ  desplazar e ir al estado 403
 
 
 Estado 293
 
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion . mayorQ PATH
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion . mayorQ PATH
 
-    mayorQ  desplazar e ir al estado 400
+    mayorQ  desplazar e ir al estado 404
 
 
 Estado 294
 
-  127 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid guion . mayorQ id
-
-    mayorQ  desplazar e ir al estado 401
-
-
-Estado 295
-
-  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont guion . mayorQ PATH
-
-    mayorQ  desplazar e ir al estado 402
-
-
-Estado 296
-
-  139 PROPIEDADESMKDIR: ampersand ppath guion mayorQ . PATH
-
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
-
-    PATH  ir al estado 403
-
-
-Estado 297
-
-  141 PROPIEDADESMKDIR: ampersand pid guion mayorQ . id
-
-    id  desplazar e ir al estado 404
-
-
-Estado 298
-
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion . mayorQ PATH
+  131 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid guion . mayorQ id
 
     mayorQ  desplazar e ir al estado 405
 
 
-Estado 299
+Estado 295
 
-  137 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid guion . mayorQ id
+  134 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont guion . mayorQ PATH
 
     mayorQ  desplazar e ir al estado 406
+
+
+Estado 296
+
+  143 PROPIEDADESMKDIR: ampersand ppath guion mayorQ . PATH
+
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 407
+
+
+Estado 297
+
+  145 PROPIEDADESMKDIR: ampersand pid guion mayorQ . id
+
+    id  desplazar e ir al estado 408
+
+
+Estado 298
+
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion . mayorQ PATH
+
+    mayorQ  desplazar e ir al estado 409
+
+
+Estado 299
+
+  141 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid guion . mayorQ id
+
+    mayorQ  desplazar e ir al estado 410
 
 
 Estado 300
@@ -2884,7 +2897,7 @@ Estado 307
 
    22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion mayorQ . numero
 
-    numero  desplazar e ir al estado 407
+    numero  desplazar e ir al estado 411
 
 
 Estado 308
@@ -2895,7 +2908,7 @@ Estado 308
     pk  desplazar e ir al estado 302
     pm  desplazar e ir al estado 303
 
-    UNIDAD  ir al estado 408
+    UNIDAD  ir al estado 412
 
 
 Estado 309
@@ -2905,14 +2918,14 @@ Estado 309
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 409
+    PATH  ir al estado 413
 
 
 Estado 310
 
    25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion mayorQ . id
 
-    id  desplazar e ir al estado 410
+    id  desplazar e ir al estado 414
 
 
 Estado 311
@@ -3038,7 +3051,7 @@ Estado 328
 
    63 E: guion . numero
 
-    numero  desplazar e ir al estado 411
+    numero  desplazar e ir al estado 415
 
 
 Estado 329
@@ -3080,7 +3093,7 @@ Estado 334
 
    39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion mayorQ . numero
 
-    numero  desplazar e ir al estado 412
+    numero  desplazar e ir al estado 416
 
 
 Estado 335
@@ -3091,7 +3104,7 @@ Estado 335
     pff  desplazar e ir al estado 314
     pwf  desplazar e ir al estado 315
 
-    AJUSTE  ir al estado 413
+    AJUSTE  ir al estado 417
 
 
 Estado 336
@@ -3102,7 +3115,7 @@ Estado 336
     pk  desplazar e ir al estado 302
     pm  desplazar e ir al estado 303
 
-    UNIDAD  ir al estado 414
+    UNIDAD  ir al estado 418
 
 
 Estado 337
@@ -3112,7 +3125,7 @@ Estado 337
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 415
+    PATH  ir al estado 419
 
 
 Estado 338
@@ -3123,7 +3136,7 @@ Estado 338
     pe  desplazar e ir al estado 320
     pl  desplazar e ir al estado 321
 
-    TYPE  ir al estado 416
+    TYPE  ir al estado 420
 
 
 Estado 339
@@ -3133,7 +3146,7 @@ Estado 339
     pfast  desplazar e ir al estado 323
     pfull  desplazar e ir al estado 324
 
-    DELETE  ir al estado 417
+    DELETE  ir al estado 421
 
 
 Estado 340
@@ -3143,7 +3156,7 @@ Estado 340
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 418
+    PATH  ir al estado 422
 
 
 Estado 341
@@ -3153,7 +3166,7 @@ Estado 341
     numero  desplazar e ir al estado 327
     guion   desplazar e ir al estado 328
 
-    E  ir al estado 419
+    E  ir al estado 423
 
 
 Estado 342
@@ -3164,7 +3177,7 @@ Estado 342
     pc   desplazar e ir al estado 331
     pix  desplazar e ir al estado 332
 
-    ALLOCATION  ir al estado 420
+    ALLOCATION  ir al estado 424
 
 
 Estado 343
@@ -3188,7 +3201,7 @@ Estado 345
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 421
+    PATH  ir al estado 425
 
 
 Estado 346
@@ -3198,7 +3211,7 @@ Estado 346
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 422
+    PATH  ir al estado 426
 
 
 Estado 347
@@ -3224,94 +3237,126 @@ Estado 349
 
 Estado 350
 
+   82 NAME: pbm_arbdir .
+
+    $default  reduce usando la regla 82 (NAME)
+
+
+Estado 351
+
+   83 NAME: pbm_detdir .
+
+    $default  reduce usando la regla 83 (NAME)
+
+
+Estado 352
+
+   84 NAME: pbm_inode .
+
+    $default  reduce usando la regla 84 (NAME)
+
+
+Estado 353
+
+   85 NAME: pbm_block .
+
+    $default  reduce usando la regla 85 (NAME)
+
+
+Estado 354
+
    76 PROPIEDADESREP: ampersand pname guion mayorQ NAME .
 
     $default  reduce usando la regla 76 (PROPIEDADESREP)
 
 
-Estado 351
+Estado 355
 
    78 PROPIEDADESREP: ampersand pid guion mayorQ id .
 
     $default  reduce usando la regla 78 (PROPIEDADESREP)
 
 
-Estado 352
+Estado 356
 
    79 PROPIEDADESREP: ampersand pruta guion mayorQ PATH .
 
     $default  reduce usando la regla 79 (PROPIEDADESREP)
 
 
-Estado 353
+Estado 357
 
    73 PROPIEDADESREP: PROPIEDADESREP ampersand ppath guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 423
+    PATH  ir al estado 427
 
 
-Estado 354
+Estado 358
 
    72 PROPIEDADESREP: PROPIEDADESREP ampersand pname guion mayorQ . NAME
 
-    pmbr   desplazar e ir al estado 348
-    pdisk  desplazar e ir al estado 349
+    pmbr        desplazar e ir al estado 348
+    pdisk       desplazar e ir al estado 349
+    pbm_arbdir  desplazar e ir al estado 350
+    pbm_detdir  desplazar e ir al estado 351
+    pbm_inode   desplazar e ir al estado 352
+    pbm_block   desplazar e ir al estado 353
 
-    NAME  ir al estado 424
+    NAME  ir al estado 428
 
 
-Estado 355
+Estado 359
 
    74 PROPIEDADESREP: PROPIEDADESREP ampersand pid guion mayorQ . id
 
-    id  desplazar e ir al estado 425
+    id  desplazar e ir al estado 429
 
 
-Estado 356
+Estado 360
 
    75 PROPIEDADESREP: PROPIEDADESREP ampersand pruta guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 426
-
-
-Estado 357
-
-   93 PROPIEDADESMKFS: ampersand ptype guion mayorQ UNIDAD .
-
-    $default  reduce usando la regla 93 (PROPIEDADESMKFS)
-
-
-Estado 358
-
-   91 PROPIEDADESMKFS: ampersand ptype guion mayorQ DELETE .
-
-    $default  reduce usando la regla 91 (PROPIEDADESMKFS)
-
-
-Estado 359
-
-   92 PROPIEDADESMKFS: ampersand padd guion mayorQ E .
-
-    $default  reduce usando la regla 92 (PROPIEDADESMKFS)
-
-
-Estado 360
-
-   90 PROPIEDADESMKFS: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 90 (PROPIEDADESMKFS)
+    PATH  ir al estado 430
 
 
 Estado 361
 
-   87 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion mayorQ . DELETE
-   89                | PROPIEDADESMKFS ampersand ptype guion mayorQ . UNIDAD
+   97 PROPIEDADESMKFS: ampersand ptype guion mayorQ UNIDAD .
+
+    $default  reduce usando la regla 97 (PROPIEDADESMKFS)
+
+
+Estado 362
+
+   95 PROPIEDADESMKFS: ampersand ptype guion mayorQ DELETE .
+
+    $default  reduce usando la regla 95 (PROPIEDADESMKFS)
+
+
+Estado 363
+
+   96 PROPIEDADESMKFS: ampersand padd guion mayorQ E .
+
+    $default  reduce usando la regla 96 (PROPIEDADESMKFS)
+
+
+Estado 364
+
+   94 PROPIEDADESMKFS: ampersand pid guion mayorQ id .
+
+    $default  reduce usando la regla 94 (PROPIEDADESMKFS)
+
+
+Estado 365
+
+   91 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion mayorQ . DELETE
+   93                | PROPIEDADESMKFS ampersand ptype guion mayorQ . UNIDAD
 
     pb     desplazar e ir al estado 301
     pk     desplazar e ir al estado 302
@@ -3319,145 +3364,79 @@ Estado 361
     pfast  desplazar e ir al estado 323
     pfull  desplazar e ir al estado 324
 
-    UNIDAD  ir al estado 427
-    DELETE  ir al estado 428
-
-
-Estado 362
-
-   88 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd guion mayorQ . E
-
-    numero  desplazar e ir al estado 327
-    guion   desplazar e ir al estado 328
-
-    E  ir al estado 429
-
-
-Estado 363
-
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion mayorQ . id
-
-    id  desplazar e ir al estado 430
-
-
-Estado 364
-
-   99 PROPIEDADESLOGIN: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 99 (PROPIEDADESLOGIN)
-
-
-Estado 365
-
-   97 PROPIEDADESLOGIN: ampersand pusr guion mayorQ PATH .
-
-    $default  reduce usando la regla 97 (PROPIEDADESLOGIN)
+    UNIDAD  ir al estado 431
+    DELETE  ir al estado 432
 
 
 Estado 366
 
-   84 VALUE: numero .
+   92 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd guion mayorQ . E
 
-    $default  reduce usando la regla 84 (VALUE)
+    numero  desplazar e ir al estado 327
+    guion   desplazar e ir al estado 328
+
+    E  ir al estado 433
 
 
 Estado 367
 
-   83 VALUE: cadena .
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion mayorQ . id
 
-    $default  reduce usando la regla 83 (VALUE)
+    id  desplazar e ir al estado 434
 
 
 Estado 368
 
-   82 VALUE: id .
+  103 PROPIEDADESLOGIN: ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 82 (VALUE)
+    $default  reduce usando la regla 103 (PROPIEDADESLOGIN)
 
 
 Estado 369
 
-   98 PROPIEDADESLOGIN: ampersand ppwd guion mayorQ VALUE .
+  101 PROPIEDADESLOGIN: ampersand pusr guion mayorQ PATH .
 
-    $default  reduce usando la regla 98 (PROPIEDADESLOGIN)
+    $default  reduce usando la regla 101 (PROPIEDADESLOGIN)
 
 
 Estado 370
 
-   96 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid guion mayorQ . id
+   88 VALUE: numero .
 
-    id  desplazar e ir al estado 431
+    $default  reduce usando la regla 88 (VALUE)
 
 
 Estado 371
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion mayorQ . PATH
+   87 VALUE: cadena .
 
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
-
-    PATH  ir al estado 432
+    $default  reduce usando la regla 87 (VALUE)
 
 
 Estado 372
 
-   95 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd guion mayorQ . VALUE
+   86 VALUE: id .
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
-
-    VALUE  ir al estado 433
+    $default  reduce usando la regla 86 (VALUE)
 
 
 Estado 373
 
-  102 PROPIEDADESRMGRP: ampersand pname guion mayorQ PATH .
+  102 PROPIEDADESLOGIN: ampersand ppwd guion mayorQ VALUE .
 
-    $default  reduce usando la regla 102 (PROPIEDADESRMGRP)
+    $default  reduce usando la regla 102 (PROPIEDADESLOGIN)
 
 
 Estado 374
 
-  103 PROPIEDADESRMGRP: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 103 (PROPIEDADESRMGRP)
-
-
-Estado 375
-
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion mayorQ . PATH
-
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
-
-    PATH  ir al estado 434
-
-
-Estado 376
-
-  101 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid guion mayorQ . id
+  100 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid guion mayorQ . id
 
     id  desplazar e ir al estado 435
 
 
-Estado 377
+Estado 375
 
-  106 PROPIEDADESMKGRP: ampersand pname guion mayorQ PATH .
-
-    $default  reduce usando la regla 106 (PROPIEDADESMKGRP)
-
-
-Estado 378
-
-  107 PROPIEDADESMKGRP: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 107 (PROPIEDADESMKGRP)
-
-
-Estado 379
-
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion mayorQ . PATH
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
@@ -3465,181 +3444,171 @@ Estado 379
     PATH  ir al estado 436
 
 
+Estado 376
+
+   99 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd guion mayorQ . VALUE
+
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
+
+    VALUE  ir al estado 437
+
+
+Estado 377
+
+  106 PROPIEDADESRMGRP: ampersand pname guion mayorQ PATH .
+
+    $default  reduce usando la regla 106 (PROPIEDADESRMGRP)
+
+
+Estado 378
+
+  107 PROPIEDADESRMGRP: ampersand pid guion mayorQ id .
+
+    $default  reduce usando la regla 107 (PROPIEDADESRMGRP)
+
+
+Estado 379
+
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion mayorQ . PATH
+
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 438
+
+
 Estado 380
 
-  105 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid guion mayorQ . id
+  105 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid guion mayorQ . id
 
-    id  desplazar e ir al estado 437
+    id  desplazar e ir al estado 439
 
 
 Estado 381
 
-  115 PROPIEDADESMKUSR: ampersand pid guion mayorQ id .
+  110 PROPIEDADESMKGRP: ampersand pname guion mayorQ PATH .
 
-    $default  reduce usando la regla 115 (PROPIEDADESMKUSR)
+    $default  reduce usando la regla 110 (PROPIEDADESMKGRP)
 
 
 Estado 382
 
-  112 PROPIEDADESMKUSR: ampersand pusr guion mayorQ VALUE .
+  111 PROPIEDADESMKGRP: ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 112 (PROPIEDADESMKUSR)
+    $default  reduce usando la regla 111 (PROPIEDADESMKGRP)
 
 
 Estado 383
 
-  113 PROPIEDADESMKUSR: ampersand ppwd guion mayorQ VALUE .
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion mayorQ . PATH
 
-    $default  reduce usando la regla 113 (PROPIEDADESMKUSR)
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 440
 
 
 Estado 384
 
-  114 PROPIEDADESMKUSR: ampersand pgrp guion mayorQ VALUE .
+  109 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid guion mayorQ . id
 
-    $default  reduce usando la regla 114 (PROPIEDADESMKUSR)
+    id  desplazar e ir al estado 441
 
 
 Estado 385
 
-  109 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid guion mayorQ . id
+  119 PROPIEDADESMKUSR: ampersand pid guion mayorQ id .
 
-    id  desplazar e ir al estado 438
+    $default  reduce usando la regla 119 (PROPIEDADESMKUSR)
 
 
 Estado 386
 
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion mayorQ . VALUE
+  116 PROPIEDADESMKUSR: ampersand pusr guion mayorQ VALUE .
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
-
-    VALUE  ir al estado 439
+    $default  reduce usando la regla 116 (PROPIEDADESMKUSR)
 
 
 Estado 387
 
-  110 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd guion mayorQ . VALUE
+  117 PROPIEDADESMKUSR: ampersand ppwd guion mayorQ VALUE .
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
-
-    VALUE  ir al estado 440
+    $default  reduce usando la regla 117 (PROPIEDADESMKUSR)
 
 
 Estado 388
 
-  111 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp guion mayorQ . VALUE
+  118 PROPIEDADESMKUSR: ampersand pgrp guion mayorQ VALUE .
 
-    numero  desplazar e ir al estado 366
-    cadena  desplazar e ir al estado 367
-    id      desplazar e ir al estado 368
-
-    VALUE  ir al estado 441
+    $default  reduce usando la regla 118 (PROPIEDADESMKUSR)
 
 
 Estado 389
 
-  119 PROPIEDADESRMUSR: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 119 (PROPIEDADESRMUSR)
-
-
-Estado 390
-
-  118 PROPIEDADESRMUSR: ampersand pusr guion mayorQ PATH .
-
-    $default  reduce usando la regla 118 (PROPIEDADESRMUSR)
-
-
-Estado 391
-
-  117 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid guion mayorQ . id
+  113 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid guion mayorQ . id
 
     id  desplazar e ir al estado 442
 
 
+Estado 390
+
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion mayorQ . VALUE
+
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
+
+    VALUE  ir al estado 443
+
+
+Estado 391
+
+  114 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd guion mayorQ . VALUE
+
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
+
+    VALUE  ir al estado 444
+
+
 Estado 392
 
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion mayorQ . PATH
+  115 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp guion mayorQ . VALUE
 
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
+    numero  desplazar e ir al estado 370
+    cadena  desplazar e ir al estado 371
+    id      desplazar e ir al estado 372
 
-    PATH  ir al estado 443
+    VALUE  ir al estado 445
 
 
 Estado 393
 
-  120 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual PATH .
+  123 PROPIEDADESRMUSR: ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 120 (PROPIEDADESCHMOD)
+    $default  reduce usando la regla 123 (PROPIEDADESRMUSR)
 
 
 Estado 394
 
-  121 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo igual numero .
+  122 PROPIEDADESRMUSR: ampersand pusr guion mayorQ PATH .
 
-    $default  reduce usando la regla 121 (PROPIEDADESCHMOD)
+    $default  reduce usando la regla 122 (PROPIEDADESRMUSR)
 
 
 Estado 395
 
-  134 PROPIEDADESMKFILE: ampersand psize guion mayorQ numero .
-
-    $default  reduce usando la regla 134 (PROPIEDADESMKFILE)
-
-
-Estado 396
-
-  131 PROPIEDADESMKFILE: ampersand ppath guion mayorQ PATH .
-
-    $default  reduce usando la regla 131 (PROPIEDADESMKFILE)
-
-
-Estado 397
-
-  133 PROPIEDADESMKFILE: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 133 (PROPIEDADESMKFILE)
-
-
-Estado 398
-
-  135 PROPIEDADESMKFILE: ampersand pcont guion mayorQ PATH .
-
-    $default  reduce usando la regla 135 (PROPIEDADESMKFILE)
-
-
-Estado 399
-
-  129 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize guion mayorQ . numero
-
-    numero  desplazar e ir al estado 444
-
-
-Estado 400
-
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion mayorQ . PATH
-
-    cadena  desplazar e ir al estado 249
-    id      desplazar e ir al estado 250
-
-    PATH  ir al estado 445
-
-
-Estado 401
-
-  127 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid guion mayorQ . id
+  121 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid guion mayorQ . id
 
     id  desplazar e ir al estado 446
 
 
-Estado 402
+Estado 396
 
-  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont guion mayorQ . PATH
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
@@ -3647,333 +3616,409 @@ Estado 402
     PATH  ir al estado 447
 
 
+Estado 397
+
+  124 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion ppath igual PATH .
+
+    $default  reduce usando la regla 124 (PROPIEDADESCHMOD)
+
+
+Estado 398
+
+  125 PROPIEDADESCHMOD: PROPIEDADESCHMOD guion pugo igual numero .
+
+    $default  reduce usando la regla 125 (PROPIEDADESCHMOD)
+
+
+Estado 399
+
+  138 PROPIEDADESMKFILE: ampersand psize guion mayorQ numero .
+
+    $default  reduce usando la regla 138 (PROPIEDADESMKFILE)
+
+
+Estado 400
+
+  135 PROPIEDADESMKFILE: ampersand ppath guion mayorQ PATH .
+
+    $default  reduce usando la regla 135 (PROPIEDADESMKFILE)
+
+
+Estado 401
+
+  137 PROPIEDADESMKFILE: ampersand pid guion mayorQ id .
+
+    $default  reduce usando la regla 137 (PROPIEDADESMKFILE)
+
+
+Estado 402
+
+  139 PROPIEDADESMKFILE: ampersand pcont guion mayorQ PATH .
+
+    $default  reduce usando la regla 139 (PROPIEDADESMKFILE)
+
+
 Estado 403
 
-  139 PROPIEDADESMKDIR: ampersand ppath guion mayorQ PATH .
+  133 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize guion mayorQ . numero
 
-    $default  reduce usando la regla 139 (PROPIEDADESMKDIR)
+    numero  desplazar e ir al estado 448
 
 
 Estado 404
 
-  141 PROPIEDADESMKDIR: ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 141 (PROPIEDADESMKDIR)
-
-
-Estado 405
-
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion mayorQ . PATH
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion mayorQ . PATH
 
     cadena  desplazar e ir al estado 249
     id      desplazar e ir al estado 250
 
-    PATH  ir al estado 448
+    PATH  ir al estado 449
+
+
+Estado 405
+
+  131 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid guion mayorQ . id
+
+    id  desplazar e ir al estado 450
 
 
 Estado 406
 
-  137 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid guion mayorQ . id
+  134 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont guion mayorQ . PATH
 
-    id  desplazar e ir al estado 449
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 451
 
 
 Estado 407
+
+  143 PROPIEDADESMKDIR: ampersand ppath guion mayorQ PATH .
+
+    $default  reduce usando la regla 143 (PROPIEDADESMKDIR)
+
+
+Estado 408
+
+  145 PROPIEDADESMKDIR: ampersand pid guion mayorQ id .
+
+    $default  reduce usando la regla 145 (PROPIEDADESMKDIR)
+
+
+Estado 409
+
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion mayorQ . PATH
+
+    cadena  desplazar e ir al estado 249
+    id      desplazar e ir al estado 250
+
+    PATH  ir al estado 452
+
+
+Estado 410
+
+  141 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid guion mayorQ . id
+
+    id  desplazar e ir al estado 453
+
+
+Estado 411
 
    22 PROPIEDADESMK: PROPIEDADESMK ampersand psize guion mayorQ numero .
 
     $default  reduce usando la regla 22 (PROPIEDADESMK)
 
 
-Estado 408
+Estado 412
 
    23 PROPIEDADESMK: PROPIEDADESMK ampersand punit guion mayorQ UNIDAD .
 
     $default  reduce usando la regla 23 (PROPIEDADESMK)
 
 
-Estado 409
+Estado 413
 
    24 PROPIEDADESMK: PROPIEDADESMK ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 24 (PROPIEDADESMK)
 
 
-Estado 410
+Estado 414
 
    25 PROPIEDADESMK: PROPIEDADESMK ampersand pname guion mayorQ id .
 
     $default  reduce usando la regla 25 (PROPIEDADESMK)
 
 
-Estado 411
+Estado 415
 
    63 E: guion numero .
 
     $default  reduce usando la regla 63 (E)
 
 
-Estado 412
+Estado 416
 
    39 PROPIEDADESFD: PROPIEDADESFD ampersand psize guion mayorQ numero .
 
     $default  reduce usando la regla 39 (PROPIEDADESFD)
 
 
-Estado 413
+Estado 417
 
    46 PROPIEDADESFD: PROPIEDADESFD ampersand pfit guion mayorQ AJUSTE .
 
     $default  reduce usando la regla 46 (PROPIEDADESFD)
 
 
-Estado 414
+Estado 418
 
    40 PROPIEDADESFD: PROPIEDADESFD ampersand punit guion mayorQ UNIDAD .
 
     $default  reduce usando la regla 40 (PROPIEDADESFD)
 
 
-Estado 415
+Estado 419
 
    41 PROPIEDADESFD: PROPIEDADESFD ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 41 (PROPIEDADESFD)
 
 
-Estado 416
+Estado 420
 
    42 PROPIEDADESFD: PROPIEDADESFD ampersand ptype guion mayorQ TYPE .
 
     $default  reduce usando la regla 42 (PROPIEDADESFD)
 
 
-Estado 417
+Estado 421
 
    43 PROPIEDADESFD: PROPIEDADESFD ampersand pdetele guion mayorQ DELETE .
 
     $default  reduce usando la regla 43 (PROPIEDADESFD)
 
 
-Estado 418
+Estado 422
 
    44 PROPIEDADESFD: PROPIEDADESFD ampersand pname guion mayorQ PATH .
 
     $default  reduce usando la regla 44 (PROPIEDADESFD)
 
 
-Estado 419
+Estado 423
 
    45 PROPIEDADESFD: PROPIEDADESFD ampersand padd guion mayorQ E .
 
     $default  reduce usando la regla 45 (PROPIEDADESFD)
 
 
-Estado 420
+Estado 424
 
    47 PROPIEDADESFD: PROPIEDADESFD ampersand pallocation guion mayorQ ALLOCATION .
 
     $default  reduce usando la regla 47 (PROPIEDADESFD)
 
 
-Estado 421
+Estado 425
 
    67 PROPIEDADESMOUNT: PROPIEDADESMOUNT ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 67 (PROPIEDADESMOUNT)
 
 
-Estado 422
+Estado 426
 
    68 PROPIEDADESMOUNT: PROPIEDADESMOUNT ampersand pname guion mayorQ PATH .
 
     $default  reduce usando la regla 68 (PROPIEDADESMOUNT)
 
 
-Estado 423
+Estado 427
 
    73 PROPIEDADESREP: PROPIEDADESREP ampersand ppath guion mayorQ PATH .
 
     $default  reduce usando la regla 73 (PROPIEDADESREP)
 
 
-Estado 424
+Estado 428
 
    72 PROPIEDADESREP: PROPIEDADESREP ampersand pname guion mayorQ NAME .
 
     $default  reduce usando la regla 72 (PROPIEDADESREP)
 
 
-Estado 425
+Estado 429
 
    74 PROPIEDADESREP: PROPIEDADESREP ampersand pid guion mayorQ id .
 
     $default  reduce usando la regla 74 (PROPIEDADESREP)
 
 
-Estado 426
+Estado 430
 
    75 PROPIEDADESREP: PROPIEDADESREP ampersand pruta guion mayorQ PATH .
 
     $default  reduce usando la regla 75 (PROPIEDADESREP)
 
 
-Estado 427
-
-   89 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion mayorQ UNIDAD .
-
-    $default  reduce usando la regla 89 (PROPIEDADESMKFS)
-
-
-Estado 428
-
-   87 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion mayorQ DELETE .
-
-    $default  reduce usando la regla 87 (PROPIEDADESMKFS)
-
-
-Estado 429
-
-   88 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd guion mayorQ E .
-
-    $default  reduce usando la regla 88 (PROPIEDADESMKFS)
-
-
-Estado 430
-
-   86 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion mayorQ id .
-
-    $default  reduce usando la regla 86 (PROPIEDADESMKFS)
-
-
 Estado 431
 
-   96 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid guion mayorQ id .
+   93 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion mayorQ UNIDAD .
 
-    $default  reduce usando la regla 96 (PROPIEDADESLOGIN)
+    $default  reduce usando la regla 93 (PROPIEDADESMKFS)
 
 
 Estado 432
 
-   94 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion mayorQ PATH .
+   91 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand ptype guion mayorQ DELETE .
 
-    $default  reduce usando la regla 94 (PROPIEDADESLOGIN)
+    $default  reduce usando la regla 91 (PROPIEDADESMKFS)
 
 
 Estado 433
 
-   95 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd guion mayorQ VALUE .
+   92 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand padd guion mayorQ E .
 
-    $default  reduce usando la regla 95 (PROPIEDADESLOGIN)
+    $default  reduce usando la regla 92 (PROPIEDADESMKFS)
 
 
 Estado 434
 
-  100 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion mayorQ PATH .
+   90 PROPIEDADESMKFS: PROPIEDADESMKFS ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 100 (PROPIEDADESRMGRP)
+    $default  reduce usando la regla 90 (PROPIEDADESMKFS)
 
 
 Estado 435
 
-  101 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid guion mayorQ id .
+  100 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 101 (PROPIEDADESRMGRP)
+    $default  reduce usando la regla 100 (PROPIEDADESLOGIN)
 
 
 Estado 436
 
-  104 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion mayorQ PATH .
+   98 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand pusr guion mayorQ PATH .
 
-    $default  reduce usando la regla 104 (PROPIEDADESMKGRP)
+    $default  reduce usando la regla 98 (PROPIEDADESLOGIN)
 
 
 Estado 437
 
-  105 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid guion mayorQ id .
+   99 PROPIEDADESLOGIN: PROPIEDADESLOGIN ampersand ppwd guion mayorQ VALUE .
 
-    $default  reduce usando la regla 105 (PROPIEDADESMKGRP)
+    $default  reduce usando la regla 99 (PROPIEDADESLOGIN)
 
 
 Estado 438
 
-  109 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid guion mayorQ id .
+  104 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pname guion mayorQ PATH .
 
-    $default  reduce usando la regla 109 (PROPIEDADESMKUSR)
+    $default  reduce usando la regla 104 (PROPIEDADESRMGRP)
 
 
 Estado 439
 
-  108 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion mayorQ VALUE .
+  105 PROPIEDADESRMGRP: PROPIEDADESRMGRP ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 108 (PROPIEDADESMKUSR)
+    $default  reduce usando la regla 105 (PROPIEDADESRMGRP)
 
 
 Estado 440
 
-  110 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd guion mayorQ VALUE .
+  108 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pname guion mayorQ PATH .
 
-    $default  reduce usando la regla 110 (PROPIEDADESMKUSR)
+    $default  reduce usando la regla 108 (PROPIEDADESMKGRP)
 
 
 Estado 441
 
-  111 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp guion mayorQ VALUE .
+  109 PROPIEDADESMKGRP: PROPIEDADESMKGRP ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 111 (PROPIEDADESMKUSR)
+    $default  reduce usando la regla 109 (PROPIEDADESMKGRP)
 
 
 Estado 442
 
-  117 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid guion mayorQ id .
+  113 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 117 (PROPIEDADESRMUSR)
+    $default  reduce usando la regla 113 (PROPIEDADESMKUSR)
 
 
 Estado 443
 
-  116 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion mayorQ PATH .
+  112 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pusr guion mayorQ VALUE .
 
-    $default  reduce usando la regla 116 (PROPIEDADESRMUSR)
+    $default  reduce usando la regla 112 (PROPIEDADESMKUSR)
 
 
 Estado 444
 
-  129 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize guion mayorQ numero .
+  114 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand ppwd guion mayorQ VALUE .
 
-    $default  reduce usando la regla 129 (PROPIEDADESMKFILE)
+    $default  reduce usando la regla 114 (PROPIEDADESMKUSR)
 
 
 Estado 445
 
-  126 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion mayorQ PATH .
+  115 PROPIEDADESMKUSR: PROPIEDADESMKUSR ampersand pgrp guion mayorQ VALUE .
 
-    $default  reduce usando la regla 126 (PROPIEDADESMKFILE)
+    $default  reduce usando la regla 115 (PROPIEDADESMKUSR)
 
 
 Estado 446
 
-  127 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid guion mayorQ id .
+  121 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pid guion mayorQ id .
 
-    $default  reduce usando la regla 127 (PROPIEDADESMKFILE)
+    $default  reduce usando la regla 121 (PROPIEDADESRMUSR)
 
 
 Estado 447
 
-  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont guion mayorQ PATH .
+  120 PROPIEDADESRMUSR: PROPIEDADESRMUSR ampersand pusr guion mayorQ PATH .
 
-    $default  reduce usando la regla 130 (PROPIEDADESMKFILE)
+    $default  reduce usando la regla 120 (PROPIEDADESRMUSR)
 
 
 Estado 448
 
-  136 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH .
+  133 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand psize guion mayorQ numero .
 
-    $default  reduce usando la regla 136 (PROPIEDADESMKDIR)
+    $default  reduce usando la regla 133 (PROPIEDADESMKFILE)
 
 
 Estado 449
 
-  137 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid guion mayorQ id .
+  130 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand ppath guion mayorQ PATH .
 
-    $default  reduce usando la regla 137 (PROPIEDADESMKDIR)
+    $default  reduce usando la regla 130 (PROPIEDADESMKFILE)
+
+
+Estado 450
+
+  131 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pid guion mayorQ id .
+
+    $default  reduce usando la regla 131 (PROPIEDADESMKFILE)
+
+
+Estado 451
+
+  134 PROPIEDADESMKFILE: PROPIEDADESMKFILE ampersand pcont guion mayorQ PATH .
+
+    $default  reduce usando la regla 134 (PROPIEDADESMKFILE)
+
+
+Estado 452
+
+  140 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH .
+
+    $default  reduce usando la regla 140 (PROPIEDADESMKDIR)
+
+
+Estado 453
+
+  141 PROPIEDADESMKDIR: PROPIEDADESMKDIR ampersand pid guion mayorQ id .
+
+    $default  reduce usando la regla 141 (PROPIEDADESMKDIR)

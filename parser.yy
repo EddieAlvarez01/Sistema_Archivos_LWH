@@ -117,6 +117,10 @@ class Mkdir* mkdir;
 %token<TEXT> pc;
 %token<TEXT> pix;
 %token<TEXT> pruta;
+%token<TEXT> pbm_arbdir;
+%token<TEXT> pbm_detdir;
+%token<TEXT> pbm_inode;
+%token<TEXT> pbm_block;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -248,7 +252,11 @@ PROPIEDADESREP : PROPIEDADESREP ampersand pname guion mayorQ NAME { $$ = $1; $$-
                 |ampersand pruta guion mayorQ PATH { $$ = new Rep(); $$->route = $5; };
 
 NAME : pmbr { strcpy($$, "mbr"); }
-      |pdisk { strcpy($$, "disk"); };
+      |pdisk { strcpy($$, "disk"); }
+      |pbm_arbdir { strcpy($$, "bm_arbdir"); }
+      |pbm_detdir { strcpy($$, "bm_detdir"); }
+      |pbm_inode { strcpy($$, "bm_inode"); }
+      |pbm_block { strcpy($$, "bm_block"); };
 
 VALUE : id { strcpy($$, $1); }
         |cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }

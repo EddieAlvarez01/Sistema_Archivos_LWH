@@ -104,7 +104,11 @@ extern int yydebug;
     pallocation = 314,
     pc = 315,
     pix = 316,
-    pruta = 317
+    pruta = 317,
+    pbm_arbdir = 318,
+    pbm_detdir = 319,
+    pbm_inode = 320,
+    pbm_block = 321
   };
 #endif
 
@@ -134,7 +138,7 @@ class Chmod* chmod;
 class Mkfile* mkfile;
 class Mkdir* mkdir;
 
-#line 138 "parser.h" /* yacc.c:1909  */
+#line 142 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

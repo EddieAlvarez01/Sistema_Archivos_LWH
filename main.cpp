@@ -2014,8 +2014,6 @@ int CreatePath(FILE *file, SuperBoot sb, VirtualDirectoryTree root, int isOk, Mk
                 }else{
                     isOk = -1;
                 }
-            }else{
-                isOk = -1;
             }
         }
     }
@@ -2201,7 +2199,7 @@ int main()
                                 }else{
                                     cout << "No existe el id '" + rp->id + "' montada\n";
                                 }
-                            }else{
+                            }else if(strcmp(rp->name.c_str(), "disk") == 0){
                                  string oPath = list_ram.To_Report(rp->id);
                                  if(oPath != ""){
                                     Create_Directory(rp->path);
@@ -2210,14 +2208,114 @@ int main()
                                         Mbr mbr;
                                         fseek(file, 0, SEEK_SET);
                                         fread(&mbr, sizeof (Mbr), 1, file);
+                                        plot.Plot_Disk(file, mbr, Path_To_Report(rp->path), Disk_Space(mbr));
                                         fclose(file);
-                                        plot.Plot_Disk(mbr, Path_To_Report(rp->path), Disk_Space(mbr));
                                     }else{
                                         cout << "Error al abrir el archivo\n";
                                     }
                                  }else{
                                      cout << "No existe el id '" + rp->id + "' montada\n";
                                  }
+                            }else if(strcmp(rp->name.c_str(), "bm_arbdir") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_BmAvd(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de bitmap AVD creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
+                            }else if(strcmp(rp->name.c_str(), "bm_detdir") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_BmAvd(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de bitmap DD creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
+                            }else if(strcmp(rp->name.c_str(), "bm_inode") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_BmAvd(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de bitmap Inodos creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
+                            }else if(strcmp(rp->name.c_str(), "bm_block") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_BmAvd(file, sb.sb_ap_bitmap_bloques, sb.sb_ap_bloques, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de bitmap bloques creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
                             }
                         }else{
                             cout << "Error: el 'id' es obligatorio\n";

@@ -141,7 +141,7 @@ std::string Plotter::Ebr_Recursive(FILE *file, Ebr logic, std::string textBody, 
     return textBody;
 }
 
-void Plotter::Plot_Disk(Mbr mbr, std::string path, int space){
+void Plotter::Plot_Disk(FILE *ff, Mbr mbr, std::string path, int space){
     std::string body;
     int yy = 0;
     body += "<TD>MBR</TD>\n";
@@ -156,7 +156,28 @@ void Plotter::Plot_Disk(Mbr mbr, std::string path, int space){
             if(mbr.particions[x].part_type == 80){
                 body += "Primaria<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco";
             }else if(mbr.particions[x].part_type == 69){
-                body += "Extendida<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco";
+                Ebr ebr;
+                fseek(ff, mbr.particions[x].part_start, SEEK_SET);
+                fread(&ebr, sizeof(Ebr), 1, ff);
+                std::string tableLogic = "";
+                std::string ebrLogic = "";
+                ebrLogic += "<TD>EBR</TD>\n";
+                if(ebr.isLogic == 49){
+                    ebrLogic += "<TD>Logica<br/>" + std::to_string(ebr.part_size * 100 / mbr.mbr_size) + "% del disco</TD>\n";
+                    int freeSpaceLogic = mbr.particions[x].part_size - ebr.part_size;
+                    if(ebr.part_next != 0){
+                        ebrLogic = Ebr_REcursive_Disk(ff, ebr, ebrLogic, mbr.mbr_size, freeSpaceLogic);
+                    }else{
+                        ebrLogic += "<TD>Libre<br/>" + std::to_string(freeSpaceLogic * 100 / mbr.mbr_size) + "% del disco</TD>\n";
+                    }
+                }else{
+                    ebrLogic += "<TD>Libre<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco</TD>\n";
+                }
+                tableLogic = std::string("<TABLE>\n") +
+                              "<TR><TD>Extendida</TD></TR>" +
+                              "<TR>" + ebrLogic + "</TR>\n" +
+                              "</TABLE>";
+                body += tableLogic;
             }
         }else{
             body += "Libre<br/>" + std::to_string((space/yy) * 100 / mbr.mbr_size) + "% del disco";
@@ -188,4 +209,51 @@ void Plotter::Plot_Disk(Mbr mbr, std::string path, int space){
     file.close();
     std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
     system(pathUnion.c_str());
+}
+
+std::string Plotter::Ebr_REcursive_Disk(FILE *file, Ebr logic, std::string txtBody, int totalSize, int freeExtended){
+    Ebr ebr;
+    fseek(file, logic.part_next, SEEK_SET);
+    fread(&ebr, sizeof(Ebr), 1, file);
+    txtBody += "<TD>EBR</TD>\n";
+    txtBody += "<TD>Logica<br/>" + std::to_string(ebr.part_size * 100 / totalSize) + "% del disco</TD>\n";
+    freeExtended -= ebr.part_size;
+    if(ebr.part_next != 0){
+        txtBody = Ebr_REcursive_Disk(file, ebr, txtBody, totalSize, freeExtended);
+    }else{
+        txtBody += "<TD>Libre<br/>" + std::to_string(freeExtended * 100 / totalSize) + "% del disco</TD>\n";
+    }
+    return txtBody;
+}
+
+void Plotter::Plot_BmAvd(FILE *file, int startBm, int endBm, std::string path){
+    std::string pathRR = path + ".txt";
+    std::ofstream fs(pathRR);
+    if(fs.fail()){
+        std::cout << "Error al abrir el txt\n";
+        return;
+    }
+    int count = 1;
+    char pivot;
+    while(startBm < endBm){
+        fseek(file, startBm, SEEK_SET);
+        fread(&pivot, 1, 1, file);
+        if(count == 20){
+            if(pivot == 49){
+                fs << "1\n";
+            }else{
+                fs << "0\n";
+            }
+            count = 0;
+        }else{
+            if(pivot == 49){
+                fs << "1|";
+            }else{
+                fs << "0|";
+            }
+        }
+        startBm++;
+        count++;
+    }
+    fs.close();
 }
