@@ -116,6 +116,7 @@ class Mkdir* mkdir;
 %token<TEXT> pallocation;
 %token<TEXT> pc;
 %token<TEXT> pix;
+%token<TEXT> pruta;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -237,12 +238,14 @@ PROPIEDADESMOUNT : PROPIEDADESMOUNT ampersand ppath guion mayorQ PATH { $$ = $1;
 
 PROPIEDADESUNMOUNT : pid igual id { $$ = new Unmount(); $$->id = $3; };
 
-PROPIEDADESREP : PROPIEDADESREP guion pname igual NAME { $$ = $1; $$->name = $5; }
-                |PROPIEDADESREP guion ppath igual PATH { $$ = $1; $$->path = $5; }
-                |PROPIEDADESREP guion pid igual id { $$ = $1; $$->id = $5; }
-                |guion pname igual NAME { $$ = new Rep(); $$->name = $4; }
-                |guion ppath igual PATH { $$ = new Rep(); $$->path = $4; }
-                |guion pid igual id { $$ = new Rep(); $$->id = $4; };
+PROPIEDADESREP : PROPIEDADESREP ampersand pname guion mayorQ NAME { $$ = $1; $$->name = $6; }
+                |PROPIEDADESREP ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }
+                |PROPIEDADESREP ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                |PROPIEDADESREP ampersand pruta guion mayorQ PATH { $$ = $1; $$->route = $6; }
+                |ampersand pname guion mayorQ NAME { $$ = new Rep(); $$->name = $5; }
+                |ampersand ppath guion mayorQ PATH { $$ = new Rep(); $$->path = $5; }
+                |ampersand pid guion mayorQ id { $$ = new Rep(); $$->id = $5; }
+                |ampersand pruta guion mayorQ PATH { $$ = new Rep(); $$->route = $5; };
 
 NAME : pmbr { strcpy($$, "mbr"); }
       |pdisk { strcpy($$, "disk"); };

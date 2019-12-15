@@ -10,6 +10,7 @@ public:
     std::string name;
     std::string path;
     std::string id;
+    std::string route;
     Rep();
 };
 

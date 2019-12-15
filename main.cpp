@@ -746,7 +746,7 @@ void Create_Partition_Extended(Fdisk *fd){
                             }
                             if(end <= mbr.mbr_size){
                                 mbr.particions[parT].part_start = start;
-                                mbr.particions[parT].part_status = 1;
+                                mbr.particions[parT].part_status = 49;
                                 strcpy(mbr.particions[parT].part_name, fd->name.c_str());
                                 mbr.particions[parT].part_size = fd->size;
                                 strcpy(mbr.particions[parT].part_fit, fd->fit.c_str());
@@ -2193,8 +2193,8 @@ int main()
                                         Mbr mbr;
                                         fseek(file, 0, SEEK_SET);
                                         fread(&mbr, sizeof (Mbr), 1, file);
+                                        plot.Plot_Mbr(file, mbr, NameDisk(oPath), Path_To_Report(rp->path));
                                         fclose(file);
-                                        plot.Plot_Mbr(mbr, NameDisk(oPath), Path_To_Report(rp->path));
                                     }else{
                                         cout << "Error al abrir el archivo\n";
                                     }

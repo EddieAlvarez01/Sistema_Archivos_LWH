@@ -45,8 +45,14 @@ std::string ListMount::To_Report(std::string idDisk){
     if(first != nullptr){
         NodeList *tmp = first;
         while(tmp != nullptr){
-            if(strcmp(tmp->data.id, idDisk.c_str()) == 0){
-                return tmp->disk;
+            if(tmp->type == 0){
+                if(strcmp(tmp->data.id, idDisk.c_str()) == 0){
+                    return tmp->disk;
+                }
+            }else{
+                if(strcmp(tmp->data2.id, idDisk.c_str()) == 0){
+                    return tmp->disk;
+                }
             }
             tmp = tmp->next;
         }

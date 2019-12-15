@@ -6,5 +6,6 @@ Rep::Rep()
     path = "";
     name = "";
     id = "";
+    route = "";
 
 }

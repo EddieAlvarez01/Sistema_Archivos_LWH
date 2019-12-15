@@ -103,7 +103,8 @@ extern int yydebug;
     porcentaje = 313,
     pallocation = 314,
     pc = 315,
-    pix = 316
+    pix = 316,
+    pruta = 317
   };
 #endif
 
@@ -133,7 +134,7 @@ class Chmod* chmod;
 class Mkfile* mkfile;
 class Mkdir* mkdir;
 
-#line 137 "parser.h" /* yacc.c:1909  */
+#line 138 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

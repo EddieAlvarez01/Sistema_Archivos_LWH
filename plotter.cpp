@@ -5,8 +5,9 @@ Plotter::Plotter()
 
 }
 
-void Plotter::Plot_Mbr(Mbr mbr, std::string nameDisk, std::string path){
+void Plotter::Plot_Mbr(FILE *filetoRead, Mbr mbr, std::string nameDisk, std::string path){
     std::string body = "";
+    std::string ebrNode = "";
     body += "<TR>\n" +
             std::string("<TD BGCOLOR=\"lightblue\">Nombre</TD>\n") +
             "<TD BGCOLOR=\"lightblue\">Valor</TD>\n" +
@@ -27,7 +28,7 @@ void Plotter::Plot_Mbr(Mbr mbr, std::string nameDisk, std::string path){
         if(mbr.particions[x].part_start != -1){
             body += "<TR>\n" +
             std::string("<TD>part_status_") + std::to_string(x+1) + "</TD>\n" +
-            "<TD>" + std::to_string(mbr.particions[x].part_status) + "</TD>\n" +
+            "<TD>" + mbr.particions[x].part_status + "</TD>\n" +
             std::string("</TR>\n");
             body += "<TR>\n" +
                     std::string("<TD>part_type_") + std::to_string(x+1) + "</TD>\n" +
@@ -49,17 +50,39 @@ void Plotter::Plot_Mbr(Mbr mbr, std::string nameDisk, std::string path){
                     std::string("<TD>part_name_") + std::to_string(x+1) + "</TD>\n" +
                     "<TD>" + mbr.particions[x].part_name + "</TD>\n" +
                     std::string("</TR>\n");
+            if(mbr.particions[x].part_type == 69){
+                Ebr ebr;
+                fseek(filetoRead, mbr.particions[x].part_start, SEEK_SET);
+                fread(&ebr, sizeof(Ebr), 1, filetoRead);
+                if(ebr.isLogic == 49){
+                   ebrNode = Ebr_Recursive(filetoRead, ebr, "", 66, 1);
+                }
+            }
         }
     }
-    std::string input = "digraph example {\n" +
-                        std::string("node [shape=plaintext]\n") +
-                        "rankdir=TB\n" +
-                        std::string("A [label=<\n") +
-                        "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n" +
-                        body +
-                        "</TABLE>\n" +
-                        ">];\n" +
-                        "}";
+    std::string input = "";
+    if(ebrNode == ""){
+        input = "digraph example {\n" +
+                            std::string("node [shape=plaintext]\n") +
+                            "rankdir=TB\n" +
+                            std::string("A [label=<\n") +
+                            "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n" +
+                            body +
+                            "</TABLE>\n" +
+                            ">];\n" +
+                            "}";
+    }else{
+        input = "digraph example {\n" +
+                            std::string("node [shape=plaintext]\n") +
+                            "rankdir=TB\n" +
+                            std::string("A [label=<\n") +
+                            "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n" +
+                            body +
+                            "</TABLE>\n" +
+                            ">];\n" +
+                            ebrNode +
+                            "}";
+    }
     std::ofstream file;
     std::string pathTxt = path + ".txt";
     std::string pathJpg = path + ".png";
@@ -72,6 +95,50 @@ void Plotter::Plot_Mbr(Mbr mbr, std::string nameDisk, std::string path){
     file.close();
     std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
     system(pathUnion.c_str());
+}
+
+std::string Plotter::Ebr_Recursive(FILE *file, Ebr logic, std::string textBody, char nodeName, int countEbr){
+    std::string bodyTxt = "";
+    bodyTxt += "<TR>\n" +
+            std::string("<TD BGCOLOR=\"lightblue\">Nombre</TD>\n") +
+            "<TD BGCOLOR=\"lightblue\">Valor</TD>\n" +
+            std::string("</TR>\n");
+    bodyTxt += "<TR>\n" +
+            std::string("<TD>part_status_") + std::to_string(countEbr) + "</TD>\n" +
+            "<TD>" + logic.part_status + "</TD>\n" +
+            std::string("</TR>\n");
+    bodyTxt += "<TR>\n" +
+            std::string("<TD>part_fit_") + std::to_string(countEbr) + "</TD>\n" +
+            "<TD>" + logic.part_fit + "</TD>\n" +
+            std::string("</TR>\n");
+    bodyTxt += "<TR>\n" +
+            std::string("<TD>part_start_") + std::to_string(countEbr) + "</TD>\n" +
+            "<TD>" + std::to_string(logic.part_start) + "</TD>\n" +
+            std::string("</TR>\n");
+    bodyTxt += "<TR>\n" +
+            std::string("<TD>part_size_") + std::to_string(countEbr) + "</TD>\n" +
+            "<TD>" + std::to_string(logic.part_size) + "</TD>\n" +
+            std::string("</TR>\n");
+    bodyTxt += "<TR>\n" +
+            std::string("<TD>part_next_") + std::to_string(countEbr) + "</TD>\n" +
+            "<TD>" + std::to_string(logic.part_next) + "</TD>\n" +
+            std::string("</TR>\n");
+    bodyTxt += "<TR>\n" +
+            std::string("<TD>part_name_") + std::to_string(countEbr) + "</TD>\n" +
+            "<TD>" + logic.part_name + "</TD>\n" +
+            std::string("</TR>\n");
+    textBody += std::to_string(nodeName++) + " [label=<\n" +
+                "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n" +
+                bodyTxt +
+                "</TABLE>\n" +
+                ">];\n";
+    if(logic.part_next != 0){
+        Ebr ebr;
+        fseek(file, logic.part_next, SEEK_SET);
+        fread(&ebr, sizeof(Ebr), 1, file);
+        textBody = Ebr_Recursive(file, ebr, textBody, nodeName, ++countEbr);
+    }
+    return textBody;
 }
 
 void Plotter::Plot_Disk(Mbr mbr, std::string path, int space){
