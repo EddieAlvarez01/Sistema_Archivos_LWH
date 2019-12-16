@@ -108,7 +108,9 @@ extern int yydebug;
     pbm_arbdir = 318,
     pbm_detdir = 319,
     pbm_inode = 320,
-    pbm_block = 321
+    pbm_block = 321,
+    ploss = 322,
+    precovery = 323
   };
 #endif
 
@@ -117,7 +119,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 40 "parser.yy" /* yacc.c:1909  */
+#line 42 "parser.yy" /* yacc.c:1909  */
 
 int NUM;
 char TEXT [256];
@@ -137,8 +139,10 @@ class Rmusr* rmusr;
 class Chmod* chmod;
 class Mkfile* mkfile;
 class Mkdir* mkdir;
+class Loss* loss;
+class Recovery* recovery;
 
-#line 142 "parser.h" /* yacc.c:1909  */
+#line 146 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

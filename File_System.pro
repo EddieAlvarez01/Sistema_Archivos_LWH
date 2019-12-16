@@ -38,7 +38,9 @@ SOURCES += main.cpp \
     datablock.cpp \
     log.cpp \
     returnedofbitmap.cpp \
-    user.cpp
+    user.cpp \
+    loss.cpp \
+    recovery.cpp
 
 DISTFILES += \
     lexico.l \
@@ -79,4 +81,6 @@ HEADERS += \
     datablock.h \
     log.h \
     returnedofbitmap.h \
-    user.h
+    user.h \
+    loss.h \
+    recovery.h

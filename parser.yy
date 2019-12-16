@@ -22,6 +22,8 @@
 #include "chmod.h"
 #include "mkfile.h"
 #include "mkdir.h"
+#include "loss.h"
+#include "recovery.h"
 
 extern int yylineno; //linea actual donde se encuentra el parser (analisis lexico) lo maneja BISON
 extern int columna; //columna actual donde se encuentra el parser (analisis lexico) lo maneja BISON
@@ -56,6 +58,8 @@ class Rmusr* rmusr;
 class Chmod* chmod;
 class Mkfile* mkfile;
 class Mkdir* mkdir;
+class Loss* loss;
+class Recovery* recovery;
 }
 %token<TEXT> numero;
 %token<TEXT> cadena;
@@ -121,6 +125,8 @@ class Mkdir* mkdir;
 %token<TEXT> pbm_detdir;
 %token<TEXT> pbm_inode;
 %token<TEXT> pbm_block;
+%token<TEXT> ploss;
+%token<TEXT> precovery;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -151,6 +157,8 @@ class Mkdir* mkdir;
 %type<chmod> PROPIEDADESCHMOD;
 %type<mkfile> PROPIEDADESMKFILE;
 %type<mkdir> PROPIEDADESMKDIR;
+%type<loss> PROPIEDADESLOSS;
+%type<recovery> PROPIEDADESRECOVERY;
 
 %start INICIO
 
@@ -178,6 +186,8 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |pchmod PROPIEDADESCHMOD { listCommand.push_back($2); }
          |pmkfile PROPIEDADESMKFILE { listCommand.push_back($2); }
          |pmkdir PROPIEDADESMKDIR { listCommand.push_back($2); }
+         |ploss PROPIEDADESLOSS { listCommand.push_back($2); }
+         |precovery PROPIEDADESRECOVERY { listCommand.push_back($2); }
          |error;
 
 PROPIEDADESMK : PROPIEDADESMK ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
@@ -328,6 +338,10 @@ PROPIEDADESMKDIR : PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH { $$ = $1;
                   |ampersand ppath guion mayorQ PATH { $$ = new Mkdir(); $$->path = $5; }
                   |ampersand pp { $$ = new Mkdir(); $$->isP = true; }
                   |ampersand pid guion mayorQ id { $$ = new Mkdir(); $$->id = $5; };
+
+PROPIEDADESLOSS : ampersand pid guion mayorQ id { $$ = new Loss(); $$->id = $5; };
+
+PROPIEDADESRECOVERY : ampersand pid guion mayorQ id { $$ = new Recovery(); $$->id = $5; };
 
 
 %%

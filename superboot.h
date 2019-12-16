@@ -36,6 +36,7 @@ public:
     int sb_first_free_bit_tabla_inodo;
     int sb_first_free_bit_bloques;
     int sb_magic_num;
+    int sb_ap_copy_sb;
 };
 
 #endif // SUPERBOOT_H

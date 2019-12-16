@@ -47,6 +47,7 @@
 #include "rmusr.h"
 #include "mkdir.h"
 #include "mkfile.h"
+#include "loss.h"
 
 using namespace std;
 
@@ -1158,6 +1159,48 @@ string Trim(string line){
     return line;
 }
 
+int LogIndex(FILE *file, int startLog, int endLog){
+    int count = 0;
+    Log log;
+    while(startLog <= endLog){
+        fseek(file, startLog, SEEK_SET);
+        fread(&log, sizeof(Log), 1, file);
+        if(log.log_tipo_operacion == 0){
+            break;
+        }
+        startLog += sizeof(Log);
+        count++;
+    }
+    if(startLog > endLog){
+        return -1;
+    }
+    return count;
+}
+
+/*Metodo para guardar una operacion en el journaling*/
+
+void Save_Log(FILE *file, SuperBoot sb, string op, int type, char logType, string name, string content){
+    Log log;
+    int index = LogIndex(file, sb.sb_ap_log, sb.sb_ap_copy_sb);
+    if(index != -1){
+        if(logType == 48){
+            strcpy(log.log_contenido, content.c_str());
+        }
+        time_t t = time(nullptr);
+        tm *now = localtime(&t);
+        string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+        strcpy(log.log_fecha, dateC.c_str());
+        strcpy(log.log_nombre, name.c_str());
+        log.log_tipo = logType;
+        log.log_tipo_operacion = type;
+        strcpy(log.op, op.c_str());
+        fseek(file, sb.sb_ap_log + (index * (int)sizeof(Log)), SEEK_SET);
+        fwrite(&log, sizeof(Log), 1, file);
+    }else{
+        cout << "NO hay espacio en el log\n";
+    }
+}
+
 vector<string> Separate_Content(string line){
     vector<string> ll;
     size_t pos1 = 0;
@@ -1261,6 +1304,7 @@ void Format_Partition(Mkfs *mkfs){
             sb.sb_ap_bitmap_bloques = sb.sb_ap_tabla_inodo + (5 * calc * (int)sizeof(Inode));
             sb.sb_ap_bloques = sb.sb_ap_bitmap_bloques + (20 * calc);
             sb.sb_ap_log = sb.sb_ap_bloques + (20 * calc * (int)sizeof(DataBlock));
+            sb.sb_ap_copy_sb = sb.sb_ap_log + (calc * (int)sizeof(Log));
             sb.sb_size_struct_arbol_directorio = sizeof(VirtualDirectoryTree);
             sb.sb_size_struct_detalle_directorio = sizeof(DirectoryDetail);
             sb.sb_size_struct_inodo = sizeof(Inode);
@@ -1272,25 +1316,8 @@ void Format_Partition(Mkfs *mkfs){
             sb.sb_magic_num = 201700326;
             fseek(file, dataStart, SEEK_SET);
             fwrite(&sb, sizeof (SuperBoot), 1, file);
-            fseek(file, sb.sb_ap_log + (calc * (int)sizeof(Log)), SEEK_SET);
+            fseek(file, sb.sb_ap_copy_sb, SEEK_SET);
             fwrite(&sb, sizeof(SuperBoot), 1, file);
-            /*Journaling jo;
-            strcpy(jo.op, "mkdir");
-            strcpy(jo.type, "Carpeta");
-            strcpy(jo.name, "/");
-            strcpy(jo.content, "-");
-            time_t t = time(nullptr);
-            tm *now = localtime(&t);
-            string chain;
-            chain = to_string(now->tm_mday) + "-" + to_string((now->tm_mon+1)) + "-" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
-            strcpy(jo.date, chain.c_str());
-            int byte = ReturnedByteJournaling(file, readSb, readJour);
-            if(byte != 0){
-                fseek(file, byte, SEEK_SET);
-                fwrite(&jo, sizeof (Journaling), 1, file);
-            }else{
-                cout << "No hay espacio en el journaling para la raiz\n";
-            }*/
             char a = 49;
             ReturnedOfBitmap byteBmVirtual = ReturnByteBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio);
             ReturnedOfBitmap byteBmDetail = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
@@ -1324,6 +1351,8 @@ void Format_Partition(Mkfs *mkfs){
             fwrite(&root, sizeof(VirtualDirectoryTree), 1, file);
             fseek(file, sb.sb_ap_detalle_directorio + (byteBmDetail.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
             fwrite(&rootDirec, sizeof(DirectoryDetail), 1, file);
+            Save_Log(file, sb, "/", 1, '1', "/", "");
+            Save_Log(file, sb, "/users.txt", 2, '0', "users.txt", text);
         }else{
             cout << "No se puede abrir el archivo de la particion\n";
         }
@@ -2063,6 +2092,15 @@ void NewFile(Mkfile *mkfile, stack<string> pathEvaluate){
     }
 }
 
+void System_Loss(NodeList *node){
+    FILE *file = fopen(node->disk.c_str(), "rb+");
+    if(file != nullptr){
+
+    }else{
+        cout << "Error: al abrir el archivo\n";
+    }
+}
+
 
 int main()
 {
@@ -2505,6 +2543,16 @@ int main()
                     }
                 }else{
                     cout << "Error: no hay ninguna sesion iniciada, porfavor inici sesion para poder usar este comando\n";
+                }
+            }else if(Loss *loss = dynamic_cast<Loss*>((*it))){
+                if(loss->id != ""){
+                    if(list_ram.isMount(loss->id)){
+                        NodeList *node = list_ram.SearchNode(loss->id);
+                    }else{
+                        cout << "Error: la particion '" + loss->id + "' no esta montada\n";
+                    }
+                }else{
+                    cout << "Error: el id es obligatorio\n";
                 }
             }
         }
