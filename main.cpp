@@ -48,6 +48,7 @@
 #include "mkdir.h"
 #include "mkfile.h"
 #include "loss.h"
+#include "recovery.h"
 
 using namespace std;
 
@@ -1179,7 +1180,7 @@ int LogIndex(FILE *file, int startLog, int endLog){
 
 /*Metodo para guardar una operacion en el journaling*/
 
-void Save_Log(FILE *file, SuperBoot sb, string op, int type, char logType, string name, string content){
+void Save_Log(FILE *file, SuperBoot sb, string op, int type, char logType, string name, string content, bool isP){
     Log log;
     int index = LogIndex(file, sb.sb_ap_log, sb.sb_ap_copy_sb);
     if(index != -1){
@@ -1194,6 +1195,7 @@ void Save_Log(FILE *file, SuperBoot sb, string op, int type, char logType, strin
         log.log_tipo = logType;
         log.log_tipo_operacion = type;
         strcpy(log.op, op.c_str());
+        log.isP = isP;
         fseek(file, sb.sb_ap_log + (index * (int)sizeof(Log)), SEEK_SET);
         fwrite(&log, sizeof(Log), 1, file);
     }else{
@@ -1248,6 +1250,15 @@ string SearchIdGroup(string name, vector<string>file){
          }
      }
      return "";
+}
+
+void CleanBitmap(FILE *file, int startBm, int endBm){
+    char a = 0;
+    while(startBm < endBm){
+        fseek(file, startBm, SEEK_SET);
+        fwrite(&a, 1, 1, file);
+        startBm++;
+    }
 }
 
 void Format_Partition(Mkfs *mkfs){
@@ -1314,6 +1325,11 @@ void Format_Partition(Mkfs *mkfs){
             sb.sb_first_free_bit_tabla_inodo = sb.sb_ap_bitmap_tabla_inodo;
             sb.sb_first_free_bit_bloques = sb.sb_ap_bitmap_bloques;
             sb.sb_magic_num = 201700326;
+            CleanBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio);
+            CleanBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
+            CleanBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+            CleanBitmap(file, sb.sb_ap_bitmap_bloques, sb.sb_ap_bloques);
+            CleanBitmap(file, sb.sb_ap_log, sb.sb_ap_copy_sb);
             fseek(file, dataStart, SEEK_SET);
             fwrite(&sb, sizeof (SuperBoot), 1, file);
             fseek(file, sb.sb_ap_copy_sb, SEEK_SET);
@@ -1351,8 +1367,7 @@ void Format_Partition(Mkfs *mkfs){
             fwrite(&root, sizeof(VirtualDirectoryTree), 1, file);
             fseek(file, sb.sb_ap_detalle_directorio + (byteBmDetail.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
             fwrite(&rootDirec, sizeof(DirectoryDetail), 1, file);
-            Save_Log(file, sb, "/", 1, '1', "/", "");
-            Save_Log(file, sb, "/users.txt", 2, '0', "users.txt", text);
+            Save_Log(file, sb, "/users.txt", 2, '0', "users.txt", text, true);
         }else{
             cout << "No se puede abrir el archivo de la particion\n";
         }
@@ -1858,6 +1873,7 @@ void NewDir(Mkdir *mkdir){
         switch (status) {
         case 1:
             cout << "Carpeta creada exitosamente\n";
+            Save_Log(file, sb, mkdir->path, 1, '1', NameDisk(mkdir->path), "", mkdir->isP);
             break;
         case -1:
             cout << "No se encontro el path o error en la creacion\n";
@@ -2081,6 +2097,7 @@ void NewFile(Mkfile *mkfile, stack<string> pathEvaluate){
         switch (CreatePath(file, sb, root, -1, mkfile, txt, 0, pathEvaluate, txtFile)) {
         case 1:
             cout << "Archivo creado exitosamente\n";
+            Save_Log(file, sb, mkfile->path, 2, '0', NameDisk(mkfile->path), txtFile, mkfile->isP);
             break;
         default:
             cout << "Error al crear el archivo, ya existe o error durante la creacion\n";
@@ -2092,12 +2109,111 @@ void NewFile(Mkfile *mkfile, stack<string> pathEvaluate){
     }
 }
 
-void System_Loss(NodeList *node){
+void System_Loss(FILE *file, SuperBoot sb){
+    VirtualDirectoryTree avd;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+    for(int x=0; x<6; x++){
+        avd.avd_ap_array_subdirectorios[x] = -1;
+    }
+    DirectoryDetail dd;
+    fseek(file, sb.sb_ap_detalle_directorio, SEEK_SET);
+    fread(&dd, sizeof(DirectoryDetail), 1, file);
+    for(int x=0; x<5; x++){
+        strcpy(dd.dd_array_files[x].dd_file_nombre, "");
+        strcpy(dd.dd_array_files[x].dd_file_date_creacion, "");
+        strcpy(dd.dd_array_files[x].dd_file_date_modificacion, "");
+        dd.dd_array_files[x].dd_file_app_inodo = -1;
+    }
+    avd.avd_ap_arbol_virtual_directorio = -1;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fwrite(&avd, sizeof(VirtualDirectoryTree), 1, file);
+    fseek(file, sb.sb_ap_detalle_directorio, SEEK_SET);
+    fwrite(&dd, sizeof(DirectoryDetail), 1, file);
+}
+
+void Action_Recovery(FILE *file, int startLog, int endLog, string id){
+    Log log;
+    while(startLog <= endLog){
+        fseek(file, startLog, SEEK_SET);
+        fread(&log, sizeof(Log), 1, file);
+        if(log.log_tipo_operacion != 0){
+            if(log.log_tipo == 49){
+                Mkdir *mkdir = new Mkdir();
+                mkdir->id = id;
+                mkdir->isP = log.isP;
+                mkdir->path = log.op;
+                NewDir(mkdir);
+            }else{
+                Mkfile *mkfile = new Mkfile();
+                mkfile->id = id;
+                mkfile->isP = log.isP;
+                mkfile->cont = log.log_contenido;
+                mkfile->path = log.op;
+                stack<string> evaluatePath = PathbyInodes(mkfile->path);
+                NewFile(mkfile, evaluatePath);
+            }
+        }else{
+            break;
+        }
+        startLog += sizeof(Log);
+    }
+}
+
+void System_Recovery(NodeList *node, string id){
     FILE *file = fopen(node->disk.c_str(), "rb+");
     if(file != nullptr){
-
+        SuperBoot sb;
+        int partStart = 0;
+        if(node->type == 0){
+            partStart = node->data.part_start;
+        }else{
+            partStart = node->data2.part_start;
+        }
+        fseek(file, partStart, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        DirectoryDetail rootDirec;
+        fseek(file, sb.sb_ap_detalle_directorio + (avd.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&rootDirec, sizeof(DirectoryDetail), 1, file);
+        char a = 49;
+        ReturnedOfBitmap byteBmDetail = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
+        ReturnedOfBitmap byteBmInode = ReturnByteBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+        fseek(file, byteBmInode.byte, SEEK_SET);
+        fwrite(&a, 1, 1, file);
+        Inode usersInode;
+        usersInode.i_count_inodo = byteBmInode.position + 1;
+        usersInode.i_count_bloques_asignados = 0;
+        usersInode.i_id_proper = 1;
+        usersInode.i_size_archivo = 0;
+        usersInode.i_perm = 764;
+        string text = "1,G,root\n1,U,root,root,201700326\n";
+        time_t t = time(nullptr);
+        tm *now = localtime(&t);
+        string dateC = to_string(now->tm_mday) + "/" + to_string((now->tm_mon+1)) + "/" + to_string((now->tm_year + 1900)) + " " + to_string(now->tm_hour) + ":" + to_string(now->tm_min);
+        Recursive_CreateFile(file, text, sb, usersInode, byteBmInode.position);
+        strcpy(rootDirec.dd_array_files[0].dd_file_nombre, "users.txt");
+        strcpy(rootDirec.dd_array_files[0].dd_file_date_creacion, dateC.c_str());
+        strcpy(rootDirec.dd_array_files[0].dd_file_date_modificacion, dateC.c_str());
+        rootDirec.dd_array_files[0].dd_file_app_inodo = byteBmInode.position;
+        fseek(file, byteBmDetail.byte, SEEK_SET);
+        fwrite(&a, 1, 1, file);
+        fseek(file, sb.sb_ap_detalle_directorio + (byteBmDetail.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fwrite(&rootDirec, sizeof(DirectoryDetail), 1, file);
+        if(!ussr.isSession){
+            ussr.id = 1;
+            ussr.idGroup = 1;
+            ussr.group = "root";
+            ussr.idPartition = id;
+            ussr.isSession = true;
+            ussr.partition = node;
+            ussr.user = "root";
+        }
+        Action_Recovery(file, sb.sb_ap_log + sizeof(Log), sb.sb_ap_copy_sb, id);
     }else{
-        cout << "Error: al abrir el archivo\n";
+        cout << "Error al abrir el disco\n";
     }
 }
 
@@ -2548,8 +2664,38 @@ int main()
                 if(loss->id != ""){
                     if(list_ram.isMount(loss->id)){
                         NodeList *node = list_ram.SearchNode(loss->id);
+                        FILE *file = fopen(node->disk.c_str(), "rb+");
+                        if(file != nullptr){
+                            SuperBoot sb;
+                            int partStart = 0;
+                            if(node->type == 0){
+                                partStart = node->data.part_start;
+                            }else{
+                                partStart = node->data2.part_start;
+                            }
+                            fseek(file, partStart, SEEK_SET);
+                            fread(&sb, sizeof(SuperBoot), 1, file);
+                            CleanBitmap(file, sb.sb_ap_bitmap_arbol_directorio + 1, sb.sb_ap_arbol_directorio);
+                            CleanBitmap(file, sb.sb_ap_bitmap_detalle_directorio + 1, sb.sb_ap_detalle_directorio);
+                            CleanBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
+                            CleanBitmap(file, sb.sb_ap_bitmap_bloques, sb.sb_ap_bloques);
+                            System_Loss(file, sb);
+                            cout << "Fallo en la particion generada exitosamente\n";
+                            fclose(file);
+                        }
                     }else{
                         cout << "Error: la particion '" + loss->id + "' no esta montada\n";
+                    }
+                }else{
+                    cout << "Error: el id es obligatorio\n";
+                }
+            }else if(Recovery *recovery = dynamic_cast<Recovery*>((*it))){
+                if(recovery->id != ""){
+                    if(list_ram.isMount(recovery->id)){
+                        NodeList *node = list_ram.SearchNode(recovery->id);
+                        System_Recovery(node, recovery->id);
+                    }else{
+                        cout << "Error: la particion '" + recovery->id + "' no esta montada\n";
                     }
                 }else{
                     cout << "Error: el id es obligatorio\n";
