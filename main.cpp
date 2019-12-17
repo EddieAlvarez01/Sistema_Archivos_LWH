@@ -63,6 +63,7 @@ Plotter plot;
 char generateLetter = 'a';
 int countLogic = 1; //Contador para los id de las monturas de las particiones logicas.
 User ussr;  //Usuario para inicio de sesion
+bool isRecovery = false;  // Bandera para no meter dos veces una creacion de carpeta o archivo a la bitacora
 
 int Total_Disk_Size(string unit, int size){
     if(unit == "k"){
@@ -1873,7 +1874,9 @@ void NewDir(Mkdir *mkdir){
         switch (status) {
         case 1:
             cout << "Carpeta creada exitosamente\n";
-            Save_Log(file, sb, mkdir->path, 1, '1', NameDisk(mkdir->path), "", mkdir->isP);
+            if(!isRecovery){
+                Save_Log(file, sb, mkdir->path, 1, '1', NameDisk(mkdir->path), "", mkdir->isP);
+            }
             break;
         case -1:
             cout << "No se encontro el path o error en la creacion\n";
@@ -2097,7 +2100,9 @@ void NewFile(Mkfile *mkfile, stack<string> pathEvaluate){
         switch (CreatePath(file, sb, root, -1, mkfile, txt, 0, pathEvaluate, txtFile)) {
         case 1:
             cout << "Archivo creado exitosamente\n";
-            Save_Log(file, sb, mkfile->path, 2, '0', NameDisk(mkfile->path), txtFile, mkfile->isP);
+            if(!isRecovery){
+                Save_Log(file, sb, mkfile->path, 2, '0', NameDisk(mkfile->path), txtFile, mkfile->isP);
+            }
             break;
         default:
             cout << "Error al crear el archivo, ya existe o error durante la creacion\n";
@@ -2470,6 +2475,31 @@ int main()
                                 }else{
                                     cout << "No existe el id '" + rp->id + "' montada\n";
                                 }
+                            }else if(strcmp(rp->name.c_str(), "bitacora") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_Log(file, sb.sb_ap_log, sb.sb_ap_copy_sb, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de Bitacora creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
                             }
                         }else{
                             cout << "Error: el 'id' es obligatorio\n";
@@ -2693,7 +2723,9 @@ int main()
                 if(recovery->id != ""){
                     if(list_ram.isMount(recovery->id)){
                         NodeList *node = list_ram.SearchNode(recovery->id);
+                        isRecovery = true;
                         System_Recovery(node, recovery->id);
+                        isRecovery = false;
                     }else{
                         cout << "Error: la particion '" + recovery->id + "' no esta montada\n";
                     }

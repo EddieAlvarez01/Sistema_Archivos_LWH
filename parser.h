@@ -110,7 +110,8 @@ extern int yydebug;
     pbm_inode = 320,
     pbm_block = 321,
     ploss = 322,
-    precovery = 323
+    precovery = 323,
+    pbitacora = 324
   };
 #endif
 
@@ -142,7 +143,7 @@ class Mkdir* mkdir;
 class Loss* loss;
 class Recovery* recovery;
 
-#line 146 "parser.h" /* yacc.c:1909  */
+#line 147 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -257,3 +257,33 @@ void Plotter::Plot_BmAvd(FILE *file, int startBm, int endBm, std::string path){
     }
     fs.close();
 }
+
+void Plotter::Plot_Log(FILE *file, int startLog, int endLog, std::string path){
+    std::string pathR = path + ".txt";
+    std::ofstream fs(pathR);
+    if(fs.fail()){
+        std::cout << "Error al abrir el txt\n";
+        return;
+    }
+    Log log;
+    while (startLog <= endLog) {
+        fseek(file, startLog, SEEK_SET);
+        fread(&log, sizeof(Log), 1, file);
+        if(log.log_tipo_operacion != 0){
+            if(log.log_tipo_operacion == 1){
+                fs << "Tipo Operación: mkdir\n";
+                fs << "Tipo: Directorio\n";
+                fs << "Nombre: " + std::string(log.log_nombre) + "\n";
+                fs << "Fecha: " + std::string(log.log_fecha) + "\n\n\n";
+            }else{
+                fs << "Tipo Operación: mkfile\n";
+                fs << "Tipo: Archivo\n";
+                fs << "Nombre: " + std::string(log.log_nombre) + "\n";
+                fs << "Contenido: " + std::string(log.log_contenido) + "\n";
+                fs << "Fecha: " + std::string(log.log_fecha) + "\n\n\n";
+            }
+        }
+        startLog += sizeof(Log);
+    }
+    fs.close();
+}
