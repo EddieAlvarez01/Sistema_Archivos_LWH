@@ -2184,7 +2184,6 @@ void System_Recovery(NodeList *node, string id){
         fseek(file, sb.sb_ap_detalle_directorio + (avd.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
         fread(&rootDirec, sizeof(DirectoryDetail), 1, file);
         char a = 49;
-        ReturnedOfBitmap byteBmDetail = ReturnByteBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio);
         ReturnedOfBitmap byteBmInode = ReturnByteBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo);
         fseek(file, byteBmInode.byte, SEEK_SET);
         fwrite(&a, 1, 1, file);
@@ -2203,9 +2202,7 @@ void System_Recovery(NodeList *node, string id){
         strcpy(rootDirec.dd_array_files[0].dd_file_date_creacion, dateC.c_str());
         strcpy(rootDirec.dd_array_files[0].dd_file_date_modificacion, dateC.c_str());
         rootDirec.dd_array_files[0].dd_file_app_inodo = byteBmInode.position;
-        fseek(file, byteBmDetail.byte, SEEK_SET);
-        fwrite(&a, 1, 1, file);
-        fseek(file, sb.sb_ap_detalle_directorio + (byteBmDetail.position * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fseek(file, sb.sb_ap_detalle_directorio + (0 * (int)sizeof(DirectoryDetail)), SEEK_SET);
         fwrite(&rootDirec, sizeof(DirectoryDetail), 1, file);
         if(!ussr.isSession){
             ussr.id = 1;
@@ -2494,6 +2491,31 @@ int main()
                                         plot.Plot_Log(file, sb.sb_ap_log, sb.sb_ap_copy_sb, Path_To_Report(rp->path));
                                         fclose(file);
                                         cout << "Reporte de Bitacora creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
+                            }else if(strcmp(rp->name.c_str(), "directorio") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_Directory(file, sb, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de Directorios creado exitosamente\n";
                                     }else{
                                         cout << "Error al abrir el archivo\n";
                                     }

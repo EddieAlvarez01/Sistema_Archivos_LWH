@@ -287,3 +287,80 @@ void Plotter::Plot_Log(FILE *file, int startLog, int endLog, std::string path){
     }
     fs.close();
 }
+
+void Plotter::Plot_Directory(FILE *file, SuperBoot sb, std::string path){
+    VirtualDirectoryTree root;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+    std::string txtBody = "";
+    std::string nodePointers = "";
+    txtBody = Directory_Tour(file, sb, root, txtBody, 0);
+    nodePointers = Pointer_Travel(file, sb, root, nodePointers, 0);
+    std::string toR = "digraph structs {\n" +
+                      std::string("node [shape=record];\n") +
+                      txtBody +
+                      nodePointers +
+                      "}";
+    std::ofstream file2;
+    std::string pathTxt = path + ".txt";
+    std::string pathJpg = path + ".png";
+    file2.open(pathTxt);
+    if(file2.fail()){
+        std::cout << "Error al abrir el txt\n";
+        return;
+    }
+    file2 << toR << std::endl;
+    file2.close();
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+    system(pathUnion.c_str());
+}
+
+std::string Plotter::Directory_Tour(FILE *file, SuperBoot sb, VirtualDirectoryTree root, std::string txt, int posAvd){
+    txt += "DA" + std::to_string(posAvd) + " [label=\"{<t0>" + root.avd_nombre_directorio + "|{";
+    for(int x=0; x<6; x++){
+        txt += "<p" + std::to_string(x) + ">" + std::to_string(root.avd_ap_array_subdirectorios[x]) + "|";
+    }
+    txt += "<p6>" + std::to_string(root.avd_ap_detalle_directorio) + "|";
+    txt += "<p7>" + std::to_string(root.avd_ap_arbol_virtual_directorio) + "}}\"];\n";
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            txt = Directory_Tour(file, sb, avd, txt, root.avd_ap_array_subdirectorios[x]);
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        txt = Directory_Tour(file, sb, avd, txt, root.avd_ap_arbol_virtual_directorio);
+    }
+    return txt;
+}
+
+std::string Plotter::Pointer_Travel(FILE *file, SuperBoot sb, VirtualDirectoryTree root, std::string txt, int posAvd){
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            txt += "DA" + std::to_string(posAvd) + ":p" + std::to_string(x) + "->DA" + std::to_string(root.avd_ap_array_subdirectorios[x]) + ":t0\n";
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        txt += "DA" + std::to_string(posAvd) + ":p7->DA" + std::to_string(root.avd_ap_arbol_virtual_directorio) + ":t0\n";
+    }
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            txt = Pointer_Travel(file, sb, avd, txt, root.avd_ap_array_subdirectorios[x]);
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        txt = Pointer_Travel(file, sb, avd, txt, root.avd_ap_arbol_virtual_directorio);
+    }
+    return txt;
+}

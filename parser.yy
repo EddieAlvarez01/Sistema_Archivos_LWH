@@ -128,6 +128,7 @@ class Recovery* recovery;
 %token<TEXT> ploss;
 %token<TEXT> precovery;
 %token<TEXT> pbitacora;
+%token<TEXT> pdirectorio;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -268,7 +269,8 @@ NAME : pmbr { strcpy($$, "mbr"); }
       |pbm_detdir { strcpy($$, "bm_detdir"); }
       |pbm_inode { strcpy($$, "bm_inode"); }
       |pbm_block { strcpy($$, "bm_block"); }
-      |pbitacora { strcpy($$, "bitacora"); };
+      |pbitacora { strcpy($$, "bitacora"); }
+      |pdirectorio { strcpy($$, "directorio"); };
 
 VALUE : id { strcpy($$, $1); }
         |cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }
