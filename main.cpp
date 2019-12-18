@@ -2619,6 +2619,31 @@ int main()
                                 }else{
                                     cout << "No existe el id '" + rp->id + "' montada\n";
                                 }
+                            }else if(strcmp(rp->name.c_str(), "tree_complete") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_Tree_Complete(file, sb, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de tree_complete creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
                             }
                         }else{
                             cout << "Error: el 'id' es obligatorio\n";

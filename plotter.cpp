@@ -703,6 +703,27 @@ void Plotter::Plot_Tree_Complete(FILE *file, SuperBoot sb, std::string path){
     VirtualDirectoryTree root;
     fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
     fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+    std::string nodeTxt = "";
+    std::string nodeRelationship = "";
+    nodeTxt = NodeAvdComplete(file, sb, nodeTxt, root, 0);
+    nodeRelationship = NodeAvdCompleteRelationship(file, sb, nodeRelationship, root, 0);
+    std::string toR = std::string("digraph structs {\n") +
+            "node [shape=record];\n" +
+             nodeTxt +
+             nodeRelationship +
+             "}";
+    std::ofstream file2;
+    std::string pathTxt = path + ".txt";
+    std::string pathJpg = path + ".pdf";
+    file2.open(pathTxt);
+    if(file2.fail()){
+        std::cout << "Error al abrir el txt\n";
+        return;
+    }
+    file2 << toR << std::endl;
+    file2.close();
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
+    system(pathUnion.c_str());
 }
 
 std::string Plotter::NodeAvdComplete(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd){
@@ -712,19 +733,145 @@ std::string Plotter::NodeAvdComplete(FILE *file, SuperBoot sb, std::string txt, 
     }
     txt += "<p6>" + std::to_string(root.avd_ap_detalle_directorio) + "|";
     txt += "<p7>" + std::to_string(root.avd_ap_arbol_virtual_directorio) + "}}\"];\n";
+    DirectoryDetail dd;
+    fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+    fread(&dd, sizeof(DirectoryDetail), 1, file);
+    txt = DirectoryDetailComplete(file, sb, txt, dd, root.avd_ap_detalle_directorio);
     for(int x=0; x<6; x++){
         if(root.avd_ap_array_subdirectorios[x] != -1){
             VirtualDirectoryTree avd;
             fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
             fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
-            txt = Directory_Tour(file, sb, avd, txt, root.avd_ap_array_subdirectorios[x]);
+            txt = NodeAvdComplete(file, sb, txt, avd, root.avd_ap_array_subdirectorios[x]);
         }
     }
     if(root.avd_ap_arbol_virtual_directorio != -1){
         VirtualDirectoryTree avd;
         fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
         fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
-        txt = Directory_Tour(file, sb, avd, txt, root.avd_ap_arbol_virtual_directorio);
+        txt = NodeAvdComplete(file, sb, txt, avd, root.avd_ap_arbol_virtual_directorio);
     }
+    return txt;
+}
 
+std::string Plotter::DirectoryDetailComplete(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD){
+    txt += "DD" + std::to_string(posDD) + " [label=\"{<t0>DD" + std::to_string(posDD) + "|";
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            txt += "{" + std::string(dd.dd_array_files[x].dd_file_nombre) + "|<p" + std::to_string(x) + ">" + std::to_string(dd.dd_array_files[x].dd_file_app_inodo) + "}|";
+        }else{
+            txt += "{--|<p" + std::to_string(x) + ">-1}|";
+        }
+    }
+    txt += "<p5>" + std::to_string(dd.dd_ap_detalle_directorio) + "}\"];\n";
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            Inode in;
+            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_array_files[x].dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+            fread(&in, sizeof(Inode), 1, file);
+            txt = InodeComplete(file, sb, in, txt, dd.dd_array_files[x].dd_file_app_inodo);
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        txt = DirectoryDetailComplete(file, sb, txt, dd2, dd.dd_ap_detalle_directorio);
+    }
+    return txt;
+}
+
+std::string Plotter::InodeComplete(FILE *file, SuperBoot sb, Inode in, std::string txt, int posIn){
+    txt += "I" + std::to_string(posIn) + " [label=\"{<t0>" + std::to_string(posIn) + "|";
+    for(int x=0; x<4; x++){
+            txt += "{<p" + std::to_string(x) + ">" + std::to_string(in.i_array_bloques[x]) + "}|";
+    }
+    txt += "{<p4>" + std::to_string(in.i_ap_indirecto) + "}}\"];\n";
+    txt = BlockComplete(file, sb, in, txt);
+    if(in.i_ap_indirecto != -1){
+        Inode in2;
+        fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in2, sizeof(Inode), 1, file);
+        txt = InodeComplete(file, sb, in2, txt, in.i_ap_indirecto);
+    }
+    return txt;
+}
+
+std::string Plotter::BlockComplete(FILE *file, SuperBoot sb, Inode in, std::string txt){
+    for(int x=0; x<4; x++){
+        if(in.i_array_bloques[x] != -1){
+            DataBlock db;
+            fseek(file, sb.sb_ap_bloques + (in.i_array_bloques[x] * (int)sizeof(DataBlock)), SEEK_SET);
+            fread(&db, sizeof(DataBlock), 1, file);
+            txt += "B" + std::to_string(in.i_array_bloques[x]) + " [label=\"{<t0>" + std::to_string(in.i_array_bloques[x]) + "|" + RetirveTextBlock(db) + "}\"];\n";
+        }
+    }
+    return txt;
+}
+
+std::string Plotter::NodeAvdCompleteRelationship(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd){
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            txt += "DA" + std::to_string(posAvd) + ":p" + std::to_string(x) + "->DA" + std::to_string(root.avd_ap_array_subdirectorios[x]) + ":t0\n";
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        txt += "DA" + std::to_string(posAvd) + ":p7->DA" + std::to_string(root.avd_ap_arbol_virtual_directorio) + ":t0\n";
+    }
+    txt += "DA" + std::to_string(posAvd) + ":p6->DD" + std::to_string(root.avd_ap_detalle_directorio) + ":t0\n";
+    DirectoryDetail dd;
+    fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+    fread(&dd, sizeof(DirectoryDetail), 1, file);
+    txt = DirectoryDetailCompleteRelationship(file, sb, txt, dd, root.avd_ap_detalle_directorio);
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            txt = NodeAvdCompleteRelationship(file, sb, txt, avd, root.avd_ap_array_subdirectorios[x]);
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        txt = NodeAvdCompleteRelationship(file, sb, txt, avd, root.avd_ap_arbol_virtual_directorio);
+    }
+    return txt;
+}
+
+std::string Plotter::DirectoryDetailCompleteRelationship(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD){
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            txt += "DD" + std::to_string(posDD) + ":p" + std::to_string(x) + "->I" + std::to_string(dd.dd_array_files[x].dd_file_app_inodo) + ":t0\n";
+            Inode in;
+            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_array_files[x].dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+            fread(&in, sizeof(Inode), 1, file);
+            txt = InodeCompleteRelationship(file, sb, in, txt, dd.dd_array_files[x].dd_file_app_inodo);
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        txt += "DD" + std::to_string(posDD) + ":p5->DD" + std::to_string(dd.dd_ap_detalle_directorio) + ":t0\n";
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        txt = DirectoryDetailCompleteRelationship(file, sb, txt, dd2, dd.dd_ap_detalle_directorio);
+    }
+    return txt;
+}
+
+std::string Plotter::InodeCompleteRelationship(FILE *file, SuperBoot sb, Inode in, std::string txt, int posInodo){
+    for(int x=0; x<4; x++){
+        if(in.i_array_bloques[x] != -1){
+            txt += "I" + std::to_string(posInodo) + ":p" + std::to_string(x) + "->B" + std::to_string(in.i_array_bloques[x]) + ":t0\n";
+        }
+    }
+    if(in.i_ap_indirecto != -1){
+        txt += "I" + std::to_string(posInodo) + ":p5->I" + std::to_string(in.i_ap_indirecto) + ":t0\n";
+        Inode in2;
+        fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in2, sizeof(Inode), 1, file);
+        txt = InodeCompleteRelationship(file, sb, in2, txt, in.i_ap_indirecto);
+    }
+    return txt;
 }

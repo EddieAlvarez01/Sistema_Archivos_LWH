@@ -131,6 +131,7 @@ class Recovery* recovery;
 %token<TEXT> pdirectorio;
 %token<TEXT> ptree_file;
 %token<TEXT> psb;
+%token<TEXT> ptree_complete;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -275,7 +276,8 @@ NAME : pmbr { strcpy($$, "mbr"); }
       |pbitacora { strcpy($$, "bitacora"); }
       |pdirectorio { strcpy($$, "directorio"); }
       |ptree_file { strcpy($$, "tree_file"); }
-      |psb { strcpy($$, "sb"); };
+      |psb { strcpy($$, "sb"); }
+      |ptree_complete { strcpy($$, "tree_complete"); };
 
 VALUE : id { strcpy($$, $1); }
         |cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }

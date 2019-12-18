@@ -41,6 +41,12 @@ public:
     int FreeBitmap(FILE *file, int startBm, int endBm); //Devuelve el bit del primer bit libre en el bitmap
     void Plot_Tree_Complete(FILE *file, SuperBoot sb, std::string path); //Grafica la estructura comleta del sistema de archivos (Reporte tree_complete)
     std::string NodeAvdComplete(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd); // Lista todos los directorios en nodos de graphviz
+    std::string DirectoryDetailComplete(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD); // Lista todos los detalles de carpeta en graphviz
+    std::string InodeComplete(FILE *file, SuperBoot sb, Inode in, std::string txt, int posIn);
+    std::string BlockComplete(FILE *file, SuperBoot sb, Inode in, std::string txt);
+    std::string NodeAvdCompleteRelationship(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd);
+    std::string DirectoryDetailCompleteRelationship(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD);
+    std::string InodeCompleteRelationship(FILE *file, SuperBoot sb, Inode in, std::string txt, int posIn);
 };
 
 #endif // PLOTTER_H
