@@ -2559,6 +2559,31 @@ int main()
                                 }else{
                                     cout << "Error: en el reporte de treee_file es necesario la &ruta\n";
                                 }
+                            }else if(strcmp(rp->name.c_str(), "sb") == 0){
+                                string oPath = list_ram.To_Report(rp->id);
+                                if(oPath != ""){
+                                    NodeList *node = list_ram.SearchNode(rp->id);
+                                    Create_Directory(rp->path);
+                                    FILE *file = fopen(oPath.c_str(), "rb+");
+                                    if(file != nullptr){
+                                        SuperBoot sb;
+                                        int partStart = 0;
+                                        if(node->type == 0){
+                                            partStart = node->data.part_start;
+                                        }else{
+                                            partStart = node->data2.part_start;
+                                        }
+                                        fseek(file, partStart, SEEK_SET);
+                                        fread(&sb, sizeof(SuperBoot), 1, file);
+                                        plot.Plot_Sb(sb, file, Path_To_Report(rp->path));
+                                        fclose(file);
+                                        cout << "Reporte de SuperBoot creado exitosamente\n";
+                                    }else{
+                                        cout << "Error al abrir el archivo\n";
+                                    }
+                                }else{
+                                    cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
                             }
                         }else{
                             cout << "Error: el 'id' es obligatorio\n";

@@ -427,25 +427,6 @@ ContentDetail Plotter::searchContent(FILE *file, SuperBoot sb, DirectoryDetail d
     return cD;
 }
 
-Inode Plotter::seachInode(FILE *file, SuperBoot sb, DirectoryDetail dd, int count, int selection, Inode nn){
-    for(int x=0; x<5; x++){
-        if(count == selection){
-            Inode in;
-            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_array_files[x].dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
-            fread(&in, sizeof(Inode), 1, file);
-            return in;
-        }
-        count++;
-    }
-    if(dd.dd_ap_detalle_directorio != -1){
-        DirectoryDetail dd2;
-        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
-        fread(&dd2, sizeof(DirectoryDetail), 1, file);
-        return seachInode(file, sb, dd2, count, selection, nn);
-    }
-    return nn;
-}
-
 void Plotter::Plot_Tree_File(FILE *file, SuperBoot sb, std::string folder, std::queue<std::string> route, std::string path){
     VirtualDirectoryTree root;
     fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
@@ -553,4 +534,167 @@ std::string Plotter::RetirveTextBlock(DataBlock db){
         }
     }
     return txt;
+}
+
+void Plotter::Plot_Sb(SuperBoot sb, FILE *file, std::string path){
+    std::string body = "";
+    body += "<TR>\n" +
+            std::string("<TD BGCOLOR=\"lightblue\">Nombre</TD>\n") +
+            "<TD BGCOLOR=\"lightblue\">Valor</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_nombre_hd</TD>\n") +
+            "<TD>" + sb.sb_nombre_hd + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_arbol_virtual_count</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_arbol_virtual_count) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_detalle_directorio_count</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_detalle_directorio_count) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_inodos_count</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_inodos_count) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_bloques_count</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_bloques_count) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_arbol_virtual_free</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_arbol_virtual_free) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_detalle_directorio_free</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_detalle_directorio_free) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_inodos_free</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_inodos_free) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_bloques_free</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_bloques_free) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_date_creacion</TD>\n") +
+            "<TD>" + sb.sb_date_creacion + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_date_ultimo_montaje</TD>\n") +
+            "<TD>" + sb.sb_date_ultimo_montaje + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_montajes_count</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_montajes_count) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_bitmap_arbol_directorio</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_bitmap_arbol_directorio) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_arbol_directorio</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_arbol_directorio) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_bitmap_detalle_directorio</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_bitmap_detalle_directorio) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_detalle_directorio</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_detalle_directorio) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_bitmap_tabla_inodo</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_bitmap_tabla_inodo) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_tabla_inodo</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_tabla_inodo) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_bitmap_bloques</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_bitmap_bloques) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_bloques</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_bloques) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_ap_log</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_ap_log) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_size_struct_arbol_directorio</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_size_struct_arbol_directorio) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_size_struct_detalle_directorio</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_size_struct_detalle_directorio) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_size_struct_inodo</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_size_struct_inodo) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_size_struct_bloque</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_size_struct_bloque) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_first_free_bit_arbol_directorio</TD>\n") +
+            "<TD>" + std::to_string(FreeBitmap(file, sb.sb_ap_bitmap_arbol_directorio, sb.sb_ap_arbol_directorio)) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_first_free_bit_detalle_directorio</TD>\n") +
+            "<TD>" + std::to_string(FreeBitmap(file, sb.sb_ap_bitmap_detalle_directorio, sb.sb_ap_detalle_directorio)) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_first_free_bit_tabla_inodo</TD>\n") +
+            "<TD>" + std::to_string(FreeBitmap(file, sb.sb_ap_bitmap_tabla_inodo, sb.sb_ap_tabla_inodo)) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_first_free_bit_bloques</TD>\n") +
+            "<TD>" + std::to_string(FreeBitmap(file, sb.sb_ap_bitmap_bloques, sb.sb_ap_bloques)) + "</TD>\n" +
+            std::string("</TR>\n");
+    body += "<TR>\n" +
+            std::string("<TD>sb_magic_num</TD>\n") +
+            "<TD>" + std::to_string(sb.sb_magic_num) + "</TD>\n" +
+            std::string("</TR>\n");
+    std::string input = "";
+    input = "digraph example {\n" +
+                        std::string("node [shape=plaintext]\n") +
+                        "rankdir=TB\n" +
+                        std::string("A [label=<\n") +
+                        "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n" +
+                        body +
+                        "</TABLE>\n" +
+                        ">];\n" +
+                        "}";
+    std::ofstream file2;
+    std::string pathTxt = path + ".txt";
+    std::string pathJpg = path + ".png";
+    file2.open(pathTxt);
+    if(file2.fail()){
+        std::cout << "Error al abrir el txt\n";
+        return;
+    }
+    file2 << input << std::endl;
+    file2.close();
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+    system(pathUnion.c_str());
+}
+
+int Plotter::FreeBitmap(FILE *file, int startBm, int endBm){
+    char a;
+    while(startBm <= endBm){
+        fseek(file, startBm, SEEK_SET);
+        fread(&a, 1, 1, file);
+        if(a == 0){
+            return startBm;
+        }
+        startBm++;
+    }
+    return 0;
 }

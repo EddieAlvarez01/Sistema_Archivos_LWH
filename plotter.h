@@ -31,13 +31,14 @@ public:
     std::string Pointer_Travel(FILE *file, SuperBoot sb, VirtualDirectoryTree root, std::string, int posAvd);
     void Plot_Tree_File(FILE *file, SuperBoot sb, std::string folder, std::queue<std::string> route, std::string path);    //Graficador de Inodo de archivo con sus bloques
     VirtualDirectoryTree SearchAvd(FILE *file, SuperBoot sb, VirtualDirectoryTree root, std::string folder, std::queue<std::string> route, VirtualDirectoryTree searchNode);
-    Inode seachInode(FILE *file, SuperBoot sb, DirectoryDetail dd, int count, int selection, Inode nn); // Regresa el inodo en base a la opcion
     ContentDetail searchContent(FILE *file, SuperBoot sb, DirectoryDetail dd, int count, int selection, ContentDetail cD); // Regresa datos para la graficacion del inodo
     void Print_Files(FILE *file, SuperBoot sb, DirectoryDetail dd, int count); //Imprime los archivos de &ruta (solo los exteriores no subdirectorios)
     std::string Txt_Inode(FILE *file, SuperBoot sb, Inode in, std::string txt, int posInodo); //Crea los nodos en graphviz para los 'n' inodos
     std::string Txt_Block(FILE *file, SuperBoot sb, Inode in, std::string txt); //Crea los nodos de los bloques
     std::string Node_Relationsip_Inodes(FILE *file, SuperBoot sb, Inode in, int posInodo, std::string txt); //Crea los enlaces de los bloques con inodos e inodos indirectos
     std::string RetirveTextBlock(DataBlock db); //Devuelve el texto de un bloque sin el char '\0'
+    void Plot_Sb(SuperBoot sb, FILE *file, std::string path); //Genera la tabla de superboot de la particion
+    int FreeBitmap(FILE *file, int startBm, int endBm); //Devuelve el bit del primer bit libre en el bitmap
 };
 
 #endif // PLOTTER_H
