@@ -254,7 +254,8 @@ PROPIEDADESMOUNT : PROPIEDADESMOUNT ampersand ppath guion mayorQ PATH { $$ = $1;
                   |ampersand ppath guion mayorQ PATH { $$ = new Mount(); $$->path = $5; }
                   |ampersand pname guion mayorQ PATH { $$ = new Mount(); $$->name = $5; };
 
-PROPIEDADESUNMOUNT : pid igual id { $$ = new Unmount(); $$->id = $3; };
+PROPIEDADESUNMOUNT : PROPIEDADESUNMOUNT ampersand pid numero guion mayorQ id { $$ = $1; $$->id = "|" + std::string($7); }
+                    |ampersand pid numero guion mayorQ id { $$ = new Unmount(); $$->id = $6; };
 
 PROPIEDADESREP : PROPIEDADESREP ampersand pname guion mayorQ NAME { $$ = $1; $$->name = $6; }
                 |PROPIEDADESREP ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6; }

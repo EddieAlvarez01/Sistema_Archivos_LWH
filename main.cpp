@@ -2313,7 +2313,12 @@ int main()
                 }
             }else if(Unmount *unm = dynamic_cast<Unmount*>((*it))){
                 if(unm->id != ""){
-
+                    std::size_t found = unm->id.find("|");
+                    if(found != std::string::npos){
+                        cout << "Tiene pipes\n";
+                    }else{
+                        cout << "No tiene pipes\n";
+                    }
                 }else{
                     cout << "Error: el 'id' es obligatorio\n";
                 }

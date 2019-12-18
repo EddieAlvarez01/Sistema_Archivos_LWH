@@ -85,7 +85,7 @@ void Plotter::Plot_Mbr(FILE *filetoRead, Mbr mbr, std::string nameDisk, std::str
     }
     std::ofstream file;
     std::string pathTxt = path + ".txt";
-    std::string pathJpg = path + ".png";
+    std::string pathJpg = path + ".pdf";
     file.open(pathTxt);
     if(file.fail()){
         std::cout << "Error al abrir el txt\n";
@@ -93,7 +93,7 @@ void Plotter::Plot_Mbr(FILE *filetoRead, Mbr mbr, std::string nameDisk, std::str
     }
     file << input << std::endl;
     file.close();
-    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
     system(pathUnion.c_str());
 }
 
@@ -199,7 +199,7 @@ void Plotter::Plot_Disk(FILE *ff, Mbr mbr, std::string path, int space){
 
     std::ofstream file;
     std::string pathTxt = path + ".txt";
-    std::string pathJpg = path + ".png";
+    std::string pathJpg = path + ".pdf";
     file.open(pathTxt);
     if(file.fail()){
         std::cout << "Error al abrir el txt\n";
@@ -207,7 +207,7 @@ void Plotter::Plot_Disk(FILE *ff, Mbr mbr, std::string path, int space){
     }
     file << input << std::endl;
     file.close();
-    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
     system(pathUnion.c_str());
 }
 
@@ -303,7 +303,7 @@ void Plotter::Plot_Directory(FILE *file, SuperBoot sb, std::string path){
                       "}";
     std::ofstream file2;
     std::string pathTxt = path + ".txt";
-    std::string pathJpg = path + ".png";
+    std::string pathJpg = path + ".pdf";
     file2.open(pathTxt);
     if(file2.fail()){
         std::cout << "Error al abrir el txt\n";
@@ -311,7 +311,7 @@ void Plotter::Plot_Directory(FILE *file, SuperBoot sb, std::string path){
     }
     file2 << toR << std::endl;
     file2.close();
-    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
     system(pathUnion.c_str());
 }
 
@@ -462,7 +462,7 @@ void Plotter::Plot_Tree_File(FILE *file, SuperBoot sb, std::string folder, std::
                            "}";
         std::ofstream file2;
         std::string pathTxt = path + ".txt";
-        std::string pathJpg = path + ".png";
+        std::string pathJpg = path + ".pdf";
         file2.open(pathTxt);
         if(file2.fail()){
             std::cout << "Error al abrir el txt\n";
@@ -470,7 +470,7 @@ void Plotter::Plot_Tree_File(FILE *file, SuperBoot sb, std::string folder, std::
         }
         file2 << toR << std::endl;
         file2.close();
-        std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+        std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
         system(pathUnion.c_str());
     }else{
         std::cout << "Error no hay ningun archivo en la opcion seleccionada\n";
@@ -674,7 +674,7 @@ void Plotter::Plot_Sb(SuperBoot sb, FILE *file, std::string path){
                         "}";
     std::ofstream file2;
     std::string pathTxt = path + ".txt";
-    std::string pathJpg = path + ".png";
+    std::string pathJpg = path + ".pdf";
     file2.open(pathTxt);
     if(file2.fail()){
         std::cout << "Error al abrir el txt\n";
@@ -682,7 +682,7 @@ void Plotter::Plot_Sb(SuperBoot sb, FILE *file, std::string path){
     }
     file2 << input << std::endl;
     file2.close();
-    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+    std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
     system(pathUnion.c_str());
 }
 
@@ -697,4 +697,34 @@ int Plotter::FreeBitmap(FILE *file, int startBm, int endBm){
         startBm++;
     }
     return 0;
+}
+
+void Plotter::Plot_Tree_Complete(FILE *file, SuperBoot sb, std::string path){
+    VirtualDirectoryTree root;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+}
+
+std::string Plotter::NodeAvdComplete(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd){
+    txt += "DA" + std::to_string(posAvd) + " [label=\"{<t0>" + root.avd_nombre_directorio + "|{";
+    for(int x=0; x<6; x++){
+        txt += "<p" + std::to_string(x) + ">" + std::to_string(root.avd_ap_array_subdirectorios[x]) + "|";
+    }
+    txt += "<p6>" + std::to_string(root.avd_ap_detalle_directorio) + "|";
+    txt += "<p7>" + std::to_string(root.avd_ap_arbol_virtual_directorio) + "}}\"];\n";
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            txt = Directory_Tour(file, sb, avd, txt, root.avd_ap_array_subdirectorios[x]);
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        txt = Directory_Tour(file, sb, avd, txt, root.avd_ap_arbol_virtual_directorio);
+    }
+
 }

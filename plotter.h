@@ -39,6 +39,8 @@ public:
     std::string RetirveTextBlock(DataBlock db); //Devuelve el texto de un bloque sin el char '\0'
     void Plot_Sb(SuperBoot sb, FILE *file, std::string path); //Genera la tabla de superboot de la particion
     int FreeBitmap(FILE *file, int startBm, int endBm); //Devuelve el bit del primer bit libre en el bitmap
+    void Plot_Tree_Complete(FILE *file, SuperBoot sb, std::string path); //Grafica la estructura comleta del sistema de archivos (Reporte tree_complete)
+    std::string NodeAvdComplete(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd); // Lista todos los directorios en nodos de graphviz
 };
 
 #endif // PLOTTER_H
