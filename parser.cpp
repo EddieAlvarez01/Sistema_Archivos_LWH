@@ -2154,7 +2154,7 @@ yyreduce:
 
   case 74:
 #line 257 "parser.yy" /* yacc.c:1646  */
-    { (yyval.unmount) = (yyvsp[-5].unmount); (yyval.unmount)->id = "|" + std::string((yyvsp[0].TEXT)); }
+    { (yyval.unmount) = (yyvsp[-5].unmount); (yyval.unmount)->id += "|" + std::string((yyvsp[0].TEXT)); }
 #line 2159 "parser.cpp" /* yacc.c:1646  */
     break;
 

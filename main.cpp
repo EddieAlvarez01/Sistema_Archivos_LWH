@@ -2219,6 +2219,25 @@ void System_Recovery(NodeList *node, string id){
     }
 }
 
+/****Metodo para separar pipes de id anidados*****/
+vector<string> SeparateId(string line){
+    vector<string> ll;
+    size_t pos1 = 0;
+    size_t pos2 = 0;
+    while(pos2 != line.npos){
+        pos2 = line.find("|", pos1);
+        if(pos2 != line.npos){
+            if(pos2 > pos1){
+                ll.push_back(Trim(line.substr(pos1, pos2-pos1)));
+            }
+            pos1 = pos2+1;
+        }
+    }
+
+    ll.push_back(Trim(line.substr(pos1, line.size() - pos1)));
+    return ll;
+}
+
 
 int main()
 {
@@ -2315,9 +2334,20 @@ int main()
                 if(unm->id != ""){
                     std::size_t found = unm->id.find("|");
                     if(found != std::string::npos){
-                        cout << "Tiene pipes\n";
+                        vector<string> idList = SeparateId(unm->id);
+                        for(int x=0; x<idList.size(); x++){
+                            if(list_ram.isMount(idList.at(x))){
+                                list_ram.unMount(idList.at(x));
+                            }else{
+                                cout << "La particion " + idList.at(x) + " no esta montada\n";
+                            }
+                        }
                     }else{
-                        cout << "No tiene pipes\n";
+                        if(list_ram.isMount(unm->id)){
+                            list_ram.unMount(unm->id);
+                        }else{
+                            cout << "La particion " + unm->id + " no esta montada\n";
+                        }
                     }
                 }else{
                     cout << "Error: el 'id' es obligatorio\n";

@@ -25,13 +25,25 @@ void ListMount::unMount(std::string idDisk){
         NodeList *tmp = first;
         NodeList *tmp2 = nullptr;
         while (tmp != nullptr) {
-            if(strcmp(tmp->data.id, idDisk.c_str()) == 0){
-                if(tmp == first){
-                    first = tmp->next;
-                }else if(tmp->next == nullptr){
-                    tmp2->next = nullptr;
-                }else{
-                    tmp2->next = tmp->next;
+            if(tmp->type == 0){
+                if(strcmp(tmp->data.id, idDisk.c_str()) == 0){
+                    if(tmp == first){
+                        first = tmp->next;
+                    }else if(tmp->next == nullptr){
+                        tmp2->next = nullptr;
+                    }else{
+                        tmp2->next = tmp->next;
+                    }
+                }
+            }else{
+                if(strcmp(tmp->data2.id, idDisk.c_str()) == 0){
+                    if(tmp == first){
+                        first = tmp->next;
+                    }else if(tmp->next == nullptr){
+                        tmp2->next = nullptr;
+                    }else{
+                        tmp2->next = tmp->next;
+                    }
                 }
             }
             tmp2 = tmp;
