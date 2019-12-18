@@ -112,7 +112,8 @@ extern int yydebug;
     ploss = 322,
     precovery = 323,
     pbitacora = 324,
-    pdirectorio = 325
+    pdirectorio = 325,
+    ptree_file = 326
   };
 #endif
 
@@ -144,7 +145,7 @@ class Mkdir* mkdir;
 class Loss* loss;
 class Recovery* recovery;
 
-#line 148 "parser.h" /* yacc.c:1909  */
+#line 149 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

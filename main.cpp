@@ -2522,6 +2522,43 @@ int main()
                                 }else{
                                     cout << "No existe el id '" + rp->id + "' montada\n";
                                 }
+                            }else if(strcmp(rp->name.c_str(), "tree_file") == 0){
+                                if(rp->route != ""){
+                                    string oPath = list_ram.To_Report(rp->id);
+                                    if(oPath != ""){
+                                        NodeList *node = list_ram.SearchNode(rp->id);
+                                        Create_Directory(rp->path);
+                                        FILE *file = fopen(oPath.c_str(), "rb+");
+                                        if(file != nullptr){
+                                            SuperBoot sb;
+                                            int partStart = 0;
+                                            if(node->type == 0){
+                                                partStart = node->data.part_start;
+                                            }else{
+                                                partStart = node->data2.part_start;
+                                            }
+                                            fseek(file, partStart, SEEK_SET);
+                                            fread(&sb, sizeof(SuperBoot), 1, file);
+                                            queue<string> route;
+                                            if(rp->route == "/"){
+                                                route.push("/");
+                                            }else{
+                                                route = FolderTheInodes(rp->route);
+                                            }
+                                            string folder = route.front();
+                                            route.pop();
+                                            plot.Plot_Tree_File(file, sb, folder, route, Path_To_Report(rp->path));
+                                            fclose(file);
+                                            cout << "Reporte de tree_file creado exitosamente\n";
+                                        }else{
+                                            cout << "Error al abrir el archivo\n";
+                                        }
+                                    }else{
+                                        cout << "No existe el id '" + rp->id + "' montada\n";
+                                    }
+                                }else{
+                                    cout << "Error: en el reporte de treee_file es necesario la &ruta\n";
+                                }
                             }
                         }else{
                             cout << "Error: el 'id' es obligatorio\n";

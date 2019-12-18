@@ -364,3 +364,193 @@ std::string Plotter::Pointer_Travel(FILE *file, SuperBoot sb, VirtualDirectoryTr
     }
     return txt;
 }
+
+VirtualDirectoryTree Plotter::SearchAvd(FILE *file, SuperBoot sb, VirtualDirectoryTree root, std::string folder, std::queue<std::string> route, VirtualDirectoryTree searchNode){
+    if(strcmp(root.avd_nombre_directorio, folder.c_str()) == 0){
+        if(route.empty()){
+            return root;
+        }else{
+            folder = route.front();
+            route.pop();
+        }
+    }
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            searchNode = SearchAvd(file, sb, avd, folder, route, searchNode);
+            if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+                return searchNode;
+            }
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        searchNode = SearchAvd(file, sb, avd, folder, route, searchNode);
+        if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+            return searchNode;
+        }
+    }
+    return searchNode;
+}
+
+void Plotter::Print_Files(FILE *file, SuperBoot sb, DirectoryDetail dd, int count){
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            std::cout << std::to_string(++count) + ". " + dd.dd_array_files[x].dd_file_nombre + "\n";
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        Print_Files(file, sb, dd2, count);
+    }
+}
+
+ContentDetail Plotter::searchContent(FILE *file, SuperBoot sb, DirectoryDetail dd, int count, int selection, ContentDetail cD){
+    for(int x=0; x<5; x++){
+        if(count == selection){
+            return dd.dd_array_files[x];
+        }
+        count++;
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        return searchContent(file, sb, dd2, count, selection, cD);
+    }
+    return cD;
+}
+
+Inode Plotter::seachInode(FILE *file, SuperBoot sb, DirectoryDetail dd, int count, int selection, Inode nn){
+    for(int x=0; x<5; x++){
+        if(count == selection){
+            Inode in;
+            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_array_files[x].dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+            fread(&in, sizeof(Inode), 1, file);
+            return in;
+        }
+        count++;
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        return seachInode(file, sb, dd2, count, selection, nn);
+    }
+    return nn;
+}
+
+void Plotter::Plot_Tree_File(FILE *file, SuperBoot sb, std::string folder, std::queue<std::string> route, std::string path){
+    VirtualDirectoryTree root;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+    VirtualDirectoryTree searchNode;
+    searchNode = SearchAvd(file, sb, root, folder, route, searchNode);
+    DirectoryDetail dd;
+    fseek(file, sb.sb_ap_detalle_directorio + (searchNode.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+    fread(&dd, sizeof(DirectoryDetail), 1, file);
+    int count = 0;
+    std::cout << "Elija el archivo a graficar\n";
+    Print_Files(file, sb, dd, count);
+    std::string option;
+    getline(std::cin, option);
+    int op = std::stoi(option);
+    ContentDetail cD2;
+    ContentDetail cD = searchContent(file, sb, dd, 0, op - 1, cD2);
+    if(strcmp(cD.dd_file_nombre, "") != 0){
+        Inode in;
+        fseek(file, sb.sb_ap_tabla_inodo + (cD.dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in, sizeof(Inode), 1, file);
+        std::string txtBody = "";
+        std::string txtRelationship = "";
+        txtBody = Txt_Inode(file, sb, in, txtBody, cD.dd_file_app_inodo);
+        txtBody = Txt_Block(file, sb, in, txtBody);
+        txtRelationship = Node_Relationsip_Inodes(file, sb, in, cD.dd_file_app_inodo, txtRelationship);
+        std::string toR = std::string("digraph structs {\n") +
+                          "node [shape=record];\n" +
+                          "DD" + " [label=\"{<t0>DD|{" + cD.dd_file_nombre + "|<p0>" + std::to_string(cD.dd_file_app_inodo) + "}}\"];\n" +
+                           txtBody +
+                           txtRelationship +
+                           "DD:p0->I" + std::to_string(cD.dd_file_app_inodo) + ":t0\n" +
+                           "}";
+        std::ofstream file2;
+        std::string pathTxt = path + ".txt";
+        std::string pathJpg = path + ".png";
+        file2.open(pathTxt);
+        if(file2.fail()){
+            std::cout << "Error al abrir el txt\n";
+            return;
+        }
+        file2 << toR << std::endl;
+        file2.close();
+        std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpng";
+        system(pathUnion.c_str());
+    }else{
+        std::cout << "Error no hay ningun archivo en la opcion seleccionada\n";
+    }
+}
+
+std::string Plotter::Txt_Inode(FILE *file, SuperBoot sb, Inode in, std::string txt, int posIn){
+    txt += "I" + std::to_string(posIn) + " [label=\"{<t0>" + std::to_string(posIn) + "|";
+    for(int x=0; x<4; x++){
+            txt += "{<p" + std::to_string(x) + ">" + std::to_string(in.i_array_bloques[x]) + "}|";
+    }
+    txt += "{<p4>" + std::to_string(in.i_ap_indirecto) + "}}\"];\n";
+    if(in.i_ap_indirecto != -1){
+        Inode in2;
+        fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in2, sizeof(Inode), 1, file);
+        txt = Txt_Inode(file, sb, in2, txt, in.i_ap_indirecto);
+    }
+    return txt;
+}
+
+std::string Plotter::Txt_Block(FILE *file, SuperBoot sb, Inode in, std::string txt){
+    for(int x=0; x<4; x++){
+        if(in.i_array_bloques[x] != -1){
+            DataBlock db;
+            fseek(file, sb.sb_ap_bloques + (in.i_array_bloques[x] * (int)sizeof(DataBlock)), SEEK_SET);
+            fread(&db, sizeof(DataBlock), 1, file);
+            txt += "B" + std::to_string(in.i_array_bloques[x]) + " [label=\"{<t0>" + std::to_string(in.i_array_bloques[x]) + "|" + RetirveTextBlock(db) + "}\"];\n";
+        }
+    }
+    if(in.i_ap_indirecto != -1){
+        Inode in2;
+        fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in2, sizeof(Inode), 1, file);
+        txt = Txt_Block(file, sb, in2, txt);
+    }
+    return txt;
+}
+
+std::string Plotter::Node_Relationsip_Inodes(FILE *file, SuperBoot sb, Inode in, int posInodo, std::string txt){
+    for(int x=0; x<4; x++){
+        if(in.i_array_bloques[x] != -1){
+            txt += "I" + std::to_string(posInodo) + ":p" + std::to_string(x) + "->B" + std::to_string(in.i_array_bloques[x]) + ":t0\n";
+        }
+    }
+    if(in.i_ap_indirecto != -1){
+        txt += "I" + std::to_string(posInodo) + ":p5->I" + std::to_string(in.i_ap_indirecto) + ":t0\n";
+        Inode in2;
+        fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
+        fread(&in2, sizeof(Inode), 1, file);
+        txt = Node_Relationsip_Inodes(file, sb, in2, in.i_ap_indirecto, txt);
+    }
+    return txt;
+}
+
+std::string Plotter::RetirveTextBlock(DataBlock db){
+    std::string txt = "";
+    for(int x=0; x<25; x++){
+        if(db.db_data[x] != 0){
+            txt += db.db_data[x];
+        }
+    }
+    return txt;
+}
