@@ -152,6 +152,25 @@ void ListMount::FormatPartition(std::string id){
     }
 }
 
+bool ListMount::isFormat(NodeList *node){
+    FILE *file = fopen(node->disk.c_str(), "rb+");
+    int partStart = 0;
+    if(node->type == 0){
+        partStart = node->data.part_start;
+    }else{
+        partStart = node->data2.part_start;
+    }
+    SuperBoot sb;
+    fseek(file, partStart, SEEK_SET);
+    fread(&sb, sizeof(SuperBoot), 1, file);
+    if(sb.sb_magic_num == 201700326){
+        fclose(file);
+        return true;
+    }
+    fclose(file);
+    return false;
+}
+
 NodeList* ListMount::SearchNode(std::string id){
     if(first != nullptr){
         NodeList *tmp = first;

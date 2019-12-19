@@ -2,6 +2,7 @@
 #define LISTMOUNT_H
 
 #include "nodelist.h"
+#include "superboot.h"
 #include <iostream>
 
 class ListMount
@@ -17,6 +18,7 @@ public:
     void FormatPartition(std::string id);
     void List_Mount();
     NodeList *SearchNode(std::string id);
+    bool isFormat(NodeList *node);
 };
 
 #endif // LISTMOUNT_H

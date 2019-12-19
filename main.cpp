@@ -1408,7 +1408,7 @@ void Format_Partition(Mkfs *mkfs){
 void Session(Login *login){
     if(list_ram.isMount(login->id)){
         NodeList *node = list_ram.SearchNode(login->id);
-        if(node->format == 1){
+        if(list_ram.isFormat(node)){
             FILE *file = fopen(node->disk.c_str(), "rb+");
             if(file != nullptr){
                 SuperBoot sb;
