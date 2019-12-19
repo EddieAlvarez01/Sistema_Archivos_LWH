@@ -24,6 +24,7 @@
 #include "mkdir.h"
 #include "loss.h"
 #include "recovery.h"
+#include "pause.h"
 
 extern int yylineno; //linea actual donde se encuentra el parser (analisis lexico) lo maneja BISON
 extern int columna; //columna actual donde se encuentra el parser (analisis lexico) lo maneja BISON
@@ -60,6 +61,7 @@ class Mkfile* mkfile;
 class Mkdir* mkdir;
 class Loss* loss;
 class Recovery* recovery;
+class Pause* pause;
 }
 %token<TEXT> numero;
 %token<TEXT> cadena;
@@ -134,6 +136,7 @@ class Recovery* recovery;
 %token<TEXT> ptree_complete;
 %token<TEXT> pls;
 %token<TEXT> ptree_directorio;
+%token<TEXT> ppause;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -195,6 +198,7 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |pmkdir PROPIEDADESMKDIR { listCommand.push_back($2); }
          |ploss PROPIEDADESLOSS { listCommand.push_back($2); }
          |precovery PROPIEDADESRECOVERY { listCommand.push_back($2); }
+         |ppause { listCommand.push_back(new Pause()); }
          |error;
 
 PROPIEDADESMK : PROPIEDADESMK ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }

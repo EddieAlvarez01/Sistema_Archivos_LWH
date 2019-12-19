@@ -40,7 +40,8 @@ SOURCES += main.cpp \
     returnedofbitmap.cpp \
     user.cpp \
     loss.cpp \
-    recovery.cpp
+    recovery.cpp \
+    pause.cpp
 
 DISTFILES += \
     lexico.l \
@@ -83,4 +84,5 @@ HEADERS += \
     returnedofbitmap.h \
     user.h \
     loss.h \
-    recovery.h
+    recovery.h \
+    pause.h

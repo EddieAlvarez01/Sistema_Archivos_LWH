@@ -49,6 +49,7 @@
 #include "mkfile.h"
 #include "loss.h"
 #include "recovery.h"
+#include "pause.h"
 
 using namespace std;
 
@@ -3081,6 +3082,9 @@ int main()
                 }else{
                     cout << "Error: el id es obligatorio\n";
                 }
+            }else if(Pause *pause = dynamic_cast<Pause*>((*it))){
+                cout << "\nPresione enter para continuar.....";
+                cin.get();
             }
         }
     }else{
