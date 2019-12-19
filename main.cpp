@@ -1253,6 +1253,32 @@ string SearchIdGroup(string name, vector<string>file){
      return "";
 }
 
+string SearchUsernameById(int id, vector<string>file){
+     for(size_t i=0; i<file.size(); i++){
+         string line = file[i];
+         if(line.substr(2, 1) == "U"){
+             vector<string> group = Separate_Content(line);
+             if(stoi(group.at(0)) == id){
+                return group.at(3);
+             }
+         }
+     }
+     return "";
+}
+
+string SearchGroupByIdUser(int id, vector<string>file){
+     for(size_t i=0; i<file.size(); i++){
+         string line = file[i];
+         if(line.substr(2, 1) == "U"){
+             vector<string> group = Separate_Content(line);
+             if(stoi(group.at(0)) == id){
+                return group.at(2);
+             }
+         }
+     }
+     return "";
+}
+
 void CleanBitmap(FILE *file, int startBm, int endBm){
     char a = 0;
     while(startBm < endBm){
@@ -1400,7 +1426,7 @@ void Session(Login *login){
                 string txtUsers = "";
                 txtUsers = RetrieveText(users, file, txtUsers, sb);
                 vector<string> textJump = SplitJump(txtUsers);
-                for(size_t i=0; i<textJump.size() - 1; i++){
+                for(size_t i=0; i<textJump.size(); i++){
                     string usr = textJump[i];
                     if(usr.substr(2, 1) == "U"){
                         vector<string> usr2 = Separate_Content(usr);
@@ -2238,6 +2264,120 @@ vector<string> SeparateId(string line){
     return ll;
 }
 
+/***************************************DEVUELVE EL AVD QUE MANDA EN LA RUTA*****************************/
+VirtualDirectoryTree SearchAvd(FILE *file, SuperBoot sb, VirtualDirectoryTree root, std::string folder, std::queue<std::string> route, VirtualDirectoryTree searchNode){
+    if(strcmp(root.avd_nombre_directorio, folder.c_str()) == 0){
+        if(route.empty()){
+            return root;
+        }else{
+            folder = route.front();
+            route.pop();
+        }
+    }
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            searchNode = SearchAvd(file, sb, avd, folder, route, searchNode);
+            if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+                return searchNode;
+            }
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        searchNode = SearchAvd(file, sb, avd, folder, route, searchNode);
+        if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+            return searchNode;
+        }
+    }
+    return searchNode;
+}
+
+void PrintFolders(FILE *file, SuperBoot sb, VirtualDirectoryTree avd){
+    for(int x=0; x<6; x++){
+        if(avd.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd2;
+            fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+            Inode users;
+            fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+            fread(&users, sizeof(Inode), 1, file);
+            string txtBlockUsers = "";
+            txtBlockUsers = RetrieveText(users, file, txtBlockUsers, sb);
+            vector<string> textJump = SplitJump(txtBlockUsers);
+            string Username = SearchUsernameById(avd2.avd_proper, textJump);
+            string group = SearchGroupByIdUser(avd2.avd_proper, textJump);
+            cout << "drw-rw-r--  " + Username + "   " + group + "   0   " + avd2.avd_fecha_creacion + "   " + avd2.avd_nombre_directorio + "\n";
+        }
+    }
+    if(avd.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd2;
+        fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+        PrintFolders(file, sb, avd2);
+    }
+}
+
+void PrintFiles(FILE *file, SuperBoot sb, DirectoryDetail dd){
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            Inode in;
+            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_array_files[x].dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+            fread(&in, sizeof(Inode), 1, file);
+            Inode users;
+            fseek(file, sb.sb_ap_tabla_inodo, SEEK_SET);
+            fread(&users, sizeof(Inode), 1, file);
+            string txtBlockUsers = "";
+            txtBlockUsers = RetrieveText(users, file, txtBlockUsers, sb);
+            vector<string> textJump = SplitJump(txtBlockUsers);
+            string Username = SearchUsernameById(in.i_id_proper, textJump);
+            if(Username != ""){
+                string group = SearchGroupByIdUser(in.i_id_proper, textJump);
+                cout << "-rw-rw-r--  " + Username + "   " + group + "   " + to_string(in.i_size_archivo) + "   " + dd.dd_array_files[x].dd_file_date_creacion + "   " + dd.dd_array_files[x].dd_file_nombre + "\n";
+            }else{
+                cout << "-----  " + string(dd.dd_array_files[x].dd_file_nombre) + "\n";
+            }
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        PrintFiles(file, sb, dd2);
+    }
+}
+
+
+/***MUESTRA EL REPORTE LS***/
+void ShowLs(FILE *file, SuperBoot sb, string route){
+    queue<string> route2;
+    if(route == "/"){
+        route2.push("/");
+    }else{
+        route2 = FolderTheInodes(route);
+    }
+    string folder = route2.front();
+    route2.pop();
+    VirtualDirectoryTree avd;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+    VirtualDirectoryTree searchNode;
+    searchNode = SearchAvd(file, sb, avd, folder, route2, searchNode);
+    if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+        PrintFolders(file, sb, searchNode);
+        DirectoryDetail dd;
+        fseek(file, sb.sb_ap_detalle_directorio + (searchNode.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd, sizeof(DirectoryDetail), 1, file);
+        PrintFiles(file, sb, dd);
+    }else{
+        cout << "No existe la carpeta de la ruta\n";
+    }
+}
+
 
 int main()
 {
@@ -2584,7 +2724,6 @@ int main()
                                             route.pop();
                                             plot.Plot_Tree_File(file, sb, folder, route, Path_To_Report(rp->path));
                                             fclose(file);
-                                            cout << "Reporte de tree_file creado exitosamente\n";
                                         }else{
                                             cout << "Error al abrir el archivo\n";
                                         }
@@ -2643,6 +2782,34 @@ int main()
                                     }
                                 }else{
                                     cout << "No existe el id '" + rp->id + "' montada\n";
+                                }
+                            }else if(strcmp(rp->name.c_str(), "ls") == 0){
+                                if(rp->route != ""){
+                                    string oPath = list_ram.To_Report(rp->id);
+                                    if(oPath != ""){
+                                        NodeList *node = list_ram.SearchNode(rp->id);
+                                        Create_Directory(rp->path);
+                                        FILE *file = fopen(oPath.c_str(), "rb+");
+                                        if(file != nullptr){
+                                            SuperBoot sb;
+                                            int partStart = 0;
+                                            if(node->type == 0){
+                                                partStart = node->data.part_start;
+                                            }else{
+                                                partStart = node->data2.part_start;
+                                            }
+                                            fseek(file, partStart, SEEK_SET);
+                                            fread(&sb, sizeof(SuperBoot), 1, file);
+                                            ShowLs(file, sb, rp->route);
+                                            fclose(file);
+                                        }else{
+                                            cout << "Error al abrir el archivo\n";
+                                        }
+                                    }else{
+                                        cout << "No existe el id '" + rp->id + "' montada\n";
+                                    }
+                                }else{
+                                    cout << "Error: en el reporte de ls es necesario la &ruta\n";
                                 }
                             }
                         }else{

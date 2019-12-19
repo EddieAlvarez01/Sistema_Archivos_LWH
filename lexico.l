@@ -26,7 +26,7 @@ letra [a-zñA-ZÑ]+
 numero [0-9]+
 booleano ("verdadero"|"falso"|"true"|"false")
 decimal [0-9]+"."[0-9]+
-id ("\/"?({letra}|{numero}))+({letra}|{numero}|"_"|"."|"\/")*
+id ("\/"?({letra}|{numero})*)+({letra}|{numero}|"_"|"."|"\/")*
 cadena "\""[^"\""]*"\""
 
 
@@ -99,6 +99,7 @@ INITIAL
 "tree_file" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return ptree_file;}
 "sb" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return psb;}
 "tree_complete" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return ptree_complete;}
+"ls" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pls;}
 {id} { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return id;}
 "=" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return igual;}
 "-"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return guion; }

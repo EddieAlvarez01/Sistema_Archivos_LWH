@@ -433,47 +433,52 @@ void Plotter::Plot_Tree_File(FILE *file, SuperBoot sb, std::string folder, std::
     fread(&root, sizeof(VirtualDirectoryTree), 1, file);
     VirtualDirectoryTree searchNode;
     searchNode = SearchAvd(file, sb, root, folder, route, searchNode);
-    DirectoryDetail dd;
-    fseek(file, sb.sb_ap_detalle_directorio + (searchNode.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
-    fread(&dd, sizeof(DirectoryDetail), 1, file);
-    int count = 0;
-    std::cout << "Elija el archivo a graficar\n";
-    Print_Files(file, sb, dd, count);
-    std::string option;
-    getline(std::cin, option);
-    int op = std::stoi(option);
-    ContentDetail cD2;
-    ContentDetail cD = searchContent(file, sb, dd, 0, op - 1, cD2);
-    if(strcmp(cD.dd_file_nombre, "") != 0){
-        Inode in;
-        fseek(file, sb.sb_ap_tabla_inodo + (cD.dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
-        fread(&in, sizeof(Inode), 1, file);
-        std::string txtBody = "";
-        std::string txtRelationship = "";
-        txtBody = Txt_Inode(file, sb, in, txtBody, cD.dd_file_app_inodo);
-        txtBody = Txt_Block(file, sb, in, txtBody);
-        txtRelationship = Node_Relationsip_Inodes(file, sb, in, cD.dd_file_app_inodo, txtRelationship);
-        std::string toR = std::string("digraph structs {\n") +
-                          "node [shape=record];\n" +
-                          "DD" + " [label=\"{<t0>DD|{" + cD.dd_file_nombre + "|<p0>" + std::to_string(cD.dd_file_app_inodo) + "}}\"];\n" +
-                           txtBody +
-                           txtRelationship +
-                           "DD:p0->I" + std::to_string(cD.dd_file_app_inodo) + ":t0\n" +
-                           "}";
-        std::ofstream file2;
-        std::string pathTxt = path + ".txt";
-        std::string pathJpg = path + ".pdf";
-        file2.open(pathTxt);
-        if(file2.fail()){
-            std::cout << "Error al abrir el txt\n";
-            return;
+    if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+        DirectoryDetail dd;
+        fseek(file, sb.sb_ap_detalle_directorio + (searchNode.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd, sizeof(DirectoryDetail), 1, file);
+        int count = 0;
+        std::cout << "Elija el archivo a graficar\n";
+        Print_Files(file, sb, dd, count);
+        std::string option;
+        getline(std::cin, option);
+        int op = std::stoi(option);
+        ContentDetail cD2;
+        ContentDetail cD = searchContent(file, sb, dd, 0, op - 1, cD2);
+        if(strcmp(cD.dd_file_nombre, "") != 0){
+            Inode in;
+            fseek(file, sb.sb_ap_tabla_inodo + (cD.dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+            fread(&in, sizeof(Inode), 1, file);
+            std::string txtBody = "";
+            std::string txtRelationship = "";
+            txtBody = Txt_Inode(file, sb, in, txtBody, cD.dd_file_app_inodo);
+            txtBody = Txt_Block(file, sb, in, txtBody);
+            txtRelationship = Node_Relationsip_Inodes(file, sb, in, cD.dd_file_app_inodo, txtRelationship);
+            std::string toR = std::string("digraph structs {\n") +
+                              "node [shape=record];\n" +
+                              "DD" + " [label=\"{<t0>DD|{" + cD.dd_file_nombre + "|<p0>" + std::to_string(cD.dd_file_app_inodo) + "}}\"];\n" +
+                               txtBody +
+                               txtRelationship +
+                               "DD:p0->I" + std::to_string(cD.dd_file_app_inodo) + ":t0\n" +
+                               "}";
+            std::ofstream file2;
+            std::string pathTxt = path + ".txt";
+            std::string pathJpg = path + ".pdf";
+            file2.open(pathTxt);
+            if(file2.fail()){
+                std::cout << "Error al abrir el txt\n";
+                return;
+            }
+            file2 << toR << std::endl;
+            file2.close();
+            std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
+            system(pathUnion.c_str());
+            std::cout << "Reporte de tree_file creado exitosamente\n";
+        }else{
+            std::cout << "Error no hay ningun archivo en la opcion seleccionada\n";
         }
-        file2 << toR << std::endl;
-        file2.close();
-        std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
-        system(pathUnion.c_str());
     }else{
-        std::cout << "Error no hay ningun archivo en la opcion seleccionada\n";
+        std::cout << "Error: no existe la ruta indicada\n";
     }
 }
 
