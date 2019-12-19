@@ -880,3 +880,111 @@ std::string Plotter::InodeCompleteRelationship(FILE *file, SuperBoot sb, Inode i
     }
     return txt;
 }
+
+void Plotter::Plot_Tree_Directory(FILE *file, SuperBoot sb, std::string path, std::string folder, std::queue<std::string> route){
+    VirtualDirectoryTree root;
+    fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+    fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+    VirtualDirectoryTree searchNode;
+    searchNode = SearchAvd(file, sb, root, folder, route, searchNode);
+    if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+        std::cout << "Elija la carpeta a reportar su detalle directorio\n";
+        Print_Folder(file, sb, searchNode, 0);
+        std::string option;
+        getline(std::cin, option);
+        int op = std::stoi(option);
+        VirtualDirectoryTree existNode;
+        existNode = searchAVDF(file, sb, searchNode, 0, op - 1, existNode);
+        if(strcmp(existNode.avd_nombre_directorio, "") != 0){
+            DirectoryDetail dd;
+            fseek(file, sb.sb_ap_detalle_directorio + (existNode.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fread(&dd, sizeof(DirectoryDetail), 1, file);
+            std::string nodesDD = "";
+            nodesDD += "DA" + std::string("[label=\"{<t0>") + std::string(existNode.avd_nombre_directorio) + "|{";
+            for(int x=0; x<6; x++){
+                nodesDD += "<p" + std::to_string(x) + ">" + std::to_string(existNode.avd_ap_array_subdirectorios[x]) + "|";
+            }
+            nodesDD += "<p6>" + std::to_string(existNode.avd_ap_detalle_directorio) + "|";
+            nodesDD += "<p7>" + std::to_string(existNode.avd_ap_arbol_virtual_directorio) + "}}\"];\n";
+            nodesDD = NodeDD(file, sb, nodesDD, dd, existNode.avd_ap_detalle_directorio);
+            nodesDD += "DA:p6->DD" + std::to_string(existNode.avd_ap_detalle_directorio) + ":t0\n";
+            std::string toR = std::string("digraph structs {\n") +
+                    "node [shape=record];\n" +
+                     nodesDD +
+                     "}";
+            std::ofstream file2;
+            std::string pathTxt = path + ".txt";
+            std::string pathJpg = path + ".pdf";
+            file2.open(pathTxt);
+            if(file2.fail()){
+                std::cout << "Error al abrir el txt\n";
+                return;
+            }
+            file2 << toR << std::endl;
+            file2.close();
+            std::string pathUnion = "dot " + pathTxt + " -o " + pathJpg + " -Tpdf";
+            system(pathUnion.c_str());
+            std::cout << "Reporte tree_directorio generado exitosamente\n";
+        }else{
+            std::cout << "No hay ningun directorio en la opcion seleccionada\n";
+        }
+    }else{
+        std::cout << "La carpeta en la ruta indica no existe\n";
+    }
+}
+
+void Plotter::Print_Folder(FILE *file, SuperBoot sb, VirtualDirectoryTree avd, int count){
+    for(int x=0; x<6; x++){
+        if(avd.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd2;
+            fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+            std::cout << std::to_string(++count) + ". " + avd2.avd_nombre_directorio + "\n";
+        }
+    }
+    if(avd.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd2;
+        fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+        Print_Folder(file, sb, avd2, count);
+    }
+}
+
+VirtualDirectoryTree Plotter::searchAVDF(FILE *file, SuperBoot sb, VirtualDirectoryTree avd, int count, int selection, VirtualDirectoryTree rAvd){
+    for(int x=0; x<6; x++){
+        if(count == selection){
+            VirtualDirectoryTree avd2;
+            fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+            return avd2;
+        }
+        count++;
+    }
+    if(avd.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd2;
+        fseek(file, sb.sb_ap_arbol_directorio + (avd.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd2, sizeof(VirtualDirectoryTree), 1, file);
+        return searchAVDF(file, sb, avd2, count, selection, rAvd);
+    }
+    return rAvd;
+}
+
+std::string Plotter::NodeDD(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD){
+    txt += "DD" + std::to_string(posDD) + " [label=\"{<t0>DD" + std::to_string(posDD) + "|";
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            txt += "{" + std::string(dd.dd_array_files[x].dd_file_nombre) + "|<p" + std::to_string(x) + ">" + std::to_string(dd.dd_array_files[x].dd_file_app_inodo) + "}|";
+        }else{
+            txt += "{--|<p" + std::to_string(x) + ">-1}|";
+        }
+    }
+    txt += "<p5>" + std::to_string(dd.dd_ap_detalle_directorio) + "}\"];\n";
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        txt += "DD" + std::to_string(posDD) + ":p5->DD" + std::to_string(dd.dd_ap_detalle_directorio) + ":t0\n";
+        txt = NodeDD(file, sb, txt, dd2, dd.dd_ap_detalle_directorio);
+    }
+    return txt;
+}

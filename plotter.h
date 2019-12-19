@@ -47,6 +47,10 @@ public:
     std::string NodeAvdCompleteRelationship(FILE *file, SuperBoot sb, std::string txt, VirtualDirectoryTree root, int posAvd);
     std::string DirectoryDetailCompleteRelationship(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD);
     std::string InodeCompleteRelationship(FILE *file, SuperBoot sb, Inode in, std::string txt, int posIn);
+    void Plot_Tree_Directory(FILE *file, SuperBoot sb, std::string path, std::string folder, std::queue<std::string> route);
+    void Print_Folder(FILE *file, SuperBoot sb, VirtualDirectoryTree avd, int count); //Lista todas las carpetas de la ruta seleccionada en el reporte tree_directory
+    VirtualDirectoryTree searchAVDF(FILE *file, SuperBoot sb, VirtualDirectoryTree avd, int count, int selection, VirtualDirectoryTree rAvd); //Devuelve el AVD seleccionado
+    std::string NodeDD(FILE *file, SuperBoot sb, std::string txt, DirectoryDetail dd, int posDD);
 };
 
 #endif // PLOTTER_H
