@@ -21,7 +21,7 @@ std::list<Command*> listCommand;
 %option noyywrap
 %option nounput
 
-Commentary "#"[^\n]*[\n]
+Commentary "#"[^\r\n]*[\r\n]
 letra [a-zñA-ZÑ]+
 numero [0-9]+
 booleano ("verdadero"|"falso"|"true"|"false")
@@ -109,6 +109,9 @@ INITIAL
 "&"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return ampersand; }
 "%"         {   columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return porcentaje; }
 "\t"            {
+                    strcpy(yylval.TEXT, yytext); columna=26;
+                }
+"\r"            {
                     strcpy(yylval.TEXT, yytext); columna=26;
                 }
 [[:blank:]]     { columna++; }

@@ -292,7 +292,7 @@ VALUE : id { strcpy($$, $1); }
         |cadena { std::string text = $1; text.replace(0,1,""); text.replace(text.length()-1, 1, ""); strcpy($$, text.c_str()); }
         |numero { strcpy($$, $1); };
 
-PROPIEDADESEXEC : guion ppath igual PATH { $$ = new Exec(); $$->path = $4; };
+PROPIEDADESEXEC : ampersand ppath guion mayorQ PATH { $$ = new Exec(); $$->path = $5; };
 
 PROPIEDADESMKFS : PROPIEDADESMKFS ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
                  |PROPIEDADESMKFS ampersand ptype guion mayorQ DELETE { $$ = $1; $$->type = $6; }

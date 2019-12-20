@@ -1187,6 +1187,9 @@ void Save_Log(FILE *file, SuperBoot sb, string op, int type, char logType, strin
     int index = LogIndex(file, sb.sb_ap_log, sb.sb_ap_copy_sb);
     if(index != -1){
         if(logType == 48){
+            if(content.length() > 149){
+                content = content.substr(0, 149);
+            }
             strcpy(log.log_contenido, content.c_str());
         }
         time_t t = time(nullptr);
@@ -1255,7 +1258,7 @@ string SearchIdGroup(string name, vector<string>file){
 }
 
 string SearchUsernameById(int id, vector<string>file){
-     for(size_t i=0; i<file.size(); i++){
+     for(size_t i=0; i<file.size() - 1; i++){
          string line = file[i];
          if(line.substr(2, 1) == "U"){
              vector<string> group = Separate_Content(line);
@@ -1268,7 +1271,7 @@ string SearchUsernameById(int id, vector<string>file){
 }
 
 string SearchGroupByIdUser(int id, vector<string>file){
-     for(size_t i=0; i<file.size(); i++){
+     for(size_t i=0; i<file.size() - 1; i++){
          string line = file[i];
          if(line.substr(2, 1) == "U"){
              vector<string> group = Separate_Content(line);
@@ -1427,7 +1430,7 @@ void Session(Login *login){
                 string txtUsers = "";
                 txtUsers = RetrieveText(users, file, txtUsers, sb);
                 vector<string> textJump = SplitJump(txtUsers);
-                for(size_t i=0; i<textJump.size(); i++){
+                for(size_t i=0; i<textJump.size() - 1; i++){
                     string usr = textJump[i];
                     if(usr.substr(2, 1) == "U"){
                         vector<string> usr2 = Separate_Content(usr);
@@ -1991,7 +1994,7 @@ bool CreateNewFile(FILE *file, SuperBoot sb, DirectoryDetail dd, int posDD, stri
     if(!isCreate){
         if(dd.dd_ap_detalle_directorio != -1){
             DirectoryDetail dd2;
-            fseek(file, sb.sb_ap_tabla_inodo + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
             fread(&dd2, sizeof(DirectoryDetail), 1, file);
             isCreate = CreateNewFile(file, sb, dd2, dd.dd_ap_detalle_directorio, nameFile, isCreate, toWrite);
         }
@@ -2124,7 +2127,8 @@ void NewFile(Mkfile *mkfile, stack<string> pathEvaluate){
         }
         string txt = pathEvaluate.top();
         pathEvaluate.pop();
-        switch (CreatePath(file, sb, root, -1, mkfile, txt, 0, pathEvaluate, txtFile)) {
+        int status = CreatePath(file, sb, root, -1, mkfile, txt, 0, pathEvaluate, txtFile);
+        switch (status) {
         case 1:
             cout << "Archivo creado exitosamente\n";
             if(!isRecovery){
@@ -2389,9 +2393,10 @@ int main()
             getline(cin, command);
             YY_BUFFER_STATE buffer = yy_scan_string(command.c_str());
         }else{
-            string msg = printExec.front() + "\n";
+            cout << "\nInserte comando\n";
+            string msg = printExec.front();
             printExec.pop_front();
-            cout << msg;
+            cout << msg + "\n";
             YY_BUFFER_STATE buffer = yy_scan_string(msg.c_str());
         }
     linea = 1;
@@ -2464,7 +2469,6 @@ int main()
                 if(mn->name != ""){
                     if(mn->path != ""){
                         Mount_Partition(mn);
-                        list_ram.List_Mount();
                     }else{
                         cout << "Error: el 'path' es obligatorio\n";
                     }
@@ -2503,7 +2507,13 @@ int main()
                     if(!file.fail()){
                         while(!file.eof()){
                             getline(file, line);
-                            printExec.push_back(line);
+                            //if(line != ""){
+
+                            //}
+                            //line.erase(line.length() - 1);    ///elimina retroceso de carro
+                            //if(line != ""){
+                                printExec.push_back(line);
+                            //}
                         }
                         file.close();
                     }else{
@@ -3013,7 +3023,7 @@ int main()
                                 stack<string> evaluatePath = PathbyInodes(mkfile->path);
                                 NewFile(mkfile, evaluatePath);
                             }else{
-                                cout << "Error: el usuario que esta en sesion no es admin en '" + rmgrp->id + "'\n";
+                                cout << "Error: el usuario que esta en sesion no es admin en '" + mkfile->id + "'\n";
                             }
                         }else{
                             cout << "Error: el id es obligatorio\n";

@@ -271,12 +271,12 @@ void Plotter::Plot_Log(FILE *file, int startLog, int endLog, std::string path){
         fread(&log, sizeof(Log), 1, file);
         if(log.log_tipo_operacion != 0){
             if(log.log_tipo_operacion == 1){
-                fs << "Tipo Operación: mkdir\n";
+                fs << "Tipo Operacion: mkdir\n";
                 fs << "Tipo: Directorio\n";
                 fs << "Nombre: " + std::string(log.log_nombre) + "\n";
                 fs << "Fecha: " + std::string(log.log_fecha) + "\n\n\n";
             }else{
-                fs << "Tipo Operación: mkfile\n";
+                fs << "Tipo Operacion: mkfile\n";
                 fs << "Tipo: Archivo\n";
                 fs << "Nombre: " + std::string(log.log_nombre) + "\n";
                 fs << "Contenido: " + std::string(log.log_contenido) + "\n";
@@ -522,7 +522,7 @@ std::string Plotter::Node_Relationsip_Inodes(FILE *file, SuperBoot sb, Inode in,
         }
     }
     if(in.i_ap_indirecto != -1){
-        txt += "I" + std::to_string(posInodo) + ":p5->I" + std::to_string(in.i_ap_indirecto) + ":t0\n";
+        txt += "I" + std::to_string(posInodo) + ":p4->I" + std::to_string(in.i_ap_indirecto) + ":t0\n";
         Inode in2;
         fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
         fread(&in2, sizeof(Inode), 1, file);
@@ -738,10 +738,12 @@ std::string Plotter::NodeAvdComplete(FILE *file, SuperBoot sb, std::string txt, 
     }
     txt += "<p6>" + std::to_string(root.avd_ap_detalle_directorio) + "|";
     txt += "<p7>" + std::to_string(root.avd_ap_arbol_virtual_directorio) + "}}\"];\n";
-    DirectoryDetail dd;
-    fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
-    fread(&dd, sizeof(DirectoryDetail), 1, file);
-    txt = DirectoryDetailComplete(file, sb, txt, dd, root.avd_ap_detalle_directorio);
+    if(root.avd_ap_detalle_directorio != -1){
+        DirectoryDetail dd;
+        fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd, sizeof(DirectoryDetail), 1, file);
+        txt = DirectoryDetailComplete(file, sb, txt, dd, root.avd_ap_detalle_directorio);
+    }
     for(int x=0; x<6; x++){
         if(root.avd_ap_array_subdirectorios[x] != -1){
             VirtualDirectoryTree avd;
@@ -823,11 +825,13 @@ std::string Plotter::NodeAvdCompleteRelationship(FILE *file, SuperBoot sb, std::
     if(root.avd_ap_arbol_virtual_directorio != -1){
         txt += "DA" + std::to_string(posAvd) + ":p7->DA" + std::to_string(root.avd_ap_arbol_virtual_directorio) + ":t0\n";
     }
-    txt += "DA" + std::to_string(posAvd) + ":p6->DD" + std::to_string(root.avd_ap_detalle_directorio) + ":t0\n";
-    DirectoryDetail dd;
-    fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
-    fread(&dd, sizeof(DirectoryDetail), 1, file);
-    txt = DirectoryDetailCompleteRelationship(file, sb, txt, dd, root.avd_ap_detalle_directorio);
+    if(root.avd_ap_detalle_directorio != -1){
+        txt += "DA" + std::to_string(posAvd) + ":p6->DD" + std::to_string(root.avd_ap_detalle_directorio) + ":t0\n";
+        DirectoryDetail dd;
+        fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd, sizeof(DirectoryDetail), 1, file);
+        txt = DirectoryDetailCompleteRelationship(file, sb, txt, dd, root.avd_ap_detalle_directorio);
+    }
     for(int x=0; x<6; x++){
         if(root.avd_ap_array_subdirectorios[x] != -1){
             VirtualDirectoryTree avd;
@@ -872,7 +876,7 @@ std::string Plotter::InodeCompleteRelationship(FILE *file, SuperBoot sb, Inode i
         }
     }
     if(in.i_ap_indirecto != -1){
-        txt += "I" + std::to_string(posInodo) + ":p5->I" + std::to_string(in.i_ap_indirecto) + ":t0\n";
+        txt += "I" + std::to_string(posInodo) + ":p4->I" + std::to_string(in.i_ap_indirecto) + ":t0\n";
         Inode in2;
         fseek(file, sb.sb_ap_tabla_inodo + (in.i_ap_indirecto * (int)sizeof(Inode)), SEEK_SET);
         fread(&in2, sizeof(Inode), 1, file);
