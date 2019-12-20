@@ -131,6 +131,8 @@ void ListMount::List_Mount(){
             }
             tmp = tmp->next;
         }
+    }else{
+        std::cout << "\nNo hay particiones montadas\n";
     }
 }
 

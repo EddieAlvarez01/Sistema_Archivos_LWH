@@ -183,6 +183,7 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |prmdisk PROPIEDADESRM { listCommand.push_back($2); }
          |pfdisk PROPIEDADESFD { listCommand.push_back($2); }
          |pmount PROPIEDADESMOUNT { listCommand.push_back($2); }
+         |pmount { listCommand.push_back(new Mount()); }
          |punmount PROPIEDADESUNMOUNT { listCommand.push_back($2); }
          |prep PROPIEDADESREP { listCommand.push_back($2); }
          |pexec PROPIEDADESEXEC { listCommand.push_back($2); }

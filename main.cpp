@@ -2468,6 +2468,8 @@ int main()
                     }else{
                         cout << "Error: el 'path' es obligatorio\n";
                     }
+                }else if(mn->name == "" && mn->path == ""){
+                    list_ram.List_Mount();
                 }else{
                     cout << "Error: el 'name' es obligatorio\n";
                 }
