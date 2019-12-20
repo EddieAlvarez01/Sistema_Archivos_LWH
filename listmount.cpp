@@ -112,6 +112,7 @@ bool ListMount::isMountByName(std::string name){
 
 void ListMount::List_Mount(){
     if(first != nullptr){
+        std::cout << "\nParticiones montadas:\n";
         NodeList *tmp = first;
         while(tmp != nullptr){
             if(tmp->type == 0){

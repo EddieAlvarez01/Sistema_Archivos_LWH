@@ -275,7 +275,7 @@ void Plotter::Plot_Log(FILE *file, int startLog, int endLog, std::string path){
                 fs << "Tipo: Directorio\n";
                 fs << "Nombre: " + std::string(log.log_nombre) + "\n";
                 fs << "Fecha: " + std::string(log.log_fecha) + "\n\n\n";
-            }else{
+            }else if(log.log_tipo_operacion == 2){
                 fs << "Tipo Operacion: mkfile\n";
                 fs << "Tipo: Archivo\n";
                 fs << "Nombre: " + std::string(log.log_nombre) + "\n";

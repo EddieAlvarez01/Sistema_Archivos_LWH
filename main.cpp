@@ -978,7 +978,6 @@ void Mount_Partition(Mount *mn){
                         node->date = to_string(now->tm_mday) + "-" + to_string(now->tm_mon + 1) + "-" + to_string(now->tm_year + 1900);
                          list_ram.insert(node);
                         cout << "Particion " + mn->name + " montada correctamente\n";
-                        cout << "\nParticiones montadas:\n";
                     }else{
                         cout << "Error: la particion " + mn->name + " ya esta montada\n";
                     }
