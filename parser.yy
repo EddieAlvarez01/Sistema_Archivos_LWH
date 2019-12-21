@@ -25,6 +25,7 @@
 #include "loss.h"
 #include "recovery.h"
 #include "pause.h"
+#include "cat.h"
 
 extern int yylineno; //linea actual donde se encuentra el parser (analisis lexico) lo maneja BISON
 extern int columna; //columna actual donde se encuentra el parser (analisis lexico) lo maneja BISON
@@ -62,6 +63,7 @@ class Mkdir* mkdir;
 class Loss* loss;
 class Recovery* recovery;
 class Pause* pause;
+class Cat* cat;
 }
 %token<TEXT> numero;
 %token<TEXT> cadena;
@@ -137,6 +139,8 @@ class Pause* pause;
 %token<TEXT> pls;
 %token<TEXT> ptree_directorio;
 %token<TEXT> ppause;
+%token<TEXT> pcat;
+%token<TEXT> pfile;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -169,6 +173,7 @@ class Pause* pause;
 %type<mkdir> PROPIEDADESMKDIR;
 %type<loss> PROPIEDADESLOSS;
 %type<recovery> PROPIEDADESRECOVERY;
+%type<cat> PROPIEDADESCAT;
 
 %start INICIO
 
@@ -200,6 +205,7 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |ploss PROPIEDADESLOSS { listCommand.push_back($2); }
          |precovery PROPIEDADESRECOVERY { listCommand.push_back($2); }
          |ppause { listCommand.push_back(new Pause()); }
+         |pcat PROPIEDADESCAT { listCommand.push_back($2); }
          |error;
 
 PROPIEDADESMK : PROPIEDADESMK ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
@@ -362,6 +368,11 @@ PROPIEDADESMKDIR : PROPIEDADESMKDIR ampersand ppath guion mayorQ PATH { $$ = $1;
 PROPIEDADESLOSS : ampersand pid guion mayorQ id { $$ = new Loss(); $$->id = $5; };
 
 PROPIEDADESRECOVERY : ampersand pid guion mayorQ id { $$ = new Recovery(); $$->id = $5; };
+
+PROPIEDADESCAT : PROPIEDADESCAT ampersand pid guion mayorQ id { $$ = $1; $$->id = $6; }
+                |PROPIEDADESCAT ampersand pfile guion mayorQ PATH { $$ = $1; $$->file.push_back($6); }
+                |ampersand pid guion mayorQ id { $$ = new Cat(); $$->id = $5; }
+                |ampersand pfile guion mayorQ PATH { $$ = new Cat(); $$->file.push_back($5); };
 
 
 %%

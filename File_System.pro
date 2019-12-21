@@ -41,7 +41,8 @@ SOURCES += main.cpp \
     user.cpp \
     loss.cpp \
     recovery.cpp \
-    pause.cpp
+    pause.cpp \
+    cat.cpp
 
 DISTFILES += \
     lexico.l \
@@ -85,4 +86,5 @@ HEADERS += \
     user.h \
     loss.h \
     recovery.h \
-    pause.h
+    pause.h \
+    cat.h

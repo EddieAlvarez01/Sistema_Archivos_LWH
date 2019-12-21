@@ -50,6 +50,7 @@
 #include "loss.h"
 #include "recovery.h"
 #include "pause.h"
+#include "cat.h"
 
 using namespace std;
 
@@ -2382,6 +2383,95 @@ void ShowLs(FILE *file, SuperBoot sb, string route){
     }
 }
 
+ContentDetail searchContent(FILE *file, SuperBoot sb, DirectoryDetail dd, string name, ContentDetail cD){
+    for(int x=0; x<5; x++){
+        if(dd.dd_array_files[x].dd_file_app_inodo != -1){
+            if(strcmp(dd.dd_array_files[x].dd_file_nombre, name.c_str()) == 0){
+                return dd.dd_array_files[x];
+            }
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        return searchContent(file, sb, dd2, name, cD);
+    }
+    return cD;
+}
+
+ContentDetail SearchCatAvd(FILE *file, SuperBoot sb, VirtualDirectoryTree root, string path, stack<string> pathEvaluate, ContentDetail cd){
+    if(path.find(".") != string::npos){
+        if(root.avd_ap_detalle_directorio != -1){
+            DirectoryDetail dd;
+            fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+            fread(&dd, sizeof(DirectoryDetail), 1, file);
+            return searchContent(file, sb, dd, path, cd);
+        }
+    }else{
+        for(int x=0; x<6; x++){
+            if(root.avd_ap_array_subdirectorios[x] != -1){
+                VirtualDirectoryTree avd;
+                fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+                if(strcmp(avd.avd_nombre_directorio, path.c_str()) == 0){
+                    string txt = pathEvaluate.top();
+                    pathEvaluate.pop();
+                    return SearchCatAvd(file, sb, avd, txt, pathEvaluate, cd);
+                }
+            }
+        }
+        if(root.avd_ap_arbol_virtual_directorio != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            return SearchCatAvd(file, sb, avd, path, pathEvaluate, cd);
+        }
+    }
+    return cd;
+}
+
+/*************************************** Ejecuta el comando cat de mostrar contenido de archivos ************************************/
+void CatFile(Cat *cat){
+    FILE *file = fopen(ussr.partition->disk.c_str(), "rb+");
+    if(file != nullptr){
+        SuperBoot sb;
+        int partStart = 0;
+        if(ussr.partition->type == 0){
+            partStart = ussr.partition->data.part_start;
+        }else{
+            partStart = ussr.partition->data2.part_start;
+        }
+        fseek(file, partStart, SEEK_SET);
+        fread(&sb, sizeof(SuperBoot), 1, file);
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        list<string>::iterator itt;
+        for(itt = cat->file.begin(); itt != cat->file.end(); ++itt){
+            stack<string> pathEvaluate = PathbyInodes(*itt);
+            string path = pathEvaluate.top();
+            pathEvaluate.pop();
+            ContentDetail cd;
+            cd = SearchCatAvd(file, sb, avd, path, pathEvaluate, cd);
+            if(strcasecmp(cd.dd_file_nombre, "") != 0){
+                Inode in;
+                fseek(file, sb.sb_ap_tabla_inodo + (cd.dd_file_app_inodo * (int)sizeof(Inode)), SEEK_SET);
+                fread(&in, sizeof(Inode), 1, file);
+                string text = "";
+                text = RetrieveText(in, file, text, sb);
+                cout << "\n" + string(cd.dd_file_nombre) + "\n";
+                cout << text + "\n";
+            }else{
+                cout << "Error: no existe " + *itt + "\n";
+            }
+        }
+        fclose(file);
+    }else{
+        cout << "Error al abrir el archivo\n";
+    }
+}
+
 
 int main()
 {
@@ -3096,6 +3186,24 @@ int main()
             }else if(Pause *pause = dynamic_cast<Pause*>((*it))){
                 cout << "\nPresione enter para continuar.....";
                 cin.get();
+            }else if(Cat *cat = dynamic_cast<Cat*>((*it))){
+                if(ussr.isSession){
+                    if(cat->file.size() > 0){
+                        if(cat->id != ""){
+                            if(cat->id == ussr.idPartition){
+                                CatFile(cat);
+                            }else{
+                                cout << "Error: no es igual el id al de la sesion\n";
+                            }
+                        }else{
+                            cout << "Error: el id es obligatorio\n";
+                        }
+                    }else{
+                        cout << "Error: el file es obligatorio\n";
+                    }
+                }else{
+                    cout << "Error: no hay una sesion iniciada\n";
+                }
             }
         }
     }else{

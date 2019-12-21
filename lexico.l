@@ -21,7 +21,7 @@ std::list<Command*> listCommand;
 %option noyywrap
 %option nounput
 
-Commentary "#"[^\r\n]*[\r\n]
+Commentary "#"[^\r\n]*([\r]|[\n]|[\r\n]|[\n\r])?
 letra [a-zñA-ZÑ]+
 numero [0-9]+
 booleano ("verdadero"|"falso"|"true"|"false")
@@ -69,6 +69,8 @@ INITIAL
 "id"{numero}* { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pid;}
 "rep" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return prep;}
 "exec" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pexec;}
+"cat" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pcat;}
+"file"{numero}* { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pfile;}
 "b" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pb;}
 "k" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pk;}
 "m" { columna=columna+ anterior;  anterior = strlen(yytext);strcpy(yylval.TEXT, yytext); return pm;}

@@ -118,7 +118,9 @@ extern int yydebug;
     ptree_complete = 328,
     pls = 329,
     ptree_directorio = 330,
-    ppause = 331
+    ppause = 331,
+    pcat = 332,
+    pfile = 333
   };
 #endif
 
@@ -127,7 +129,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 43 "parser.yy" /* yacc.c:1909  */
+#line 44 "parser.yy" /* yacc.c:1909  */
 
 int NUM;
 char TEXT [256];
@@ -150,8 +152,9 @@ class Mkdir* mkdir;
 class Loss* loss;
 class Recovery* recovery;
 class Pause* pause;
+class Cat* cat;
 
-#line 155 "parser.h" /* yacc.c:1909  */
+#line 158 "parser.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
