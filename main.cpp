@@ -2246,6 +2246,7 @@ void System_Recovery(NodeList *node, string id){
             ussr.user = "root";
         }
         Action_Recovery(file, sb.sb_ap_log + sizeof(Log), sb.sb_ap_copy_sb, id);
+        fclose(file);
     }else{
         cout << "Error al abrir el disco\n";
     }

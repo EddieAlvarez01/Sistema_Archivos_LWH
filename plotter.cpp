@@ -154,7 +154,7 @@ void Plotter::Plot_Disk(FILE *ff, Mbr mbr, std::string path, int space){
         body += "<TD>";
         if(mbr.particions[x].part_start != -1){
             if(mbr.particions[x].part_type == 80){
-                body += "Primaria<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco";
+                body += "Primaria<br/>" + std::to_string((mbr.particions[x].part_size * 100) / mbr.mbr_size) + "% del disco";
             }else if(mbr.particions[x].part_type == 69){
                 Ebr ebr;
                 fseek(ff, mbr.particions[x].part_start, SEEK_SET);
@@ -163,15 +163,15 @@ void Plotter::Plot_Disk(FILE *ff, Mbr mbr, std::string path, int space){
                 std::string ebrLogic = "";
                 ebrLogic += "<TD>EBR</TD>\n";
                 if(ebr.isLogic == 49){
-                    ebrLogic += "<TD>Logica<br/>" + std::to_string(ebr.part_size * 100 / mbr.mbr_size) + "% del disco</TD>\n";
+                    ebrLogic += "<TD>Logica<br/>" + std::to_string((ebr.part_size * 100) / mbr.mbr_size) + "% del disco</TD>\n";
                     int freeSpaceLogic = mbr.particions[x].part_size - ebr.part_size;
                     if(ebr.part_next != 0){
                         ebrLogic = Ebr_REcursive_Disk(ff, ebr, ebrLogic, mbr.mbr_size, freeSpaceLogic);
                     }else{
-                        ebrLogic += "<TD>Libre<br/>" + std::to_string(freeSpaceLogic * 100 / mbr.mbr_size) + "% del disco</TD>\n";
+                        ebrLogic += "<TD>Libre<br/>" + std::to_string((freeSpaceLogic * 100) / mbr.mbr_size) + "% del disco</TD>\n";
                     }
                 }else{
-                    ebrLogic += "<TD>Libre<br/>" + std::to_string(mbr.particions[x].part_size * 100 / mbr.mbr_size) + "% del disco</TD>\n";
+                    ebrLogic += "<TD>Libre<br/>" + std::to_string((mbr.particions[x].part_size * 100) / mbr.mbr_size) + "% del disco</TD>\n";
                 }
                 tableLogic = std::string("<TABLE>\n") +
                               "<TR><TD>Extendida</TD></TR>" +
@@ -180,7 +180,7 @@ void Plotter::Plot_Disk(FILE *ff, Mbr mbr, std::string path, int space){
                 body += tableLogic;
             }
         }else{
-            body += "Libre<br/>" + std::to_string((space/yy) * 100 / mbr.mbr_size) + "% del disco";
+            body += "Libre<br/>" + std::to_string(((space/yy) * 100) / mbr.mbr_size) + "% del disco";
         }
         body += "</TD>\n";
     }
