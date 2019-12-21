@@ -51,6 +51,7 @@
 #include "recovery.h"
 #include "pause.h"
 #include "cat.h"
+#include "ren.h"
 
 using namespace std;
 
@@ -2472,6 +2473,240 @@ void CatFile(Cat *cat){
     }
 }
 
+/*************************************************BUSCA UNA CARPTA ANTES DEL ARCHIVO QUE SE VA A RENOMBRAR, ESTO PRQUE SI SE TRAJERA DIRECTAMENTE DONDE ESTA NO SE PODRIA EVALUAR QUE EXISTA OTRO IGUAL SI ES UN INDIRECTO************************************************/
+VirtualDirectoryTree SearchRenameAvd(FILE *file, SuperBoot sb, VirtualDirectoryTree root, string path, stack<string> pathEvaluate, VirtualDirectoryTree search){
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            if(strcmp(avd.avd_nombre_directorio, path.c_str()) == 0){
+                if(pathEvaluate.size() > 1){
+                    string txt = pathEvaluate.top();
+                    pathEvaluate.pop();
+                    return SearchRenameAvd(file, sb, avd, txt, pathEvaluate, search);
+                }else{
+                    return avd;
+                }
+            }
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        return SearchRenameAvd(file, sb, avd, path, pathEvaluate, search);
+    }
+    return search;
+}
+
+/*****************************************************************VERIFICA QUE LA CARPETA EXISTA EN LA CARPETA PADRE*************************************/
+bool isFolderExistToRename(FILE *file, SuperBoot sb, VirtualDirectoryTree root, string name){
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            if(strcmp(avd.avd_nombre_directorio, name.c_str()) == 0){
+                return true;
+            }
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        return isFolderExistToRename(file, sb, avd, name);
+    }
+    return false;
+}
+
+
+/************************************************************TRAER la posicion de carpeta que se va a renombrar*****************************************/
+int SearchAvdToRename(FILE *file, SuperBoot sb, VirtualDirectoryTree root, string name){
+    for(int x=0; x<6; x++){
+        if(root.avd_ap_array_subdirectorios[x] != -1){
+            VirtualDirectoryTree avd;
+            fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_array_subdirectorios[x] * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+            fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+            if(strcmp(avd.avd_nombre_directorio, name.c_str()) == 0){
+                return root.avd_ap_array_subdirectorios[x];
+            }
+        }
+    }
+    if(root.avd_ap_arbol_virtual_directorio != -1){
+        VirtualDirectoryTree avd;
+        fseek(file, sb.sb_ap_arbol_directorio + (root.avd_ap_arbol_virtual_directorio * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+        fread(&avd, sizeof(VirtualDirectoryTree), 1, file);
+        return SearchAvdToRename(file, sb, avd, name);
+    }
+    return -1;
+}
+
+int SearchDDToRename(FILE *file, SuperBoot sb, DirectoryDetail dd, string name, int posDD){
+    for(int x=0; x<5; x++){
+        if(strcmp(dd.dd_array_files[x].dd_file_nombre, name.c_str()) == 0){
+            return posDD;
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        return SearchDDToRename(file, sb, dd2, name, dd.dd_ap_detalle_directorio);
+    }
+    return -1;
+}
+
+bool isExistRenameinDD(FILE *file, SuperBoot sb, DirectoryDetail dd, string name){
+    for(int x=0; x<5; x++){
+        if(strcmp(dd.dd_array_files[x].dd_file_nombre, name.c_str()) == 0){
+            return true;
+        }
+    }
+    if(dd.dd_ap_detalle_directorio != -1){
+        DirectoryDetail dd2;
+        fseek(file, sb.sb_ap_detalle_directorio + (dd.dd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+        fread(&dd2, sizeof(DirectoryDetail), 1, file);
+        return isExistRenameinDD(file, sb, dd2, name);
+    }
+    return false;
+}
+
+
+
+/*********************************METODO QUE SE EJECUTA EN EL COMANDO REN******************************************************/
+void Rename(Ren *ren){
+    if(list_ram.isMount(ren->id)){
+        NodeList *node = list_ram.SearchNode(ren->id);
+        if(list_ram.isFormat(node)){
+            FILE *file = fopen(node->disk.c_str(), "rb+");
+            if(file != nullptr){
+                SuperBoot sb;
+                int partStart = 0;
+                if(node->type == 0){
+                    partStart = node->data.part_start;
+                }else{
+                    partStart = node->data2.part_start;
+                }
+                fseek(file, partStart, SEEK_SET);
+                fread(&sb, sizeof(SuperBoot), 1, file);
+                VirtualDirectoryTree root;
+                fseek(file, sb.sb_ap_arbol_directorio, SEEK_SET);
+                fread(&root, sizeof(VirtualDirectoryTree), 1, file);
+                string nameFile = NameDisk(ren->path);
+                stack<string> pathEvaluate = PathbyInodes(ren->path);
+                if(pathEvaluate.size() > 1){
+                    string path = pathEvaluate.top();
+                    pathEvaluate.pop();
+                    VirtualDirectoryTree searchNode;
+                    searchNode = SearchRenameAvd(file, sb, root, path, pathEvaluate, searchNode);
+                    if(strcmp(searchNode.avd_nombre_directorio, "") != 0){
+                        if(nameFile.find(".") != string::npos){
+                            DirectoryDetail dd;
+                            fseek(file, sb.sb_ap_detalle_directorio + (searchNode.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                            fread(&dd, sizeof(DirectoryDetail), 1, file);
+                            int posDD = SearchDDToRename(file, sb, dd, nameFile, searchNode.avd_ap_detalle_directorio);
+                            if(posDD != -1){
+                                if(!isExistRenameinDD(file, sb, dd, ren->name)){
+                                    DirectoryDetail dd2;
+                                    fseek(file, sb.sb_ap_detalle_directorio + (posDD * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                                    fread(&dd2, sizeof(DirectoryDetail), 1, file);
+                                    for(int x=0; x<5; x++){
+                                        if(strcmp(dd2.dd_array_files[x].dd_file_nombre, nameFile.c_str()) == 0){
+                                            strcpy(dd2.dd_array_files[x].dd_file_nombre, ren->name.c_str());
+                                            fseek(file, sb.sb_ap_detalle_directorio + (posDD * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                                            fwrite(&dd2, sizeof(DirectoryDetail), 1, file);
+                                            break;
+                                        }
+                                    }
+                                    cout << "Archivo renombrado exitosamente\n";
+                                }else{
+                                    cout << "Error: ya exite el archivo " + ren->name + " en " + searchNode.avd_nombre_directorio + "\n";
+                                }
+                            }else{
+                                cout << "No existe el archivo " + nameFile + "\n";
+                            }
+                        }else{
+                            int posAVd = SearchAvdToRename(file, sb, searchNode, nameFile);
+                            if(posAVd != -1){
+                                bool notEqualName = isFolderExistToRename(file, sb, searchNode, ren->name);
+                                if(!notEqualName){
+                                    VirtualDirectoryTree avdR;
+                                    fseek(file, sb.sb_ap_arbol_directorio + (posAVd * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                                    fread(&avdR, sizeof(VirtualDirectoryTree), 1, file);
+                                    strcpy(avdR.avd_nombre_directorio, ren->name.c_str());
+                                    fseek(file, sb.sb_ap_arbol_directorio + (posAVd * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                                    fwrite(&avdR, sizeof(VirtualDirectoryTree), 1, file);
+                                    cout << "Carpeta renombrada exitosamente\n";
+                                }else{
+                                    cout << "Error: ya existe un carpeta con el nombre de " + ren->name + " en " + searchNode.avd_nombre_directorio + "\n";
+                                }
+                            }else{
+                                cout << "Error no existe la carpeta " + nameFile + "\n";
+                            }
+                        }
+                    }else{
+                        cout << "No existe la ruta " + ren->path + "\n";
+                    }
+                }else{
+                    if(nameFile.find(".") != string::npos){
+                        DirectoryDetail dd;
+                        fseek(file, sb.sb_ap_detalle_directorio + (root.avd_ap_detalle_directorio * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                        fread(&dd, sizeof(DirectoryDetail), 1, file);
+                        int posDD = SearchDDToRename(file, sb, dd, nameFile, root.avd_ap_detalle_directorio);
+                        if(posDD != -1){
+                            if(!isExistRenameinDD(file, sb, dd, ren->name)){
+                                DirectoryDetail dd2;
+                                fseek(file, sb.sb_ap_detalle_directorio + (posDD * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                                fread(&dd2, sizeof(DirectoryDetail), 1, file);
+                                for(int x=0; x<5; x++){
+                                    if(strcmp(dd2.dd_array_files[x].dd_file_nombre, nameFile.c_str()) == 0){
+                                        strcpy(dd2.dd_array_files[x].dd_file_nombre, ren->name.c_str());
+                                        fseek(file, sb.sb_ap_detalle_directorio + (posDD * (int)sizeof(DirectoryDetail)), SEEK_SET);
+                                        fwrite(&dd2, sizeof(DirectoryDetail), 1, file);
+                                        break;
+                                    }
+                                }
+                                cout << "Archivo renombrado exitosamente\n";
+                            }else{
+                                cout << "Error: ya exite el archivo " + ren->name + " en " + root.avd_nombre_directorio + "\n";
+                            }
+                        }else{
+                            cout << "No existe el archivo " + nameFile + "\n";
+                        }
+                    }else{
+                        int posAVd = SearchAvdToRename(file, sb, root, nameFile);
+                        if(posAVd != -1){
+                            bool notEqualName = isFolderExistToRename(file, sb, root, ren->name);
+                            if(!notEqualName){
+                                VirtualDirectoryTree avdR;
+                                fseek(file, sb.sb_ap_arbol_directorio + (posAVd * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                                fread(&avdR, sizeof(VirtualDirectoryTree), 1, file);
+                                strcpy(avdR.avd_nombre_directorio, ren->name.c_str());
+                                fseek(file, sb.sb_ap_arbol_directorio + (posAVd * (int)sizeof(VirtualDirectoryTree)), SEEK_SET);
+                                fwrite(&avdR, sizeof(VirtualDirectoryTree), 1, file);
+                                cout << "Carpeta renombrada exitosamente\n";
+                            }else{
+                                cout << "Error: ya existe un carpeta con el nombre de " + ren->name + " en " + root.avd_nombre_directorio + "\n";
+                            }
+                        }else{
+                            cout << "Error no existe la carpeta " + nameFile + "\n";
+                        }
+                    }
+                }
+                fclose(file);
+            }else{
+                cout << "Error al abrir el archivo\n";
+            }
+        }else{
+            cout << "La particion no esta formateada\n";
+        }
+    }else{
+        cout << "La particion " + ren->id + " no esta montada\n";
+    }
+}
+
 
 int main()
 {
@@ -3200,6 +3435,24 @@ int main()
                         }
                     }else{
                         cout << "Error: el file es obligatorio\n";
+                    }
+                }else{
+                    cout << "Error: no hay una sesion iniciada\n";
+                }
+            }else if(Ren *ren = dynamic_cast<Ren*>((*it))){
+                if(ussr.isSession){
+                    if(ren->id != ""){
+                        if(ren->path != ""){
+                            if(ren->name != ""){
+                                Rename(ren);
+                            }else{
+                                cout << "Error: el name es obligatorio\n";
+                            }
+                        }else{
+                            cout << "Error: el path es obligatorio\n";
+                        }
+                    }else{
+                        cout << "Error: el id es obligatorio\n";
                     }
                 }else{
                     cout << "Error: no hay una sesion iniciada\n";

@@ -26,6 +26,7 @@
 #include "recovery.h"
 #include "pause.h"
 #include "cat.h"
+#include "ren.h"
 
 extern int yylineno; //linea actual donde se encuentra el parser (analisis lexico) lo maneja BISON
 extern int columna; //columna actual donde se encuentra el parser (analisis lexico) lo maneja BISON
@@ -64,6 +65,7 @@ class Loss* loss;
 class Recovery* recovery;
 class Pause* pause;
 class Cat* cat;
+class Ren* ren;
 }
 %token<TEXT> numero;
 %token<TEXT> cadena;
@@ -141,6 +143,7 @@ class Cat* cat;
 %token<TEXT> ppause;
 %token<TEXT> pcat;
 %token<TEXT> pfile;
+%token<TEXT> pren;
 
 /*No terminales*/
 %type<TEXT> INICIO;
@@ -174,6 +177,7 @@ class Cat* cat;
 %type<loss> PROPIEDADESLOSS;
 %type<recovery> PROPIEDADESRECOVERY;
 %type<cat> PROPIEDADESCAT;
+%type<ren> PROPIEDADESREN;
 
 %start INICIO
 
@@ -206,6 +210,7 @@ COMANDO : pmkdisk PROPIEDADESMK { listCommand.push_back($2); }
          |precovery PROPIEDADESRECOVERY { listCommand.push_back($2); }
          |ppause { listCommand.push_back(new Pause()); }
          |pcat PROPIEDADESCAT { listCommand.push_back($2); }
+         |pren PROPIEDADESREN { listCommand.push_back($2); }
          |error;
 
 PROPIEDADESMK : PROPIEDADESMK ampersand psize guion mayorQ numero { $$ = $1; $$->size = std::stoi($6); }
@@ -374,5 +379,11 @@ PROPIEDADESCAT : PROPIEDADESCAT ampersand pid guion mayorQ id { $$ = $1; $$->id 
                 |ampersand pid guion mayorQ id { $$ = new Cat(); $$->id = $5; }
                 |ampersand pfile guion mayorQ PATH { $$ = new Cat(); $$->file.push_back($5); };
 
+PROPIEDADESREN : PROPIEDADESREN ampersand pid guion mayorQ id { $$ = $1; $$->id = $6;  }
+                |PROPIEDADESREN ampersand ppath guion mayorQ PATH { $$ = $1; $$->path = $6;  }
+                |PROPIEDADESREN ampersand pname guion mayorQ PATH { $$ = $1; $$->name = $6;  }
+                |ampersand pid guion mayorQ id { $$ = new Ren(); $$->id = $5;  }
+                |ampersand ppath guion mayorQ PATH { $$ = new Ren(); $$->path = $5;  }
+                |ampersand pname guion mayorQ PATH { $$ = new Ren(); $$->name = $5;  };
 
 %%
